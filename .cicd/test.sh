@@ -27,4 +27,13 @@ if [[ "$BUILDKITE" == 'true' ]]; then
     # upload artifacts
     echo '+++ :arrow_up: Uploading Artifacts'
     echo 'Exporting xUnit XML'
-    mv -f ./tests/Testing/$(ls ./tests/Testing/
+    mv -f ./tests/Testing/$(ls ./tests/Testing/ | grep '2' | tail -n 1)/Test.xml test-results.xml
+    echo 'Uploading artifacts'
+    buildkite-agent artifact upload test-results.xml
+    echo 'Done uploading artifacts.'
+fi
+# re-throw
+if [[ "$EXIT_STATUS" != 0 ]]; then
+    echo "Failing due to non-zero exit status from ctest: $EXIT_STATUS"
+    exit $EXIT_STATUS
+fi
