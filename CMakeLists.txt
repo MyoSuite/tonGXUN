@@ -59,4 +59,5 @@ if(BUILD_TESTS)
   message(STATUS "Building unit tests.")
   add_subdirectory(tests)
 else()
-  message(STATUS "
+  message(STATUS "Unit tests will not be built. To build unit tests, set BUILD_TESTS to ON.")
+endif()
