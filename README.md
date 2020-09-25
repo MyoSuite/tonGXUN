@@ -36,4 +36,19 @@ The `main` branch contains the latest state of development; do not use this for 
 
 [CDT](https://github.com/AntelopeIO/cdt) is required to build contracts. Any operating systems supported by CDT is sufficient to build the reference contracts.
 
-To build and run the tests as well, [Leap](https://github.com/AntelopeIO/leap) is also required as a dependency,
+To build and run the tests as well, [Leap](https://github.com/AntelopeIO/leap) is also required as a dependency, which may have its further restrictions on supported operating systems.
+## Building
+
+The build guide below will assume you are running Ubuntu 20.04. However, as mentioned above, other operating systems may also be supported.
+
+### Build or install CDT dependency
+
+The CDT dependency is required with a minimum version of 3.0.
+
+The easiest way to satisfy this dependency is to install CDT on your system through a package. Find the release of a compatible version of CDT from its [releases page](https://github.com/AntelopeIO/cdt/releases), download the package file appropriate for your OS from the attached assets, and install the package.
+
+Alternatively, you can build CDT from source. Please refer to the guide in the [CDT README](https://github.com/AntelopeIO/cdt#building-from-source) for instructions on how to do this. If you choose to go with building CDT from source, please keep the path to the build directory in the shell environment variable `CDT_BUILD_PATH` for later use when building the reference contracts.
+
+### Optionally build Leap dependency
+
+The Leap dependency is optional. It is only needed if you wish to 
