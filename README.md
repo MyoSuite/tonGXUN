@@ -61,4 +61,36 @@ Please refer to the guide in the [Leap README](https://github.com/AntelopeIO/lea
 
 Beyond CDT and optionally Leap (if also building the tests), no additional dependencies are required to build the reference contracts.
 
-The instructions below assume you are building the reference contracts with tests, have already built Leap from source, and have the CDT dependency installed on your system. For some other configurations, expand the hidden p
+The instructions below assume you are building the reference contracts with tests, have already built Leap from source, and have the CDT dependency installed on your system. For some other configurations, expand the hidden panels placed lower within this section.
+
+For all configurations, you should first `cd` into the directory containing cloned reference contracts repository.
+
+Build reference contracts with tests using Leap built from source and with installed CDT package:
+
+```
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -Dleap_DIR="${LEAP_BUILD_PATH}/lib/cmake/leap" ..
+make -j $(nproc)
+```
+
+**Note:** `CMAKE_BUILD_TYPE` has no impact on the WASM files generated for the contracts. It only impacts how the test binaries are built. Use `-DCMAKE_BUILD_TYPE=Debug` if you want to create test binaries that you can debug.
+
+<details>
+<summary>Build reference contracts with tests using Leap and CDT both built from source</summary>
+
+```
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -Dcdt_DIR="${CDT_BUILD_PATH}/lib/cmake/cdt" -Dleap_DIR="${LEAP_BUILD_PATH}/lib/cmake/leap" ..
+make -j $(nproc)
+```
+</details>
+
+<details>
+<summary>Build reference contracts without tests and with CDT build from source</summary>
+
+```
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -Dcdt_DIR
