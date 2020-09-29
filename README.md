@@ -51,4 +51,14 @@ Alternatively, you can build CDT from source. Please refer to the guide in the [
 
 ### Optionally build Leap dependency
 
-The Leap dependency is optional. It is only needed if you wish to 
+The Leap dependency is optional. It is only needed if you wish to also build the tests using the `BUILD_TESTS` CMake flag.
+
+Unfortunately, it is not currently possible to satisfy the contract testing dependencies through the Leap packages made available from the [Leap releases page](https://github.com/AntelopeIO/leap/releases). So if you want to build the contract tests, you will first need to build Leap from source.
+
+Please refer to the guide in the [Leap README](https://github.com/AntelopeIO/leap#building-from-source) for instructions on how to do this. If you choose to go with building Leap from source, please keep the path to the build directory in the shell environment variable `LEAP_BUILD_PATH` for later use when building the reference contracts.
+
+### Build reference contracts
+
+Beyond CDT and optionally Leap (if also building the tests), no additional dependencies are required to build the reference contracts.
+
+The instructions below assume you are building the reference contracts with tests, have already built Leap from source, and have the CDT dependency installed on your system. For some other configurations, expand the hidden p
