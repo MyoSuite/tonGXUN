@@ -93,4 +93,35 @@ make -j $(nproc)
 ```
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -Dcdt_DIR
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -Dcdt_DIR="${CDT_BUILD_PATH}/lib/cmake/cdt" ..
+make -j $(nproc)
+```
+
+</details>
+
+#### Supported CMake options
+
+The following is a list of custom CMake options supported in building the reference contracts (default values are shown below):
+
+```
+-DBUILD_TESTS=OFF                       Do not build the tests
+
+-DSYSTEM_CONFIGURABLE_WASM_LIMITS=ON    Enable use of the CONFIGURABLE_WASM_LIMITS
+                                        protocol feature
+
+-DSYSTEM_BLOCKCHAIN_PARAMETERS=ON       Enable use of the BLOCKCHAIN_PARAMETERS
+                                        protocol feature
+```
+
+### Running tests
+
+Assuming you built with `BUILD_TESTS=ON`, you can run the tests.
+
+```
+cd build/tests
+ctest -j $(nproc)
+```
+
+## License
+
+[MIT](LICENSE)
