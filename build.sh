@@ -55,4 +55,30 @@ if [[ "${BUILD_TESTS}" == "ON" ]]; then
   LEAP_DIR_CMAKE_OPTION="-Dleap_DIR=${LEAP_BUILD_DIR}/lib/cmake/leap"
 fi
 
-CDT_DIR_
+CDT_DIR_CMAKE_OPTION=''
+
+if [[ -z $CDT_INSTALL_DIR ]]; then
+  echo "No CDT location was specified. Assuming installed in standard location."
+  echo ""
+else
+  if [[ ! -f "$CDT_INSTALL_DIR/lib/cmake/cdt/cdt-config.cmake" ]]; then
+    echo "Invalid path to CDT installation/build directory: $CDT_INSTALL_DIR"
+    echo "If CDT is installed at the standard system location, then you do not need to use the -c option."
+    echo "Cannot proceed. Exiting..."
+    exit 1;
+  fi
+  
+  echo "Using CDT installation/build at: $CDT_INSTALL_DIR"
+  echo ""
+  CDT_DIR_CMAKE_OPTION="-Dcdt_DIR=${CDT_INSTALL_DIR}/lib/cmake/cdt"
+fi
+
+printf "\t=========== Building reference-contracts ===========\n\n"
+RED='\033[0;31m'
+NC='\033[0m'
+CPU_CORES=$(getconf _NPROCESSORS_ONLN)
+mkdir -p build
+pushd build &> /dev/null
+cmake -DBUILD_TESTS=${BUILD_TESTS} ${LEAP_DIR_CMAKE_OPTION} ${CDT_DIR_CMAKE_OPTION} ../
+make -j $CPU_CORES
+popd &> /dev/null
