@@ -46,4 +46,8 @@ set(VOTING_ICON_URI "voting.png#db28cd3db6e62d4509af3644ce7d377329482a14bb4bfaca
 add_subdirectory(eosio.bios)
 add_subdirectory(eosio.boot)
 add_subdirectory(eosio.msig)
-add_subdirec
+add_subdirectory(eosio.system)
+add_subdirectory(eosio.token)
+add_subdirectory(eosio.wrap)
+
+add_subdirectory(test_contracts)
