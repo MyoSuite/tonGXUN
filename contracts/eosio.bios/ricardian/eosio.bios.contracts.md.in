@@ -110,3 +110,81 @@ icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
 
 ---
 spec_version: "0.2.0"
+title: Deploy Contract Code
+summary: 'Deploy contract code on account {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+Deploy compiled contract code to the account {{account}}.
+
+<h1 class="contract">setparams</h1>
+
+---
+spec_version: "0.2.0"
+title: Set System Parameters
+summary: 'Set system parameters'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} sets system parameters to:
+{{to_json params}}
+
+<h1 class="contract">setpriv</h1>
+
+---
+spec_version: "0.2.0"
+title: Make an Account Privileged or Unprivileged
+summary: '{{#if is_priv}}Make {{nowrap account}} privileged{{else}}Remove privileged status of {{nowrap account}}{{/if}}'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{#if is_priv}}
+{{$action.account}} makes {{account}} privileged.
+{{else}}
+{{$action.account}} removes privileged status of {{account}}.
+{{/if}}
+
+<h1 class="contract">setprods</h1>
+
+---
+spec_version: "0.2.0"
+title: Set Block Producers
+summary: 'Set block producer schedule'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} proposes a block producer schedule of:
+{{#each schedule}}
+  1. {{this.producer_name}}
+{{/each}}
+
+The block signing authorities of each of the producers in the above schedule are listed below:
+{{#each schedule}}
+### {{this.producer_name}}
+{{to_json this.authority}}
+{{/each}}
+
+<h1 class="contract">unlinkauth</h1>
+
+---
+spec_version: "0.2.0"
+title: Unlink Action from Permission
+summary: '{{nowrap account}} unsets the minimum required permission for the {{#if type}}{{nowrap type}} action of the{{/if}} {{nowrap code}} contract'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+{{account}} removes the association between the {{#if type}}{{type}} action of the{{/if}} {{code}} contract and its minimum required permission.
+
+{{#if type}}{{else}}This will not remove any links explicitly associated to specific actions of {{code}}.{{/if}}
+
+<h1 class="contract">updateauth</h1>
+
+---
+spec_version: "0.2.0"
+title: Modify Account Permission
+summary: 'Add or update the {{nowrap permission}} permission of {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+Modify, and create if necessary, the {{permission}} permission of {{account}} to have a parent permission of {{parent}} and the following authority:
+{{to_json auth}}
