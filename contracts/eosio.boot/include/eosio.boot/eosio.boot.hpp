@@ -61,4 +61,33 @@ namespace eosioboot {
     * @details An authority is defined by:
     * - a vector of key_weights (a key_weight is a public key plus a weight),
     * - a vector of permission_level_weights, (a permission_level is an account name plus a permission name)
-    * - a vector of wait_weights (a wait_weight is defined by a
+    * - a vector of wait_weights (a wait_weight is defined by a number of seconds to wait and a weight)
+    * - a threshold value
+    */
+   struct authority {
+      uint32_t                              threshold = 0;
+      std::vector<key_weight>               keys;
+      std::vector<permission_level_weight>  accounts;
+      std::vector<wait_weight>              waits;
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE( authority, (threshold)(keys)(accounts)(waits) )
+   };
+
+   /**
+    * @defgroup eosioboot eosio.boot
+    * @ingroup eosiocontracts
+    *
+    * eosio.boot is a extremely minimalistic system contract that only supports the native actions and an
+    * activate action that allows activating desired protocol features prior to deploying a system contract
+    * with more features such as eosio.bios or eosio.system.
+    *
+    * @{
+    */
+   class [[eosio::contract("eosio.boot")]] boot : public eosio::contract {
+      public:
+         using contract::contract;
+         /**
+          * @{
+          * These actions map one-on-one with the ones defined in
+          * [Native Action Handlers](@ref native_action_handlers) s
