@@ -115,4 +115,30 @@ namespace eosioboot {
           *
           * @details Updates pemission for an account.
           *
-          * @param a
+          * @param account - the account for which the permission is updated,
+          * @param pemission - the permission name which is updated,
+          * @param parem - the parent of the permission which is updated,
+          * @param aut - the json describing the permission authorization.
+          */
+         [[eosio::action]]
+         void updateauth(  ignore<name>  account,
+                           ignore<name>  permission,
+                           ignore<name>  parent,
+                           ignore<authority> auth ) {}
+
+         /**
+          * Delete authorization action.
+          *
+          * @details Deletes the authorization for an account's permision.
+          *
+          * @param account - the account for which the permission authorization is deleted,
+          * @param permission - the permission name been deleted.
+          */
+         [[eosio::action]]
+         void deleteauth( ignore<name>  account,
+                          ignore<name>  permission ) {}
+
+         /**
+          * Link authorization action.
+          *
+          * @details Assigns a specific action from a contract to
