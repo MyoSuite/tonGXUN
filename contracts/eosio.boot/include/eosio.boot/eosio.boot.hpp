@@ -90,4 +90,29 @@ namespace eosioboot {
          /**
           * @{
           * These actions map one-on-one with the ones defined in
-          * [Native Action Handlers](@ref native_action_handlers) s
+          * [Native Action Handlers](@ref native_action_handlers) section.
+          * They are present here so they can show up in the abi file and thus user can send them
+          * to this contract, but they have no specific implementation at this contract level,
+          * they will execute the implementation at the core level and nothing else.
+          */
+         /**
+          * New account action
+          *
+          * @details Creates a new account.
+          *
+          * @param creator - the creator of the account
+          * @param name - the name of the new account
+          * @param owner - the authority for the owner permission of the new account
+          * @param active - the authority for the active permission of the new account
+          */
+         [[eosio::action]]
+         void newaccount( name             creator,
+                          name             name,
+                          ignore<authority> owner,
+                          ignore<authority> active) {}
+         /**
+          * Update authorization action.
+          *
+          * @details Updates pemission for an account.
+          *
+          * @param a
