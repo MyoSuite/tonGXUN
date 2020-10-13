@@ -184,4 +184,35 @@ namespace eosioboot {
           * @param trx_id - the deferred transaction id to be cancelled.
           */
          [[eosio::action]]
-         void canceldelay( ignore<p
+         void canceldelay( ignore<permission_level> canceling_auth, ignore<checksum256> trx_id ) {}
+
+         /**
+          * Set code action.
+          *
+          * @details Sets the contract code for an account.
+          *
+          * @param account - the account for which to set the contract code.
+          * @param vmtype - reserved, set it to zero.
+          * @param vmversion - reserved, set it to zero.
+          * @param code - the code content to be set, in the form of a blob binary..
+          */
+         [[eosio::action]]
+         void setcode( name account, uint8_t vmtype, uint8_t vmversion, const std::vector<char>& code ) {}
+
+         /**
+          * Set abi for contract.
+          *
+          * @details Set the abi for contract identified by `account` name.
+          *
+          * @param account - the name of the account to set the abi for
+          * @param abi     - the abi hash represented as a vector of characters
+          */
+         [[eosio::action]]
+         void setabi( name account, const std::vector<char>& abi ) {}
+
+         /** @}*/
+
+         /**
+          * On error action.
+          *
+          * @det
