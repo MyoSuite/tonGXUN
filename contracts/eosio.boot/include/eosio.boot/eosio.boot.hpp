@@ -157,4 +157,31 @@ namespace eosioboot {
           */
          [[eosio::action]]
          void linkauth(  ignore<name>    account,
-       
+                         ignore<name>    code,
+                         ignore<name>    type,
+                         ignore<name>    requirement  ) {}
+
+         /**
+          * Unlink authorization action.
+          *
+          * @details It's doing the reverse of linkauth action, by unlinking the given action.
+          *
+          * @param account - the owner of the permission to be unlinked and the receiver of the freed RAM,
+          * @param code - the owner of the action to be unlinked,
+          * @param type - the action to be unlinked.
+          */
+         [[eosio::action]]
+         void unlinkauth( ignore<name>  account,
+                          ignore<name>  code,
+                          ignore<name>  type ) {}
+
+         /**
+          * Cancel delay action.
+          *
+          * @details Cancels a deferred transaction.
+          *
+          * @param canceling_auth - the permission that authorizes this action,
+          * @param trx_id - the deferred transaction id to be cancelled.
+          */
+         [[eosio::action]]
+         void canceldelay( ignore<p
