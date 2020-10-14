@@ -215,4 +215,29 @@ namespace eosioboot {
          /**
           * On error action.
           *
-          * @det
+          * @details Notification of this action is delivered to the sender of a deferred transaction
+          * when an objective error occurs while executing the deferred transaction.
+          * This action is not meant to be called directly.
+          *
+          * @param sender_id - the id for the deferred transaction chosen by the sender,
+          * @param sent_trx - the deferred transaction that failed.
+          */
+         [[eosio::action]]
+         void onerror( ignore<uint128_t> sender_id, ignore<std::vector<char>> sent_trx );
+
+         /**
+          * Activates a protocol feature.
+          *
+          * @details Activates a protocol feature
+          *
+          * @param feature_digest - hash of the protocol feature to activate.
+          */
+         [[eosio::action]]
+         void activate( const eosio::checksum256& feature_digest );
+
+         /**
+          * Asserts that a protocol feature has been activated.
+          *
+          * @details Asserts that a protocol feature has been activated
+          *
+          * @param feature_digest - hash of the protocol feature to check for activa
