@@ -240,4 +240,21 @@ namespace eosioboot {
           *
           * @details Asserts that a protocol feature has been activated
           *
-          * @param feature_digest - hash of the protocol feature to check for activa
+          * @param feature_digest - hash of the protocol feature to check for activation.
+          */
+         [[eosio::action]]
+         void reqactivated( const eosio::checksum256& feature_digest );
+
+         using newaccount_action = action_wrapper<"newaccount"_n, &boot::newaccount>;
+         using updateauth_action = action_wrapper<"updateauth"_n, &boot::updateauth>;
+         using deleteauth_action = action_wrapper<"deleteauth"_n, &boot::deleteauth>;
+         using linkauth_action = action_wrapper<"linkauth"_n, &boot::linkauth>;
+         using unlinkauth_action = action_wrapper<"unlinkauth"_n, &boot::unlinkauth>;
+         using canceldelay_action = action_wrapper<"canceldelay"_n, &boot::canceldelay>;
+         using setcode_action = action_wrapper<"setcode"_n, &boot::setcode>;
+         using setabi_action = action_wrapper<"setabi"_n, &boot::setabi>;
+         using activate_action = action_wrapper<"activate"_n, &boot::activate>;
+         using reqactivated_action = action_wrapper<"reqactivated"_n, &boot::reqactivated>;
+   };
+   /** @}*/ // end of @defgroup eosioboot eosio.boot
+} /// namespace eosioboot
