@@ -116,4 +116,5 @@ summary: 'Add or update the {{nowrap permission}} permission of {{nowrap account
 icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
 ---
 
-Modify, and create
+Modify, and create if necessary, the {{permission}} permission of {{account}} to have a parent permission of {{parent}} and the following authority:
+{{to_json auth}}
