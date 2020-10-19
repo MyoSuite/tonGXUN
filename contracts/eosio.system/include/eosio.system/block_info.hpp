@@ -26,4 +26,39 @@ struct [[eosio::table, eosio::contract("eosio.system")]] block_info_record
    uint32_t          block_height;
    eosio::time_point block_timestamp;
 
-   uint64_t primar
+   uint64_t primary_key() const { return block_height; }
+
+   EOSLIB_SERIALIZE(block_info_record, (version)(block_height)(block_timestamp))
+};
+
+using block_info_table = eosio::multi_index<"blockinfo"_n, block_info_record>;
+
+struct block_batch_info
+{
+   uint32_t          batch_start_height;
+   eosio::time_point batch_start_timestamp;
+   uint32_t          batch_current_end_height;
+   eosio::time_point batch_current_end_timestamp;
+};
+
+struct latest_block_batch_info_result
+{
+   enum error_code_enum : uint32_t
+   {
+      no_error,
+      invalid_input,
+      unsupported_version,
+      insufficient_data
+   };
+
+   std::optional<block_batch_info> result;
+   error_code_enum                 error_code = no_error;
+};
+
+/**
+ * Get information on the latest block batch.
+ *
+ * A block batch is a contiguous range of blocks of a particular size.
+ * A sequence of blocks can be partitioned into a sequence of block batches, where all except for perhaps the last batch
+ * in the sequence have the same size. The last batch in the sequence can have a smaller size if the
+ * blocks of the blockchain that would complete that batch have not yet been generated or re
