@@ -61,4 +61,18 @@ struct latest_block_batch_info_result
  * A block batch is a contiguous range of blocks of a particular size.
  * A sequence of blocks can be partitioned into a sequence of block batches, where all except for perhaps the last batch
  * in the sequence have the same size. The last batch in the sequence can have a smaller size if the
- * blocks of the blockchain that would complete that batch have not yet been generated or re
+ * blocks of the blockchain that would complete that batch have not yet been generated or recorded.
+ *
+ * This function enables the caller to specify a particular partitioning of the sequence of blocks into a sequence of
+ * block batches of a particular non-zero size (`batch_size`) and then isolates the last block batch in that sequence
+ * and returns the information about that latest block batch if possible. The partitioning will ensure that
+ * `batch_start_height_offset` will be equal to the starting block height of exactly one of block batches in the
+ * sequence.
+ *
+ * The information about the latest block batch is the same data captured in `block_batch_info`.
+ * Particularly, it returns the height and timestamp of starting and ending blocks within that latest block batch.
+ * Note that the range spanning from the start to end block of the latest block batch may be less than batch_size
+ * because latest block batch may be incomplete.
+ * Also, it is possible for the record capturing info for the starting block to not exist in the blockinfo table. This
+ * can either be due to the records being erased as they fall out of the rolling window or, in rare cases, due to gaps
+ * in block info recor
