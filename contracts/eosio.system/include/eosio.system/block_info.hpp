@@ -75,4 +75,25 @@ struct latest_block_batch_info_result
  * because latest block batch may be incomplete.
  * Also, it is possible for the record capturing info for the starting block to not exist in the blockinfo table. This
  * can either be due to the records being erased as they fall out of the rolling window or, in rare cases, due to gaps
- * in block info recor
+ * in block info records due to failures of the onblock action. In such a case, this function will be unable to return a
+ * `block_batch_info` and will instead be forced to return the `insufficient_data` error code.
+ * Furthermore, if `batch_start_height_offset` is greater than the height of the latest block for which
+ * information is recorded in the blockinfo table, there will be no latest block batch identified for the function to
+ * return information about and so it will again be forced to return the `insufficient_data` error code instead.
+ */
+latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_start_height_offset,
+                                                           uint32_t    batch_size,
+                                                           eosio::name system_account_name = "eosio"_n)
+{
+   latest_block_batch_info_result result;
+
+   if (batch_size == 0) {
+      result.error_code = latest_block_batch_info_result::invalid_input;
+      return result;
+   }
+
+   block_info_table t(system_account_name, 0);
+
+   // Find information on latest block recorded in the blockinfo table.
+
+   if (t.cbegin() == t.cend())
