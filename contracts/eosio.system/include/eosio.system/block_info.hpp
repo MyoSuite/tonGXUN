@@ -96,4 +96,32 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
 
    // Find information on latest block recorded in the blockinfo table.
 
-   if (t.cbegin() == t.cend())
+   if (t.cbegin() == t.cend()) {
+      // The blockinfo table is empty.
+      result.error_code = latest_block_batch_info_result::insufficient_data;
+      return result;
+   }
+
+   auto latest_block_info_itr = --t.cend();
+
+   if (latest_block_info_itr->version != 0) {
+      // Compiled code for this function within the calling contract has not been updated to support new version of
+      // the blockinfo table.
+      result.error_code = latest_block_batch_info_result::unsupported_version;
+      return result;
+   }
+
+   uint32_t latest_block_batch_end_height = latest_block_info_itr->block_height;
+
+   if (latest_block_batch_end_height < batch_start_height_offset) {
+      // Caller asking for a block batch that has not even begun to be recorded yet.
+      result.error_code = latest_block_batch_info_result::insufficient_data;
+      return result;
+   }
+
+   // Calculate height for the starting block of the latest block batch.
+
+   uint32_t latest_block_batch_start_height =
+      latest_block_batch_end_height - ((latest_block_batch_end_height - batch_start_height_offset) % batch_size);
+
+   // Note: 1 <= (latest_block_batch_end_h
