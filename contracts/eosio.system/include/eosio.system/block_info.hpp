@@ -142,4 +142,23 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
    // Find information on start block of the latest block batch recorded in the blockinfo table.
 
    auto start_block_info_itr = t.find(latest_block_batch_start_height);
-   if (start_block_info_itr == t.cend() || start_block_info_itr->bl
+   if (start_block_info_itr == t.cend() || start_block_info_itr->block_height != latest_block_batch_start_height) {
+      // Record for information on start block of the latest block batch could not be found in blockinfo table.
+      // This is either because of:
+      //    * a gap in recording info due to a failed onblock action;
+      //    * a requested start block that was processed by onblock prior to deployment of the system contract code
+      //    introducing the blockinfo table;
+      //    * or, most likely, because the record for the requested start block was pruned from the blockinfo table as
+      //    it fell out of the rolling window.
+      result.error_code = latest_block_batch_info_result::insufficient_data;
+      return result;
+   }
+
+   if (start_block_info_itr->version != 0) {
+      // Compiled code for this function within the calling contract has not been updated to support new version of
+      // the blockinfo table.
+      result.error_code = latest_block_batch_info_result::unsupported_version;
+      return result;
+   }
+
+   // Successfully return block_batch_info for the found lates
