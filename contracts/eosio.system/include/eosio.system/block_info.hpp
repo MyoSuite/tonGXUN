@@ -124,4 +124,22 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
    uint32_t latest_block_batch_start_height =
       latest_block_batch_end_height - ((latest_block_batch_end_height - batch_start_height_offset) % batch_size);
 
-   // Note: 1 <= (latest_block_batch_end_h
+   // Note: 1 <= (latest_block_batch_end_height - latest_block_batch_start_height + 1) <= batch_size
+
+   if (latest_block_batch_start_height == latest_block_batch_end_height) {
+      // When batch_size == 1, this function effectively simplifies to just returning the info of the latest recorded
+      // block. In that case, the start block and the end block of the batch are the same and there is no need for
+      // another lookup. So shortcut the rest of the process and return a successful result immediately.
+      result.result.emplace(block_batch_info{
+         .batch_start_height          = latest_block_batch_start_height,
+         .batch_start_timestamp       = latest_block_info_itr->block_timestamp,
+         .batch_current_end_height    = latest_block_batch_end_height,
+         .batch_current_end_timestamp = latest_block_info_itr->block_timestamp,
+      });
+      return result;
+   }
+
+   // Find information on start block of the latest block batch recorded in the blockinfo table.
+
+   auto start_block_info_itr = t.find(latest_block_batch_start_height);
+   if (start_block_info_itr == t.cend() || start_block_info_itr->bl
