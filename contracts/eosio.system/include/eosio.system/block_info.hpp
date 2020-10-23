@@ -161,4 +161,15 @@ latest_block_batch_info_result get_latest_block_batch_info(uint32_t    batch_sta
       return result;
    }
 
-   // Successfully return block_batch_info for the found lates
+   // Successfully return block_batch_info for the found latest block batch in its current state.
+
+   result.result.emplace(block_batch_info{
+      .batch_start_height          = latest_block_batch_start_height,
+      .batch_start_timestamp       = start_block_info_itr->block_timestamp,
+      .batch_current_end_height    = latest_block_batch_end_height,
+      .batch_current_end_timestamp = latest_block_info_itr->block_timestamp,
+   });
+   return result;
+}
+
+} // namespace eosiosystem::block_info
