@@ -98,4 +98,34 @@ namespace eosiosystem {
    using blockchain_parameters_t = eosio::blockchain_parameters;
 #endif
 
-   // B
+   // BEGIN TELOS
+   /*
+    * NOTE: 1000 is used only to make the unit tests pass.
+    * the number that is set on the main net is 1,000,000.
+	* This value should be changed by ABPs before launching.
+    */
+   const uint32_t block_num_network_activation = 1000;
+
+   const uint64_t max_bpay_rate = 6000;
+   const uint64_t max_worker_monthly_amount = 1'000'000'0000;
+
+   struct[[ eosio::table, eosio::contract("eosio.system") ]] payment_info {
+     name bp;
+     asset pay;
+
+     uint64_t primary_key() const { return bp.value; }
+   };
+
+   typedef eosio::multi_index< "payments"_n, payment_info > payments_table;
+
+   struct [[eosio::table("schedulemetr"), eosio::contract("eosio.system")]] schedule_metrics_state {
+     name                             last_onblock_caller;
+     int32_t                          block_counter_correction;
+     std::vector<producer_metric>     producers_metric;
+
+     uint64_t primary_key()const { return last_onblock_caller.value; }
+   };
+
+   typedef eosio::singleton< "schedulemetr"_n, schedule_metrics_state > schedule_metrics_singleton;
+
+   struct [[eosio::table("rotatio
