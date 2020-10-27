@@ -77,4 +77,25 @@ namespace eosiosystem {
 
    static constexpr int64_t  min_activated_stake   = 150'000'000'0000;
    static constexpr int64_t  ram_gift_bytes        = 1400;
-   static conste
+   static constexpr int64_t  min_pervote_daily_pay = 100'0000;
+   static constexpr uint32_t refund_delay_sec      = 3 * seconds_per_day;
+
+   static constexpr int64_t  inflation_precision           = 100;     // 2 decimals
+   static constexpr int64_t  default_annual_rate           = 500;     // 5% annual rate
+   static constexpr int64_t  pay_factor_precision          = 10000;
+   static constexpr int64_t  default_inflation_pay_factor  = 50000;   // producers pay share = 10000 / 50000 = 20% of the inflation
+   static constexpr int64_t  default_votepay_factor        = 40000;   // per-block pay share = 10000 / 40000 = 25% of the producer pay
+
+#ifdef SYSTEM_BLOCKCHAIN_PARAMETERS
+   struct blockchain_parameters_v1 : eosio::blockchain_parameters
+   {
+      eosio::binary_extension<uint32_t> max_action_return_value_size;
+      EOSLIB_SERIALIZE_DERIVED( blockchain_parameters_v1, eosio::blockchain_parameters,
+                                (max_action_return_value_size) )
+   };
+   using blockchain_parameters_t = blockchain_parameters_v1;
+#else
+   using blockchain_parameters_t = eosio::blockchain_parameters;
+#endif
+
+   // B
