@@ -173,4 +173,29 @@ namespace eosiosystem {
    *    delegate their vote to a proxy.
    * - Producers register in order to be voted for, and can claim per-block and per-vote rewards.
    * - Users can buy and sell RAM at a market-determined price.
-   * - Users can bid on pre
+   * - Users can bid on premium names.
+   * - A resource exchange system (REX) allows token holders to lend their tokens,
+   *    and users to rent CPU and Network resources in return for a market-determined fee.
+   */
+
+   // A name bid, which consists of:
+   // - a `newname` name that the bid is for
+   // - a `high_bidder` account name that is the one with the highest bid so far
+   // - the `high_bid` which is amount of highest bid
+   // - and `last_bid_time` which is the time of the highest bid
+   struct [[eosio::table, eosio::contract("eosio.system")]] name_bid {
+     name            newname;
+     name            high_bidder;
+     int64_t         high_bid = 0; ///< negative high_bid == closed auction waiting to be claimed
+     time_point      last_bid_time;
+
+     uint64_t primary_key()const { return newname.value;                    }
+     uint64_t by_high_bid()const { return static_cast<uint64_t>(-high_bid); }
+   };
+
+   // A bid refund, which is defined by:
+   // - the `bidder` account name owning the refund
+   // - the `amount` to be refunded
+   struct [[eosio::table, eosio::contract("eosio.system")]] bid_refund {
+      name         bidder;
+      asset  
