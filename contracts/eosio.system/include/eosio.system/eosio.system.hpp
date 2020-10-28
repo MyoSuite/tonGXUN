@@ -128,4 +128,34 @@ namespace eosiosystem {
 
    typedef eosio::singleton< "schedulemetr"_n, schedule_metrics_state > schedule_metrics_singleton;
 
-   struct [[eosio::table("rotatio
+   struct [[eosio::table("rotations"), eosio::contract("eosio.system")]] rotation_state {
+      // bool                            is_rotation_active = true;
+      name                    bp_currently_out;
+      name                    sbp_currently_in;
+      uint32_t                bp_out_index;
+      uint32_t                sbp_in_index;
+      block_timestamp         next_rotation_time;
+      block_timestamp         last_rotation_time;
+
+      //NOTE: This might not be the best place for this information
+
+      // bool                            is_kick_active = true;
+      // account_name                    last_onblock_caller;
+      // block_timestamp                 last_time_block_produced;
+   };
+
+   typedef eosio::singleton< "rotations"_n, rotation_state> rotation_singleton;
+
+
+   struct[[ eosio::table("payrate"), eosio::contract("eosio.system") ]] payrates {
+      uint64_t bpay_rate;
+      uint64_t worker_amount;
+      uint64_t primary_key() const { return bpay_rate; }
+      EOSLIB_SERIALIZE(payrates, (bpay_rate)(worker_amount))
+   };
+
+   typedef eosio::singleton< "payrate"_n, payrates > payrate_singleton;
+
+
+   enum class kick_type {
+      REACHED_TRESHOLD = 1,
