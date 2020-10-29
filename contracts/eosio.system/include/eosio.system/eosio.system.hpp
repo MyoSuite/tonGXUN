@@ -198,4 +198,26 @@ namespace eosiosystem {
    // - the `amount` to be refunded
    struct [[eosio::table, eosio::contract("eosio.system")]] bid_refund {
       name         bidder;
-      asset  
+      asset        amount;
+
+      uint64_t primary_key()const { return bidder.value; }
+   };
+   typedef eosio::multi_index< "namebids"_n, name_bid,
+                               indexed_by<"highbid"_n, const_mem_fun<name_bid, uint64_t, &name_bid::by_high_bid>  >
+                             > name_bid_table;
+
+   typedef eosio::multi_index< "bidrefunds"_n, bid_refund > bid_refund_table;
+
+   // Defines new global state parameters.
+   struct [[eosio::table("global"), eosio::contract("eosio.system")]] eosio_global_state : eosio::blockchain_parameters {
+      uint64_t free_ram()const { return max_ram_size - total_ram_bytes_reserved; }
+
+      uint64_t             max_ram_size = 12ll*1024 * 1024 * 1024;  // TELOS SPECIFIC
+      uint64_t             total_ram_bytes_reserved = 0;
+      int64_t              total_ram_stake = 0;
+
+      block_timestamp      last_producer_schedule_update;
+      block_timestamp      last_proposed_schedule_update;  // TELOS SPECIFIC
+      time_point           last_pervote_bucket_fill;
+      int64_t              pervote_bucket = 0;
+      int64_t              perblock_bucket = 0;
