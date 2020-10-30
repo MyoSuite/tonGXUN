@@ -240,4 +240,21 @@ namespace eosiosystem {
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
       EOSLIB_SERIALIZE_DERIVED( eosio_global_state, eosio::blockchain_parameters,
-                             
+                                (max_ram_size)(total_ram_bytes_reserved)(total_ram_stake)
+                                (last_producer_schedule_update)(last_proposed_schedule_update)(last_pervote_bucket_fill)
+                                (pervote_bucket)(perblock_bucket)(total_unpaid_blocks)(total_activated_stake)(thresh_activated_stake_time)
+                                (last_producer_schedule_size)(total_producer_vote_weight)(last_name_close)(block_num)(last_claimrewards)(next_payment)
+                                (new_ram_per_block)(last_ram_increase)(last_block_num)(total_producer_votepay_share)(revision) )
+   };
+
+   // Defines new global state parameters added after version 1.0
+   struct [[eosio::table("global2"), eosio::contract("eosio.system")]] eosio_global_state2 {
+      eosio_global_state2(){}
+
+      uint16_t          new_ram_per_block = 0;
+      block_timestamp   last_ram_increase;
+      block_timestamp   last_block_num; /* deprecated */
+      double            total_producer_votepay_share = 0;
+      uint8_t           revision = 0; ///< used to track version updates in the future.
+
+      EOSLIB_SERIALIZE( eosio_global_state2, (new_ram_per_block)(la
