@@ -221,3 +221,23 @@ namespace eosiosystem {
       time_point           last_pervote_bucket_fill;
       int64_t              pervote_bucket = 0;
       int64_t              perblock_bucket = 0;
+      uint32_t             total_unpaid_blocks = 0; /// all blocks which have been produced but not paid
+      int64_t              total_activated_stake = 0;
+      time_point           thresh_activated_stake_time;
+      uint16_t             last_producer_schedule_size = 0;
+      double               total_producer_vote_weight = 0; /// the sum of all producer votes
+      block_timestamp      last_name_close;
+      // BEGIN TELOS
+      uint32_t             block_num = 12;
+      uint32_t             last_claimrewards = 0;
+      uint32_t             next_payment = 0;
+      uint16_t             new_ram_per_block = 0;
+      block_timestamp      last_ram_increase;
+      block_timestamp      last_block_num; /* deprecated */
+      double               total_producer_votepay_share = 0;
+      uint8_t              revision = 0; ///< used to track version updates in the future.
+      // END TELOS
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE_DERIVED( eosio_global_state, eosio::blockchain_parameters,
+                             
