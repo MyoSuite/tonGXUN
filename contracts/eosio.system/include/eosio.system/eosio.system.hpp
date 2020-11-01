@@ -257,4 +257,28 @@ namespace eosiosystem {
       double            total_producer_votepay_share = 0;
       uint8_t           revision = 0; ///< used to track version updates in the future.
 
-      EOSLIB_SERIALIZE( eosio_global_state2, (new_ram_per_block)(la
+      EOSLIB_SERIALIZE( eosio_global_state2, (new_ram_per_block)(last_ram_increase)(last_block_num)
+                        (total_producer_votepay_share)(revision) )
+   };
+
+   // Defines new global state parameters added after version 1.3.0
+   struct [[eosio::table("global3"), eosio::contract("eosio.system")]] eosio_global_state3 {
+      eosio_global_state3() { }
+      time_point        last_vpay_state_update;
+      double            total_vpay_share_change_rate = 0;
+
+      EOSLIB_SERIALIZE( eosio_global_state3, (last_vpay_state_update)(total_vpay_share_change_rate) )
+   };
+
+   // Defines new global state parameters to store inflation rate and distribution
+   struct [[eosio::table("global4"), eosio::contract("eosio.system")]] eosio_global_state4 {
+      eosio_global_state4() { }
+      double   continuous_rate;
+      int64_t  inflation_pay_factor;
+      int64_t  votepay_factor;
+
+      EOSLIB_SERIALIZE( eosio_global_state4, (continuous_rate)(inflation_pay_factor)(votepay_factor) )
+   };
+
+   inline eosio::block_signing_authority convert_to_block_signing_authority( const eosio::public_key& producer_key ) {
+      return eosio::block_signing_authority_v0{ .threshold = 1, .keys = {{producer_key
