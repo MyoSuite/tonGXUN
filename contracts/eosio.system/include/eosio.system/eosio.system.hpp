@@ -298,4 +298,20 @@ namespace eosiosystem {
       // TELOS BEGIN
       uint32_t                                                 lifetime_produced_blocks = 0;
       uint32_t                                                 missed_blocks_per_rotation = 0;
-      uint32_t                                             
+      uint32_t                                                 lifetime_missed_blocks;
+      // TELOS END
+      time_point                                               last_claim_time;
+      uint16_t                                                 location = 0;
+      // TELOS BEGIN
+      uint32_t                                                 kick_reason_id = 0;
+      std::string                                              kick_reason;
+      uint32_t                                                 times_kicked = 0;
+      uint32_t                                                 kick_penalty_hours = 0;
+      block_timestamp                                          last_time_kicked;
+      // TELOS END
+      eosio::binary_extension<eosio::block_signing_authority>  producer_authority; // added in version 1.9.0
+
+      uint64_t primary_key()const { return owner.value;                             }
+      double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
+      bool     active()const      { return is_active;                               }
+      void     deactivate()       { producer_key = public_key(); 
