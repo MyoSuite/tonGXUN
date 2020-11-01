@@ -281,4 +281,21 @@ namespace eosiosystem {
    };
 
    inline eosio::block_signing_authority convert_to_block_signing_authority( const eosio::public_key& producer_key ) {
-      return eosio::block_signing_authority_v0{ .threshold = 1, .keys = {{producer_key
+      return eosio::block_signing_authority_v0{ .threshold = 1, .keys = {{producer_key, 1}} };
+   }
+
+   // Defines `producer_info` structure to be stored in `producer_info` table, added after version 1.0
+   struct [[eosio::table, eosio::contract("eosio.system")]] producer_info {
+      name                                                     owner;
+      double                                                   total_votes = 0;
+      eosio::public_key                                        producer_key; /// a packed public key object
+      bool                                                     is_active = true;
+      // TELOS BEGIN
+      std::string                                              unreg_reason;
+      // TELOS END
+      std::string                                              url;
+      uint32_t                                                 unpaid_blocks = 0;
+      // TELOS BEGIN
+      uint32_t                                                 lifetime_produced_blocks = 0;
+      uint32_t                                                 missed_blocks_per_rotation = 0;
+      uint32_t                                             
