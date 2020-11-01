@@ -314,4 +314,32 @@ namespace eosiosystem {
       uint64_t primary_key()const { return owner.value;                             }
       double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
-      void     deactivate()       { producer_key = public_key(); 
+      void     deactivate()       { producer_key = public_key(); producer_authority.reset(); is_active = false; }
+
+      // TELOS BEGIN
+      void kick(kick_type kt, uint32_t penalty = 0) {
+         times_kicked++;
+         last_time_kicked = block_timestamp(eosio::current_time_point());
+
+         if(penalty == 0) kick_penalty_hours  = uint32_t(std::pow(2, times_kicked));
+
+         switch(kt) {
+           case kick_type::REACHED_TRESHOLD:
+             kick_reason_id = uint32_t(kick_type::REACHED_TRESHOLD);
+             kick_reason = "Producer account was deactivated because it reached the maximum missed blocks in this rotation timeframe.";
+           break;
+           case kick_type::BPS_VOTING:
+             kick_reason_id = uint32_t(kick_type::BPS_VOTING);
+             kick_reason = "Producer account was deactivated by vote.";
+             kick_penalty_hours = penalty;
+           break;
+         }
+         lifetime_missed_blocks += missed_blocks_per_rotation;
+         missed_blocks_per_rotation = 0;
+         // print("\nblock producer: ", name{owner}, " was kicked.");
+         deactivate();
+      }
+      // TELOS END
+
+      eosio::block_signing_authority get_producer_authority()const {
+        
