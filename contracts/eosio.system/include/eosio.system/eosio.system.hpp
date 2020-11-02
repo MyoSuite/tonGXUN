@@ -342,4 +342,19 @@ namespace eosiosystem {
       // TELOS END
 
       eosio::block_signing_authority get_producer_authority()const {
-        
+         if( producer_authority.has_value() ) {
+            bool zero_threshold = std::visit( [](auto&& auth ) -> bool {
+               return (auth.threshold == 0);
+            }, *producer_authority );
+            // zero_threshold could be true despite the validation done in regproducer2 because the v1.9.0 eosio.system
+            // contract has a bug which may have modified the producer table such that the producer_authority field
+            // contains a default constructed eosio::block_signing_authority (which has a 0 threshold and so is invalid).
+            if( !zero_threshold ) return *producer_authority;
+         }
+         return convert_to_block_signing_authority( producer_key );
+      }
+
+      // The unregprod and claimrewards actions modify unrelated fields of the producers table and under the default
+      // serialization behavior they would increase the size of the serialized table if the producer_authority field
+      // was not already present. This is acceptable (though not necessarily desired) because those two actions require
+      // the aut
