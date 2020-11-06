@@ -413,4 +413,28 @@ namespace eosiosystem {
       }
    };
 
-   // Defines new producer info structure to be stored in new producer info table, added after
+   // Defines new producer info structure to be stored in new producer info table, added after version 1.3.0
+   struct [[eosio::table, eosio::contract("eosio.system")]] producer_info2 {
+      name            owner;
+      double          votepay_share = 0;
+      time_point      last_votepay_share_update;
+
+      uint64_t primary_key()const { return owner.value; }
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE( producer_info2, (owner)(votepay_share)(last_votepay_share_update) )
+   };
+
+   // Voter info. Voter info stores information about the voter:
+   // - `owner` the voter
+   // - `proxy` the proxy set by the voter, if any
+   // - `producers` the producers approved by this voter if no proxy set
+   // - `staked` the amount staked
+   struct [[eosio::table, eosio::contract("eosio.system")]] voter_info {
+      name                owner;     /// the voter
+      name                proxy;     /// the proxy set by the voter, if any
+      std::vector<name>   producers; /// the producers approved by this voter if no proxy set
+      int64_t             staked = 0;
+
+      // TELOS BEGIN
+      int64_t             last_
