@@ -381,4 +381,36 @@ namespace eosiosystem {
             << t.kick_reason_id
             << t.kick_reason
             << t.times_kicked
-            <<
+            << t.kick_penalty_hours
+            << t.last_time_kicked;
+
+         if( !t.producer_authority.has_value() ) return ds;
+
+         return ds << t.producer_authority;
+      }
+
+      // TELOS EDITED WITH CUSTOM FIELDS
+      template<typename DataStream>
+      friend DataStream& operator >> ( DataStream& ds, producer_info& t ) {
+         return ds >> t.owner
+                   >> t.total_votes
+                   >> t.producer_key
+                   >> t.is_active
+                   >> t.unreg_reason
+                   >> t.url
+                   >> t.unpaid_blocks
+                   >> t.lifetime_produced_blocks
+                   >> t.missed_blocks_per_rotation
+                   >> t.lifetime_missed_blocks
+                   >> t.last_claim_time
+                   >> t.location
+                   >> t.kick_reason_id
+                   >> t.kick_reason
+                   >> t.times_kicked
+                   >> t.kick_penalty_hours
+                   >> t.last_time_kicked
+                   >> t.producer_authority;
+      }
+   };
+
+   // Defines new producer info structure to be stored in new producer info table, added after
