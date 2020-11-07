@@ -463,4 +463,33 @@ namespace eosiosystem {
       };
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
-      EOSLIB_SERIALIZE( voter_info, (owner)(proxy)(producers)(staked)(last_stake)(las
+      EOSLIB_SERIALIZE( voter_info, (owner)(proxy)(producers)(staked)(last_stake)(last_vote_weight)(proxied_vote_weight)(is_proxy)(flags1)(reserved2)(reserved3) )
+   };
+
+
+   typedef eosio::multi_index< "voters"_n, voter_info >  voters_table;
+
+
+   typedef eosio::multi_index< "producers"_n, producer_info,
+                               indexed_by<"prototalvote"_n, const_mem_fun<producer_info, double, &producer_info::by_votes>  >
+                             > producers_table;
+
+   typedef eosio::multi_index< "producers2"_n, producer_info2 > producers_table2;
+
+
+   typedef eosio::singleton< "global"_n, eosio_global_state >   global_state_singleton;
+
+   typedef eosio::singleton< "global2"_n, eosio_global_state2 > global_state2_singleton;
+
+   typedef eosio::singleton< "global3"_n, eosio_global_state3 > global_state3_singleton;
+
+   typedef eosio::singleton< "global4"_n, eosio_global_state4 > global_state4_singleton;
+
+   struct [[eosio::table, eosio::contract("eosio.system")]] user_resources {
+      name          owner;
+      asset         net_weight;
+      asset         cpu_weight;
+      int64_t       ram_bytes = 0;
+
+      bool is_empty()const { return net_weight.amount == 0 && cpu_weight.amount == 0 && ram_bytes == 0; }
+  
