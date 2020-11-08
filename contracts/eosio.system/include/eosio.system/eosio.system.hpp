@@ -492,4 +492,31 @@ namespace eosiosystem {
       int64_t       ram_bytes = 0;
 
       bool is_empty()const { return net_weight.amount == 0 && cpu_weight.amount == 0 && ram_bytes == 0; }
-  
+      uint64_t primary_key()const { return owner.value; }
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
+   };
+
+   // Every user 'from' has a scope/table that uses every recipient 'to' as the primary key.
+   struct [[eosio::table, eosio::contract("eosio.system")]] delegated_bandwidth {
+      name          from;
+      name          to;
+      asset         net_weight;
+      asset         cpu_weight;
+
+      bool is_empty()const { return net_weight.amount == 0 && cpu_weight.amount == 0; }
+      uint64_t  primary_key()const { return to.value; }
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE( delegated_bandwidth, (from)(to)(net_weight)(cpu_weight) )
+
+   };
+
+   struct [[eosio::table, eosio::contract("eosio.system")]] refund_request {
+      name            owner;
+      time_point_sec  request_time;
+      eosio::asset    net_amount;
+      eosio::asset    cpu_amount;
+
+      bool is_em
