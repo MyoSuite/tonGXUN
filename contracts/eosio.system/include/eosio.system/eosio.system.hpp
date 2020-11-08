@@ -519,4 +519,22 @@ namespace eosiosystem {
       eosio::asset    net_amount;
       eosio::asset    cpu_amount;
 
-      bool is_em
+      bool is_empty()const { return net_amount.amount == 0 && cpu_amount.amount == 0; }
+      uint64_t  primary_key()const { return owner.value; }
+
+      // explicit serialization macro is not necessary, used here only to improve compilation time
+      EOSLIB_SERIALIZE( refund_request, (owner)(request_time)(net_amount)(cpu_amount) )
+   };
+
+
+   typedef eosio::multi_index< "userres"_n, user_resources >      user_resources_table;
+   typedef eosio::multi_index< "delband"_n, delegated_bandwidth > del_bandwidth_table;
+   typedef eosio::multi_index< "refunds"_n, refund_request >      refunds_table;
+
+   // `rex_pool` structure underlying the rex pool table. A rex pool table entry is defined by:
+   // - `version` defaulted to zero,
+   // - `total_lent` total amount of CORE_SYMBOL in open rex_loans
+   // - `total_unlent` total amount of CORE_SYMBOL available to be lent (connector),
+   // - `total_rent` fees received in exchange for lent  (connector),
+   // - `total_lendable` total amount of CORE_SYMBOL that have been lent (total_unlent + total_lent),
+   // - `total_rex` total number of REX shares allocated to contrib
