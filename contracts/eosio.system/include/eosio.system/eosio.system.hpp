@@ -537,4 +537,27 @@ namespace eosiosystem {
    // - `total_unlent` total amount of CORE_SYMBOL available to be lent (connector),
    // - `total_rent` fees received in exchange for lent  (connector),
    // - `total_lendable` total amount of CORE_SYMBOL that have been lent (total_unlent + total_lent),
-   // - `total_rex` total number of REX shares allocated to contrib
+   // - `total_rex` total number of REX shares allocated to contributors to total_lendable,
+   // - `namebid_proceeds` the amount of CORE_SYMBOL to be transferred from namebids to REX pool,
+   // - `loan_num` increments with each new loan
+   struct [[eosio::table,eosio::contract("eosio.system")]] rex_pool {
+      uint8_t    version = 0;
+      asset      total_lent;
+      asset      total_unlent;
+      asset      total_rent;
+      asset      total_lendable;
+      asset      total_rex;
+      asset      namebid_proceeds;
+      uint64_t   loan_num = 0;
+
+      uint64_t primary_key()const { return 0; }
+   };
+
+   typedef eosio::multi_index< "rexpool"_n, rex_pool > rex_pool_table;
+
+   // `rex_return_pool` structure underlying the rex return pool table. A rex return pool table entry is defined by:
+   // - `version` defaulted to zero,
+   // - `last_dist_time` the last time proceeds from renting, ram fees, and name bids were added to the rex pool,
+   // - `pending_bucket_time` timestamp of the pending 12-hour return bucket,
+   // - `oldest_bucket_time` cached timestamp of the oldest 12-hour return bucket,
+   // - `pending_buck
