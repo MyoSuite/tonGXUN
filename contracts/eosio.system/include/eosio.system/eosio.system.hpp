@@ -580,4 +580,29 @@ namespace eosiosystem {
       uint64_t primary_key()const { return 0; }
    };
 
-   typedef eosio::multi_index< "rexret
+   typedef eosio::multi_index< "rexretpool"_n, rex_return_pool > rex_return_pool_table;
+
+   struct pair_time_point_sec_int64 {
+      time_point_sec first;
+      int64_t        second;
+
+      EOSLIB_SERIALIZE(pair_time_point_sec_int64, (first)(second));
+   };
+
+   // `rex_return_buckets` structure underlying the rex return buckets table. A rex return buckets table is defined by:
+   // - `version` defaulted to zero,
+   // - `return_buckets` buckets of proceeds accumulated in 12-hour intervals
+   struct [[eosio::table,eosio::contract("eosio.system")]] rex_return_buckets {
+      uint8_t                                version = 0;
+      std::vector<pair_time_point_sec_int64> return_buckets;  // sorted by first field
+
+      uint64_t primary_key()const { return 0; }
+   };
+
+   typedef eosio::multi_index< "retbuckets"_n, rex_return_buckets > rex_return_buckets_table;
+
+   // `rex_fund` structure underlying the rex fund table. A rex fund table entry is defined by:
+   // - `version` defaulted to zero,
+   // - `owner` the owner of the rex fund,
+   // - `balance` the balance of the fund.
+   struct [[eosio::table,e
