@@ -605,4 +605,33 @@ namespace eosiosystem {
    // - `version` defaulted to zero,
    // - `owner` the owner of the rex fund,
    // - `balance` the balance of the fund.
-   struct [[eosio::table,e
+   struct [[eosio::table,eosio::contract("eosio.system")]] rex_fund {
+      uint8_t version = 0;
+      name    owner;
+      asset   balance;
+
+      uint64_t primary_key()const { return owner.value; }
+   };
+
+   typedef eosio::multi_index< "rexfund"_n, rex_fund > rex_fund_table;
+
+   // `rex_balance` structure underlying the rex balance table. A rex balance table entry is defined by:
+   // - `version` defaulted to zero,
+   // - `owner` the owner of the rex fund,
+   // - `vote_stake` the amount of CORE_SYMBOL currently included in owner's vote,
+   // - `rex_balance` the amount of REX owned by owner,
+   // - `matured_rex` matured REX available for selling
+   struct [[eosio::table,eosio::contract("eosio.system")]] rex_balance {
+      uint8_t version = 0;
+      name    owner;
+      asset   vote_stake;
+      asset   rex_balance;
+      int64_t matured_rex = 0;
+      std::vector<pair_time_point_sec_int64> rex_maturities; /// REX daily maturity buckets
+
+      uint64_t primary_key()const { return owner.value; }
+   };
+
+   typedef eosio::multi_index< "rexbal"_n, rex_balance > rex_balance_table;
+
+   // `rex_loan` structure underlying the `rex_cpu_loan_table` and `rex_net_loan_table`. A rex
