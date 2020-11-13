@@ -680,4 +680,22 @@ namespace eosiosystem {
 
       void close()                { is_open = false;    }
       uint64_t primary_key()const { return owner.value; }
-      uint64_t by_time()const     { return is_open ? order_
+      uint64_t by_time()const     { return is_open ? order_time.elapsed.count() : std::numeric_limits<uint64_t>::max(); }
+   };
+
+   typedef eosio::multi_index< "rexqueue"_n, rex_order,
+                               indexed_by<"bytime"_n, const_mem_fun<rex_order, uint64_t, &rex_order::by_time>>> rex_order_table;
+
+   struct rex_order_outcome {
+      bool success;
+      asset proceeds;
+      asset stake_change;
+   };
+
+   struct powerup_config_resource {
+      std::optional<int64_t>        current_weight_ratio;   // Immediately set weight_ratio to this amount. 1x = 10^15. 0.01x = 10^13.
+                                                            //    Do not specify to preserve the existing setting or use the default;
+                                                            //    this avoids sudden price jumps. For new chains which don't need
+                                                            //    to gradually phase out staking and REX, 0.01x (10^13) is a good
+                                                            //    value for both current_weight_ratio and target_weight_ratio.
+      std::optional<int64_t>        target_weight_ratio;    // Linearly shrink weight_
