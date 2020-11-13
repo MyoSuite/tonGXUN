@@ -634,4 +634,29 @@ namespace eosiosystem {
 
    typedef eosio::multi_index< "rexbal"_n, rex_balance > rex_balance_table;
 
-   // `rex_loan` structure underlying the `rex_cpu_loan_table` and `rex_net_loan_table`. A rex
+   // `rex_loan` structure underlying the `rex_cpu_loan_table` and `rex_net_loan_table`. A rex net/cpu loan table entry is defined by:
+   // - `version` defaulted to zero,
+   // - `from` account creating and paying for loan,
+   // - `receiver` account receiving rented resources,
+   // - `payment` SYS tokens paid for the loan,
+   // - `balance` is the amount of SYS tokens available to be used for loan auto-renewal,
+   // - `total_staked` total amount staked,
+   // - `loan_num` loan number/id,
+   // - `expiration` the expiration time when loan will be either closed or renewed
+   //       If payment <= balance, the loan is renewed, and closed otherwise.
+   struct [[eosio::table,eosio::contract("eosio.system")]] rex_loan {
+      uint8_t             version = 0;
+      name                from;
+      name                receiver;
+      asset               payment;
+      asset               balance;
+      asset               total_staked;
+      uint64_t            loan_num;
+      eosio::time_point   expiration;
+
+      uint64_t primary_key()const { return loan_num;                   }
+      uint64_t by_expr()const     { return expiration.elapsed.count(); }
+      uint64_t by_owner()const    { return from.value;                 }
+   };
+
+   typedef eosio::multi_in
