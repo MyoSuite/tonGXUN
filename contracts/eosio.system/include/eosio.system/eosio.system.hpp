@@ -698,4 +698,13 @@ namespace eosiosystem {
                                                             //    this avoids sudden price jumps. For new chains which don't need
                                                             //    to gradually phase out staking and REX, 0.01x (10^13) is a good
                                                             //    value for both current_weight_ratio and target_weight_ratio.
-      std::optional<int64_t>        target_weight_ratio;    // Linearly shrink weight_
+      std::optional<int64_t>        target_weight_ratio;    // Linearly shrink weight_ratio to this amount. 1x = 10^15. 0.01x = 10^13.
+                                                            //    Do not specify to preserve the existing setting or use the default.
+      std::optional<int64_t>        assumed_stake_weight;   // Assumed stake weight for ratio calculations. Use the sum of total
+                                                            //    staked and total rented by REX at the time the power market
+                                                            //    is first activated. Do not specify to preserve the existing
+                                                            //    setting (no default exists); this avoids sudden price jumps.
+                                                            //    For new chains which don't need to phase out staking and REX,
+                                                            //    10^12 is probably a good value.
+      std::optional<time_point_sec> target_timestamp;       // Stop automatic weight_ratio shrinkage at this time. Once this
+                                                            //    time hits, weight_ratio will be target_weight_ratio. Ignore
