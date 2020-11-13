@@ -659,4 +659,25 @@ namespace eosiosystem {
       uint64_t by_owner()const    { return from.value;                 }
    };
 
-   typedef eosio::multi_in
+   typedef eosio::multi_index< "cpuloan"_n, rex_loan,
+                               indexed_by<"byexpr"_n,  const_mem_fun<rex_loan, uint64_t, &rex_loan::by_expr>>,
+                               indexed_by<"byowner"_n, const_mem_fun<rex_loan, uint64_t, &rex_loan::by_owner>>
+                             > rex_cpu_loan_table;
+
+   typedef eosio::multi_index< "netloan"_n, rex_loan,
+                               indexed_by<"byexpr"_n,  const_mem_fun<rex_loan, uint64_t, &rex_loan::by_expr>>,
+                               indexed_by<"byowner"_n, const_mem_fun<rex_loan, uint64_t, &rex_loan::by_owner>>
+                             > rex_net_loan_table;
+
+   struct [[eosio::table,eosio::contract("eosio.system")]] rex_order {
+      uint8_t             version = 0;
+      name                owner;
+      asset               rex_requested;
+      asset               proceeds;
+      asset               stake_change;
+      eosio::time_point   order_time;
+      bool                is_open = true;
+
+      void close()                { is_open = false;    }
+      uint64_t primary_key()const { return owner.value; }
+      uint64_t by_time()const     { return is_open ? order_
