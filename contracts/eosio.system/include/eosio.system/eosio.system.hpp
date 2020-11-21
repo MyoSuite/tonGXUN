@@ -717,4 +717,19 @@ namespace eosiosystem {
                                                             //    by 63%. Do not specify to preserve the existing setting or
                                                             //    use the default.
       std::optional<asset>          min_price;              // Fee needed to reserve the entire resource market weight at the
-                                                            //    minimu
+                                                            //    minimum price. For example, this could be set to 0.005% of
+                                                            //    total token supply. Do not specify to preserve the existing
+                                                            //    setting or use the default.
+      std::optional<asset>          max_price;              // Fee needed to reserve the entire resource market weight at the
+                                                            //    maximum price. For example, this could be set to 10% of total
+                                                            //    token supply. Do not specify to preserve the existing
+                                                            //    setting (no default exists).
+
+      EOSLIB_SERIALIZE( powerup_config_resource, (current_weight_ratio)(target_weight_ratio)(assumed_stake_weight)
+                                                (target_timestamp)(exponent)(decay_secs)(min_price)(max_price)    )
+   };
+
+   struct powerup_config {
+      powerup_config_resource  net;             // NET market configuration
+      powerup_config_resource  cpu;             // CPU market configuration
+    
