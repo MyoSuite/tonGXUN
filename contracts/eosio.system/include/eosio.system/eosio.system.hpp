@@ -707,4 +707,14 @@ namespace eosiosystem {
                                                             //    For new chains which don't need to phase out staking and REX,
                                                             //    10^12 is probably a good value.
       std::optional<time_point_sec> target_timestamp;       // Stop automatic weight_ratio shrinkage at this time. Once this
-                                                            //    time hits, weight_ratio will be target_weight_ratio. Ignore
+                                                            //    time hits, weight_ratio will be target_weight_ratio. Ignored
+                                                            //    if current_weight_ratio == target_weight_ratio. Do not specify
+                                                            //    this to preserve the existing setting (no default exists).
+      std::optional<double>         exponent;               // Exponent of resource price curve. Must be >= 1. Do not specify
+                                                            //    to preserve the existing setting or use the default.
+      std::optional<uint32_t>       decay_secs;             // Number of seconds for the gap between adjusted resource
+                                                            //    utilization and instantaneous resource utilization to shrink
+                                                            //    by 63%. Do not specify to preserve the existing setting or
+                                                            //    use the default.
+      std::optional<asset>          min_price;              // Fee needed to reserve the entire resource market weight at the
+                                                            //    minimu
