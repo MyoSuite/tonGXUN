@@ -732,4 +732,17 @@ namespace eosiosystem {
    struct powerup_config {
       powerup_config_resource  net;             // NET market configuration
       powerup_config_resource  cpu;             // CPU market configuration
-    
+      std::optional<uint32_t> powerup_days;     // `powerup` `days` argument must match this. Do not specify to preserve the
+                                                //    existing setting or use the default.
+      std::optional<asset>    min_powerup_fee;  // Fees below this amount are rejected. Do not specify to preserve the
+                                                //    existing setting (no default exists).
+
+      EOSLIB_SERIALIZE( powerup_config, (net)(cpu)(powerup_days)(min_powerup_fee) )
+   };
+
+   struct powerup_state_resource {
+      static constexpr double   default_exponent   = 2.0;                  // Exponent of 2.0 means that the price to reserve a
+                                                                           //    tiny amount of resources increases linearly
+                                                                           //    with utilization.
+      static constexpr uint32_t default_decay_secs = 1 * seconds_per_day;  // 1 day; if 100% of bandwidth resources are in a
+                                                                           //    single loan, then, assuming no further pow
