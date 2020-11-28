@@ -756,4 +756,14 @@ namespace eosiosystem {
                                                                    //    satoshi of SYS staked.
       int64_t        weight_ratio            = 0;                  // resource market weight ratio:
                                                                    //    assumed_stake_weight / (assumed_stake_weight + weight).
-                                                                   //    calculated; varies over time. 1x = 10^15. 0.01x
+                                                                   //    calculated; varies over time. 1x = 10^15. 0.01x = 10^13.
+      int64_t        assumed_stake_weight    = 0;                  // Assumed stake weight for ratio calculations.
+      int64_t        initial_weight_ratio    = powerup_frac;        // Initial weight_ratio used for linear shrinkage.
+      int64_t        target_weight_ratio     = powerup_frac / 100;  // Linearly shrink the weight_ratio to this amount.
+      time_point_sec initial_timestamp       = {};                 // When weight_ratio shrinkage started
+      time_point_sec target_timestamp        = {};                 // Stop automatic weight_ratio shrinkage at this time. Once this
+                                                                   //    time hits, weight_ratio will be target_weight_ratio.
+      double         exponent                = default_exponent;   // Exponent of resource price curve.
+      uint32_t       decay_secs              = default_decay_secs; // Number of seconds for the gap between adjusted resource
+                                                                   //    utilization and instantaneous utilization to shrink by 63%.
+      asset          min_price               = {};           
