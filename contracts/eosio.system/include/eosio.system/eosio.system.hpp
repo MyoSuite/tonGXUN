@@ -766,4 +766,16 @@ namespace eosiosystem {
       double         exponent                = default_exponent;   // Exponent of resource price curve.
       uint32_t       decay_secs              = default_decay_secs; // Number of seconds for the gap between adjusted resource
                                                                    //    utilization and instantaneous utilization to shrink by 63%.
-      asset          min_price               = {};           
+      asset          min_price               = {};                 // Fee needed to reserve the entire resource market weight at
+                                                                   //    the minimum price (defaults to 0).
+      asset          max_price               = {};                 // Fee needed to reserve the entire resource market weight at
+                                                                   //    the maximum price.
+      int64_t        utilization             = 0;                  // Instantaneous resource utilization. This is the current
+                                                                   //    amount sold. utilization <= weight.
+      int64_t        adjusted_utilization    = 0;                  // Adjusted resource utilization. This is >= utilization and
+                                                                   //    <= weight. It grows instantly but decays exponentially.
+      time_point_sec utilization_timestamp   = {};                 // When adjusted_utilization was last updated
+   };
+
+   struct [[eosio::table("powup.state"),eosio::contract("eosio.system")]] powerup_state {
+      static constexpr uin
