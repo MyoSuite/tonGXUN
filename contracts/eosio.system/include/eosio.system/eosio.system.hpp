@@ -745,4 +745,15 @@ namespace eosiosystem {
                                                                            //    tiny amount of resources increases linearly
                                                                            //    with utilization.
       static constexpr uint32_t default_decay_secs = 1 * seconds_per_day;  // 1 day; if 100% of bandwidth resources are in a
-                                                                           //    single loan, then, assuming no further pow
+                                                                           //    single loan, then, assuming no further powerup usage,
+                                                                           //    1 day after it expires the adjusted utilization
+                                                                           //    will be at approximately 37% and after 3 days
+                                                                           //    the adjusted utilization will be less than 5%.
+
+      uint8_t        version                 = 0;
+      int64_t        weight                  = 0;                  // resource market weight. calculated; varies over time.
+                                                                   //    1 represents the same amount of resources as 1
+                                                                   //    satoshi of SYS staked.
+      int64_t        weight_ratio            = 0;                  // resource market weight ratio:
+                                                                   //    assumed_stake_weight / (assumed_stake_weight + weight).
+                                                                   //    calculated; varies over time. 1x = 10^15. 0.01x
