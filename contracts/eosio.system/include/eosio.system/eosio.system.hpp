@@ -778,4 +778,27 @@ namespace eosiosystem {
    };
 
    struct [[eosio::table("powup.state"),eosio::contract("eosio.system")]] powerup_state {
-      static constexpr uin
+      static constexpr uint32_t default_powerup_days = 30; // 30 day resource powerup
+
+      uint8_t                    version           = 0;
+      powerup_state_resource     net               = {};                     // NET market state
+      powerup_state_resource     cpu               = {};                     // CPU market state
+      uint32_t                   powerup_days      = default_powerup_days;   // `powerup` `days` argument must match this.
+      asset                      min_powerup_fee   = {};                     // fees below this amount are rejected
+
+      uint64_t primary_key()const { return 0; }
+   };
+
+   typedef eosio::singleton<"powup.state"_n, powerup_state> powerup_state_singleton;
+
+   struct [[eosio::table("powup.order"),eosio::contract("eosio.system")]] powerup_order {
+      uint8_t              version = 0;
+      uint64_t             id;
+      name                 owner;
+      int64_t              net_weight;
+      int64_t              cpu_weight;
+      time_point_sec       expires;
+
+      uint64_t primary_key()const { return id; }
+      uint64_t by_owner()const    { return owner.value; }
+      
