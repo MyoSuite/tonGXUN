@@ -861,4 +861,22 @@ namespace eosiosystem {
          static constexpr eosio::name ram_account{"eosio.ram"_n};
          static constexpr eosio::name ramfee_account{"eosio.ramfee"_n};
          static constexpr eosio::name stake_account{"eosio.stake"_n};
-         static con
+         static constexpr eosio::name bpay_account{"eosio.bpay"_n};
+         static constexpr eosio::name vpay_account{"eosio.vpay"_n};
+         static constexpr eosio::name names_account{"eosio.names"_n};
+         static constexpr eosio::name saving_account{"eosio.saving"_n};
+         static constexpr eosio::name rex_account{"eosio.rex"_n};
+         static constexpr eosio::name reserve_account{"eosio.reserv"_n}; // cspell:disable-line
+         static constexpr eosio::name null_account{"eosio.null"_n};
+         static constexpr symbol ramcore_symbol = symbol(symbol_code("RAMCORE"), 4);
+         static constexpr symbol ram_symbol     = symbol(symbol_code("RAM"), 0);
+         static constexpr symbol rex_symbol     = symbol(symbol_code("REX"), 4);
+
+         // TELOS BEGIN
+         static constexpr eosio::name tedp_account{"exrsrv.tf"_n};
+         static constexpr eosio::name decide_account{"telos.decide"_n};
+         static constexpr eosio::name works_account{"works.decide"_n};
+         static constexpr eosio::name amend_account{"amend.decide"_n};
+         // TELOS END
+
+         system_contract( name s
