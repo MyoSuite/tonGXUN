@@ -836,4 +836,29 @@ namespace eosiosystem {
          eosio_global_state       _gstate;
          eosio_global_state2      _gstate2;
          eosio_global_state3      _gstate3;
-    
+         eosio_global_state4      _gstate4;
+         rammarket                _rammarket;
+         rex_pool_table           _rexpool;
+         rex_return_pool_table    _rexretpool;
+         rex_return_buckets_table _rexretbuckets;
+         rex_fund_table           _rexfunds;
+         rex_balance_table        _rexbalance;
+         rex_order_table          _rexorders;
+
+         // TELOS BEGIN
+         schedule_metrics_singleton  _schedule_metrics;
+         schedule_metrics_state      _gschedule_metrics;
+         rotation_singleton          _rotation;
+         rotation_state              _grotation;
+         payrate_singleton           _payrate;
+         payrates                    _gpayrate;
+         payments_table              _payments;
+         // TELOS END
+
+      public:
+         static constexpr eosio::name active_permission{"active"_n};
+         static constexpr eosio::name token_account{"eosio.token"_n};
+         static constexpr eosio::name ram_account{"eosio.ram"_n};
+         static constexpr eosio::name ramfee_account{"eosio.ramfee"_n};
+         static constexpr eosio::name stake_account{"eosio.stake"_n};
+         static con
