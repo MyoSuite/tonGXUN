@@ -879,4 +879,31 @@ namespace eosiosystem {
          static constexpr eosio::name amend_account{"amend.decide"_n};
          // TELOS END
 
-         system_contract( name s
+         system_contract( name s, name code, datastream<const char*> ds );
+         ~system_contract();
+
+          // Returns the core symbol by system account name
+          // @param system_account - the system account to get the core symbol for.
+         static symbol get_core_symbol( name system_account = "eosio"_n ) {
+            rammarket rm(system_account, system_account.value);
+            const static auto sym = get_core_symbol( rm );
+            return sym;
+         }
+
+         // Actions:
+         /**
+          * The Init action initializes the system contract for a version and a symbol.
+          * Only succeeds when:
+          * - version is 0 and
+          * - symbol is found and
+          * - system token supply is greater than 0,
+          * - and system contract wasn’t already been initialized.
+          *
+          * @param version - the version, has to be 0,
+          * @param core - the system symbol.
+          */
+         [[eosio::action]]
+         void init( unsigned_int version, const symbol& core );
+
+         /**
+          * On block action. This special action is triggered when a block is applied by
