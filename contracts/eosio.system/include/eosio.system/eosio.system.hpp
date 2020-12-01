@@ -949,4 +949,28 @@ namespace eosiosystem {
          /**
           * Set account CPU limits action, which sets the CPU limits of an account
           *
-          * @param account - na
+          * @param account - name of the account whose resource limit to be set,
+          * @param cpu_weight - fractionally proportionate cpu limit of available resources based on (weight / total_weight_of_all_accounts).
+          */
+         [[eosio::action]]
+         void setacctcpu( const name& account, const std::optional<int64_t>& cpu_weight );
+
+
+         /**
+          * The activate action, activates a protocol feature
+          *
+          * @param feature_digest - hash of the protocol feature to activate.
+          */
+         [[eosio::action]]
+         void activate( const eosio::checksum256& feature_digest );
+
+         // functions defined in delegate_bandwidth.cpp
+
+         /**
+          * Delegate bandwidth and/or cpu action. Stakes SYS from the balance of `from` for the benefit of `receiver`.
+          *
+          * @param from - the account to delegate bandwidth from, that is, the account holding
+          *    tokens to be staked,
+          * @param receiver - the account to delegate bandwidth to, that is, the account to
+          *    whose resources staked tokens are added
+          * @param stake
