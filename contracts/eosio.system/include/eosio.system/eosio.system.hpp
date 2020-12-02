@@ -994,4 +994,30 @@ namespace eosiosystem {
           * Deposit to REX fund action. Deposits core tokens to user REX fund.
           * All proceeds and expenses related to REX are added to or taken out of this fund.
           * An inline transfer from 'owner' liquid balance is executed.
-          * All REX-related costs and proceeds are deducted from and added to 'owner' 
+          * All REX-related costs and proceeds are deducted from and added to 'owner' REX fund,
+          *    with one exception being buying REX using staked tokens.
+          * Storage change is billed to 'owner'.
+          *
+          * @param owner - REX fund owner account,
+          * @param amount - amount of tokens to be deposited.
+          */
+         [[eosio::action]]
+         void deposit( const name& owner, const asset& amount );
+
+         /**
+          * Withdraw from REX fund action, withdraws core tokens from user REX fund.
+          * An inline token transfer to user balance is executed.
+          *
+          * @param owner - REX fund owner account,
+          * @param amount - amount of tokens to be withdrawn.
+          */
+         [[eosio::action]]
+         void withdraw( const name& owner, const asset& amount );
+
+         /**
+          * Buyrex action, buys REX in exchange for tokens taken out of user's REX fund by transferring
+          * core tokens from user REX fund and converts them to REX stake. By buying REX, user is
+          * lending tokens in order to be rented as CPU or NET resources.
+          * Storage change is billed to 'from' account.
+          *
+          * @
