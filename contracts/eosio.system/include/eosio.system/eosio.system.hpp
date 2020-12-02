@@ -973,4 +973,25 @@ namespace eosiosystem {
           *    tokens to be staked,
           * @param receiver - the account to delegate bandwidth to, that is, the account to
           *    whose resources staked tokens are added
-          * @param stake
+          * @param stake_net_quantity - tokens staked for NET bandwidth,
+          * @param stake_cpu_quantity - tokens staked for CPU bandwidth,
+          * @param transfer - if true, ownership of staked tokens is transferred to `receiver`.
+          *
+          * @post All producers `from` account has voted for will have their votes updated immediately.
+          */
+         [[eosio::action]]
+         void delegatebw( const name& from, const name& receiver,
+                          const asset& stake_net_quantity, const asset& stake_cpu_quantity, bool transfer );
+
+         /**
+          * Setrex action, sets total_rent balance of REX pool to the passed value.
+          * @param balance - amount to set the REX pool balance.
+          */
+         [[eosio::action]]
+         void setrex( const asset& balance );
+
+         /**
+          * Deposit to REX fund action. Deposits core tokens to user REX fund.
+          * All proceeds and expenses related to REX are added to or taken out of this fund.
+          * An inline transfer from 'owner' liquid balance is executed.
+          * All REX-related costs and proceeds are deducted from and added to 'owner' 
