@@ -1020,4 +1020,24 @@ namespace eosiosystem {
           * lending tokens in order to be rented as CPU or NET resources.
           * Storage change is billed to 'from' account.
           *
-          * @
+          * @param from - owner account name,
+          * @param amount - amount of tokens taken out of 'from' REX fund.
+          *
+          * @pre A voting requirement must be satisfied before action can be executed.
+          * @pre User must vote for at least 21 producers or delegate vote to proxy before buying REX.
+          *
+          * @post User votes are updated following this action.
+          * @post Tokens used in purchase are added to user's voting power.
+          * @post Bought REX cannot be sold before 4 days counting from end of day of purchase.
+          */
+         [[eosio::action]]
+         void buyrex( const name& from, const asset& amount );
+
+         /**
+          * Unstaketorex action, uses staked core tokens to buy REX.
+          * Storage change is billed to 'owner' account.
+          *
+          * @param owner - owner of staked tokens,
+          * @param receiver - account name that tokens have previously been staked to,
+          * @param from_net - amount of tokens to be unstaked from NET bandwidth and used for REX purchase,
+          * @param from_cpu - amount of tokens to be unstaked from CPU ba
