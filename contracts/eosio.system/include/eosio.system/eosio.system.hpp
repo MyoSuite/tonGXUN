@@ -1040,4 +1040,22 @@ namespace eosiosystem {
           * @param owner - owner of staked tokens,
           * @param receiver - account name that tokens have previously been staked to,
           * @param from_net - amount of tokens to be unstaked from NET bandwidth and used for REX purchase,
-          * @param from_cpu - amount of tokens to be unstaked from CPU ba
+          * @param from_cpu - amount of tokens to be unstaked from CPU bandwidth and used for REX purchase.
+          *
+          * @pre A voting requirement must be satisfied before action can be executed.
+          * @pre User must vote for at least 21 producers or delegate vote to proxy before buying REX.
+          *
+          * @post User votes are updated following this action.
+          * @post Tokens used in purchase are added to user's voting power.
+          * @post Bought REX cannot be sold before 4 days counting from end of day of purchase.
+          */
+         [[eosio::action]]
+         void unstaketorex( const name& owner, const name& receiver, const asset& from_net, const asset& from_cpu );
+
+         /**
+          * Sellrex action, sells REX in exchange for core tokens by converting REX stake back into core tokens
+          * at current exchange rate. If order cannot be processed, it gets queued until there is enough
+          * in REX pool to fill order, and will be processed within 30 days at most. If successful, user
+          * votes are updated, that is, proceeds are deducted from user's voting power. In case sell order
+          * is queued, storage change is billed to 'from' account.
+  
