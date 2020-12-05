@@ -1058,4 +1058,28 @@ namespace eosiosystem {
           * in REX pool to fill order, and will be processed within 30 days at most. If successful, user
           * votes are updated, that is, proceeds are deducted from user's voting power. In case sell order
           * is queued, storage change is billed to 'from' account.
-  
+          *
+          * @param from - owner account of REX,
+          * @param rex - amount of REX to be sold.
+          */
+         [[eosio::action]]
+         void sellrex( const name& from, const asset& rex );
+
+         /**
+          * Cnclrexorder action, cancels unfilled REX sell order by owner if one exists.
+          *
+          * @param owner - owner account name.
+          *
+          * @pre Order cannot be cancelled once it's been filled.
+          */
+         [[eosio::action]]
+         void cnclrexorder( const name& owner );
+
+         /**
+          * Rentcpu action, uses payment to rent as many SYS tokens as possible as determined by market price and
+          * stake them for CPU for the benefit of receiver, after 30 days the rented core delegation of CPU
+          * will expire. At expiration, if balance is greater than or equal to `loan_payment`, `loan_payment`
+          * is taken out of loan balance and used to renew the loan. Otherwise, the loan is closed and user
+          * is refunded any remaining balance.
+          * Owner can fund or refund a loan at any time before its expiration.
+          * All loan expenses and 
