@@ -1082,4 +1082,19 @@ namespace eosiosystem {
           * is taken out of loan balance and used to renew the loan. Otherwise, the loan is closed and user
           * is refunded any remaining balance.
           * Owner can fund or refund a loan at any time before its expiration.
-          * All loan expenses and 
+          * All loan expenses and refunds come out of or are added to owner's REX fund.
+          *
+          * @param from - account creating and paying for CPU loan, 'from' account can add tokens to loan
+          *    balance using action `fundcpuloan` and withdraw from loan balance using `defcpuloan`
+          * @param receiver - account receiving rented CPU resources,
+          * @param loan_payment - tokens paid for the loan, it has to be greater than zero,
+          *    amount of rented resources is calculated from `loan_payment`,
+          * @param loan_fund - additional tokens can be zero, and is added to loan balance.
+          *    Loan balance represents a reserve that is used at expiration for automatic loan renewal.
+          */
+         [[eosio::action]]
+         void rentcpu( const name& from, const name& receiver, const asset& loan_payment, const asset& loan_fund );
+
+         /**
+          * Rentnet action, uses payment to rent as many SYS tokens as possible as determined by market price and
+          * stake them for NET for the benefit of receiver, after 30 days the rented core dele
