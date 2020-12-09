@@ -1113,4 +1113,29 @@ namespace eosiosystem {
           *    Loan balance represents a reserve that is used at expiration for automatic loan renewal.
           */
          [[eosio::action]]
-         void rentnet( const name& from, const 
+         void rentnet( const name& from, const name& receiver, const asset& loan_payment, const asset& loan_fund );
+
+         /**
+          * Fundcpuloan action, transfers tokens from REX fund to the fund of a specific CPU loan in order to
+          * be used for loan renewal at expiry.
+          *
+          * @param from - loan creator account,
+          * @param loan_num - loan id,
+          * @param payment - tokens transferred from REX fund to loan fund.
+          */
+         [[eosio::action]]
+         void fundcpuloan( const name& from, uint64_t loan_num, const asset& payment );
+
+         /**
+          * Fundnetloan action, transfers tokens from REX fund to the fund of a specific NET loan in order to
+          * be used for loan renewal at expiry.
+          *
+          * @param from - loan creator account,
+          * @param loan_num - loan id,
+          * @param payment - tokens transferred from REX fund to loan fund.
+          */
+         [[eosio::action]]
+         void fundnetloan( const name& from, uint64_t loan_num, const asset& payment );
+
+         /**
+          * Defcpuloan action, withdraws tokens from the fund of a spec
