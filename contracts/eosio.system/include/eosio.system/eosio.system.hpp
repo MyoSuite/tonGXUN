@@ -1167,4 +1167,28 @@ namespace eosiosystem {
 
          /**
           * Rexexec action, processes max CPU loans, max NET loans, and max queued sellrex orders.
- 
+          * Action does not execute anything related to a specific user.
+          *
+          * @param user - any account can execute this action,
+          * @param max - number of each of CPU loans, NET loans, and sell orders to be processed.
+          */
+         [[eosio::action]]
+         void rexexec( const name& user, uint16_t max );
+
+         /**
+          * Consolidate action, consolidates REX maturity buckets into one bucket that can be sold after 4 days
+          * starting from the end of the day.
+          *
+          * @param owner - REX owner account name.
+          */
+         [[eosio::action]]
+         void consolidate( const name& owner );
+
+         /**
+          * Mvtosavings action, moves a specified amount of REX into savings bucket. REX savings bucket
+          * never matures. In order for it to be sold, it has to be moved explicitly
+          * out of that bucket. Then the moved amount will have the regular maturity
+          * period of 4 days starting from the end of the day.
+          *
+          * @param owner - REX owner account name.
+          * @param rex - amou
