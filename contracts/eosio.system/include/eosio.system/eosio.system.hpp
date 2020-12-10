@@ -1138,4 +1138,33 @@ namespace eosiosystem {
          void fundnetloan( const name& from, uint64_t loan_num, const asset& payment );
 
          /**
-          * Defcpuloan action, withdraws tokens from the fund of a spec
+          * Defcpuloan action, withdraws tokens from the fund of a specific CPU loan and adds them to REX fund.
+          *
+          * @param from - loan creator account,
+          * @param loan_num - loan id,
+          * @param amount - tokens transferred from CPU loan fund to REX fund.
+          */
+         [[eosio::action]]
+         void defcpuloan( const name& from, uint64_t loan_num, const asset& amount );
+
+         /**
+          * Defnetloan action, withdraws tokens from the fund of a specific NET loan and adds them to REX fund.
+          *
+          * @param from - loan creator account,
+          * @param loan_num - loan id,
+          * @param amount - tokens transferred from NET loan fund to REX fund.
+          */
+         [[eosio::action]]
+         void defnetloan( const name& from, uint64_t loan_num, const asset& amount );
+
+         /**
+          * Updaterex action, updates REX owner vote weight to current value of held REX tokens.
+          *
+          * @param owner - REX owner account.
+          */
+         [[eosio::action]]
+         void updaterex( const name& owner );
+
+         /**
+          * Rexexec action, processes max CPU loans, max NET loans, and max queued sellrex orders.
+ 
