@@ -1191,4 +1191,34 @@ namespace eosiosystem {
           * period of 4 days starting from the end of the day.
           *
           * @param owner - REX owner account name.
-          * @param rex - amou
+          * @param rex - amount of REX to be moved.
+          */
+         [[eosio::action]]
+         void mvtosavings( const name& owner, const asset& rex );
+
+         /**
+          * Mvfrsavings action, moves a specified amount of REX out of savings bucket. The moved amount
+          * will have the regular REX maturity period of 4 days.
+          *
+          * @param owner - REX owner account name.
+          * @param rex - amount of REX to be moved.
+          */
+         [[eosio::action]]
+         void mvfrsavings( const name& owner, const asset& rex );
+
+         /**
+          * Closerex action, deletes owner records from REX tables and frees used RAM. Owner must not have
+          * an outstanding REX balance.
+          *
+          * @param owner - user account name.
+          *
+          * @pre If owner has a non-zero REX balance, the action fails; otherwise,
+          *    owner REX balance entry is deleted.
+          * @pre If owner has no outstanding loans and a zero REX fund balance,
+          *    REX fund entry is deleted.
+          */
+         [[eosio::action]]
+         void closerex( const name& owner );
+
+         /**
+          * Undelegate bandwidth action, decreases the total tok
