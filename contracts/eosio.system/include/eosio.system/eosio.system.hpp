@@ -1258,4 +1258,31 @@ namespace eosiosystem {
           *
           * @param payer - the ram buyer,
           * @param receiver - the ram receiver,
-          * @param quant - the quantity of tokens to buy ram w
+          * @param quant - the quantity of tokens to buy ram with.
+          */
+         [[eosio::action]]
+         void buyram( const name& payer, const name& receiver, const asset& quant );
+
+         /**
+          * Buy a specific amount of ram bytes action. Increases receiver's ram in quantity of bytes provided.
+          * An inline transfer from receiver to system contract of tokens will be executed.
+          *
+          * @param payer - the ram buyer,
+          * @param receiver - the ram receiver,
+          * @param bytes - the quantity of ram to buy specified in bytes.
+          */
+         [[eosio::action]]
+         void buyrambytes( const name& payer, const name& receiver, uint32_t bytes );
+
+         /**
+          * Sell ram action, reduces quota by bytes and then performs an inline transfer of tokens
+          * to receiver based upon the average purchase price of the original quota.
+          *
+          * @param account - the ram seller account,
+          * @param bytes - the amount of ram to sell in bytes.
+          */
+         [[eosio::action]]
+         void sellram( const name& account, int64_t bytes );
+
+         /**
+          * Refund action, this action is called
