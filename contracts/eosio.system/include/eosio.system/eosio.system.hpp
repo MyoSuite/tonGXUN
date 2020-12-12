@@ -1238,4 +1238,24 @@ namespace eosiosystem {
           * @param receiver - the account to undelegate bandwidth to, that is,
           *    the account to whose benefit tokens have been staked,
           * @param unstake_net_quantity - tokens to be unstaked from NET bandwidth,
-          * @param unstake_cpu_quantity - tokens to be 
+          * @param unstake_cpu_quantity - tokens to be unstaked from CPU bandwidth,
+          *
+          * @post Unstaked tokens are transferred to `from` liquid balance via a
+          *    deferred transaction with a delay of 3 days.
+          * @post If called during the delay period of a previous `undelegatebw`
+          *    action, pending action is canceled and timer is reset.
+          * @post All producers `from` account has voted for will have their votes updated immediately.
+          * @post Bandwidth and storage for the deferred transaction are billed to `from`.
+          */
+         [[eosio::action]]
+         void undelegatebw( const name& from, const name& receiver,
+                            const asset& unstake_net_quantity, const asset& unstake_cpu_quantity );
+
+         /**
+          * Buy ram action, increases receiver's ram quota based upon current price and quantity of
+          * tokens provided. An inline transfer from receiver to system contract of
+          * tokens will be executed.
+          *
+          * @param payer - the ram buyer,
+          * @param receiver - the ram receiver,
+          * @param quant - the quantity of tokens to buy ram w
