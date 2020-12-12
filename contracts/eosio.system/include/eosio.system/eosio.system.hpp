@@ -1221,4 +1221,21 @@ namespace eosiosystem {
          void closerex( const name& owner );
 
          /**
-          * Undelegate bandwidth action, decreases the total tok
+          * Undelegate bandwidth action, decreases the total tokens delegated by `from` to `receiver` and/or
+          * frees the memory associated with the delegation if there is nothing
+          * left to delegate.
+          * This will cause an immediate reduction in net/cpu bandwidth of the
+          * receiver.
+          * A transaction is scheduled to send the tokens back to `from` after
+          * the staking period has passed. If existing transaction is scheduled, it
+          * will be canceled and a new transaction issued that has the combined
+          * undelegated amount.
+          * The `from` account loses voting power as a result of this call and
+          * all producer tallies are updated.
+          *
+          * @param from - the account to undelegate bandwidth from, that is,
+          *    the account whose tokens will be unstaked,
+          * @param receiver - the account to undelegate bandwidth to, that is,
+          *    the account to whose benefit tokens have been staked,
+          * @param unstake_net_quantity - tokens to be unstaked from NET bandwidth,
+          * @param unstake_cpu_quantity - tokens to be 
