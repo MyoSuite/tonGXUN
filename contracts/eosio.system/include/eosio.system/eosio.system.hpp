@@ -1285,4 +1285,24 @@ namespace eosiosystem {
          void sellram( const name& account, int64_t bytes );
 
          /**
-          * Refund action, this action is called
+          * Refund action, this action is called after the delegation-period to claim all pending
+          * unstaked tokens belonging to owner.
+          *
+          * @param owner - the owner of the tokens claimed.
+          */
+         [[eosio::action]]
+         void refund( const name& owner );
+
+         // functions defined in voting.cpp
+
+         /**
+          * Register producer action, indicates that a particular account wishes to become a producer,
+          * this action will create a `producer_config` and a `producer_info` object for `producer` scope
+          * in producers tables.
+          *
+          * @param producer - account registering to be a producer candidate,
+          * @param producer_key - the public key of the block producer, this is the key used by block producer to sign blocks,
+          * @param url - the url of the block producer, normally the url of the block producer presentation website,
+          * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+          *
+          * @pre Producer to register is an accou
