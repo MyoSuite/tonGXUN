@@ -1325,4 +1325,29 @@ namespace eosiosystem {
           * @pre Authority of producer to register
           */
          [[eosio::action]]
-         void regproducer2( const name& producer, const eosio:
+         void regproducer2( const name& producer, const eosio::block_signing_authority& producer_authority, const std::string& url, uint16_t location );
+
+         /**
+          * Unregister producer action, deactivates the block producer with account name `producer`.
+          *
+          * Deactivate the block producer with account name `producer`.
+          * @param producer - the block producer account to unregister.
+          */
+         [[eosio::action]]
+         void unregprod( const name& producer );
+
+         /**
+          * Set ram action sets the ram supply.
+          * @param max_ram_size - the amount of ram supply to set.
+          */
+         [[eosio::action]]
+         void setram( uint64_t max_ram_size );
+
+         /**
+          * Set ram rate action, sets the rate of increase of RAM in bytes per block. It is capped by the uint16_t to
+          * a maximum rate of 3 TB per year. If update_ram_supply hasn't been called for the most recent block,
+          * then new ram will be allocated at the old rate up to the present block before switching the rate.
+          *
+          * @param bytes_per_block - the amount of bytes per block increase to set.
+          */
+         [[eosi
