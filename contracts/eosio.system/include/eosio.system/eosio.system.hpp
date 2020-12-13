@@ -1350,4 +1350,22 @@ namespace eosiosystem {
           *
           * @param bytes_per_block - the amount of bytes per block increase to set.
           */
-         [[eosi
+         [[eosio::action]]
+         void setramrate( uint16_t bytes_per_block );
+
+         /**
+          * Vote producer action, votes for a set of producers. This action updates the list of `producers` voted for,
+          * for `voter` account. If voting for a `proxy`, the producer votes will not change until the
+          * proxy updates their own vote. Voter can vote for a proxy __or__ a list of at most 30 producers.
+          * Storage change is billed to `voter`.
+          *
+          * @param voter - the account to change the voted producers for,
+          * @param proxy - the proxy to change the voted producers for,
+          * @param producers - the list of producers to vote for, a maximum of 30 producers is allowed.
+          *
+          * @pre Producers must be sorted from lowest to highest and must be registered and active
+          * @pre If proxy is set then no producers can be voted for
+          * @pre If proxy is set then proxy account must exist and be registered as a proxy
+          * @pre Every listed producer or proxy must have been previously registered
+          * @pre Voter must authorize this action
+          
