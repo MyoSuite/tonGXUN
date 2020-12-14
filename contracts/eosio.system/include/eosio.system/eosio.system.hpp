@@ -1387,4 +1387,27 @@ namespace eosiosystem {
           * 
           * @post the voter.staked will be updated
           * @post previously voted for producers vote weight will be updated with new weight
- 
+          * @post previously voted for proxy vote weight will be updated with new weight
+          */
+         [[eosio::action]]
+         void voteupdate( const name& voter_name );
+
+         /**
+          * Register proxy action, sets `proxy` account as proxy.
+          * An account marked as a proxy can vote with the weight of other accounts which
+          * have selected it as a proxy. Other accounts must refresh their voteproducer to
+          * update the proxy's weight.
+          * Storage change is billed to `proxy`.
+          *
+          * @param proxy - the account registering as voter proxy (or unregistering),
+          * @param isproxy - if true, proxy is registered; if false, proxy is unregistered.
+          *
+          * @pre Proxy must have something staked (existing row in voters table)
+          * @pre New state must be different than current state
+          */
+         [[eosio::action]]
+         void regproxy( const name& proxy, bool isproxy );
+
+         /**
+          * Set the blockchain parameters. By tunning these parameters a degree of
+          * customization c
