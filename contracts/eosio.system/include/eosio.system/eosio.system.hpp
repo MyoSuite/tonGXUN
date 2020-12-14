@@ -1410,4 +1410,33 @@ namespace eosiosystem {
 
          /**
           * Set the blockchain parameters. By tunning these parameters a degree of
-          * customization c
+          * customization can be achieved.
+          * @param params - New blockchain parameters to set.
+          */
+         [[eosio::action]]
+         void setparams( const blockchain_parameters_t& params );
+
+#ifdef SYSTEM_CONFIGURABLE_WASM_LIMITS
+         /**
+          * Sets the WebAssembly limits.  Valid parameters are "low",
+          * "default" (equivalent to low), and "high".  A value of "high"
+          * allows larger contracts to be deployed.
+          */
+         [[eosio::action]]
+         void wasmcfg( const name& settings );
+#endif
+
+         /**
+          * Claim rewards action, claims block producing and vote rewards.
+          * @param owner - producer account claiming per-block and per-vote rewards.
+          */
+         [[eosio::action]]
+         void claimrewards( const name& owner );
+
+         /**
+          * Set privilege status for an account. Allows to set privilege status for an account (turn it on/off).
+          * @param account - the account to set the privileged status for.
+          * @param is_priv - 0 for false, > 0 for true.
+          */
+         [[eosio::action]]
+         void setpriv( const name& account, uint8_t
