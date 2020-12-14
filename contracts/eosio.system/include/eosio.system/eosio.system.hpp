@@ -1368,4 +1368,23 @@ namespace eosiosystem {
           * @pre If proxy is set then proxy account must exist and be registered as a proxy
           * @pre Every listed producer or proxy must have been previously registered
           * @pre Voter must authorize this action
-          
+          * @pre Voter must have previously staked some EOS for voting
+          * @pre Voter->staked must be up to date
+          *
+          * @post Every producer previously voted for will have vote reduced by previous vote weight
+          * @post Every producer newly voted for will have vote increased by new vote amount
+          * @post Prior proxy will proxied_vote_weight decremented by previous vote weight
+          * @post New proxy will proxied_vote_weight incremented by new vote weight
+          */
+         [[eosio::action]]
+         void voteproducer( const name& voter, const name& proxy, const std::vector<name>& producers );
+
+         /**
+          * Update the vote weight for the producers or proxy `voter_name` currently votes for. This will also
+          * update the `staked` value for the `voter_name` by checking `rexbal` and all delegated NET and CPU. 
+          * 
+          * @param voter_name - the account to update the votes for,
+          * 
+          * @post the voter.staked will be updated
+          * @post previously voted for producers vote weight will be updated with new weight
+ 
