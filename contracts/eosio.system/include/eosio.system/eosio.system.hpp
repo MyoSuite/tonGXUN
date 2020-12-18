@@ -1439,4 +1439,30 @@ namespace eosiosystem {
           * @param is_priv - 0 for false, > 0 for true.
           */
          [[eosio::action]]
-         void setpriv( const name& account, uint8_t
+         void setpriv( const name& account, uint8_t is_priv );
+
+         /**
+          * Remove producer action, deactivates a producer by name, if not found asserts.
+          * @param producer - the producer account to deactivate.
+          */
+         [[eosio::action]]
+         void rmvproducer( const name& producer );
+
+         /**
+          * Update revision action, updates the current revision.
+          * @param revision - it has to be incremented by 1 compared with current revision.
+          *
+          * @pre Current revision can not be higher than 254, and has to be smaller
+          * than or equal 1 (“set upper bound to greatest revision supported in the code”).
+          */
+         [[eosio::action]]
+         void updtrevision( uint8_t revision );
+
+         /**
+          * Bid name action, allows an account `bidder` to place a bid for a name `newname`.
+          * @param bidder - the account placing the bid,
+          * @param newname - the name the bid is placed for,
+          * @param bid - the amount of system tokens payed for the bid.
+          *
+          * @pre Bids can be placed only on top-level suffix,
+          * @pre Non empty
