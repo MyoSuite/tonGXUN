@@ -1465,4 +1465,26 @@ namespace eosiosystem {
           * @param bid - the amount of system tokens payed for the bid.
           *
           * @pre Bids can be placed only on top-level suffix,
-          * @pre Non empty
+          * @pre Non empty name,
+          * @pre Names longer than 12 chars are not allowed,
+          * @pre Names equal with 12 chars can be created without placing a bid,
+          * @pre Bid has to be bigger than zero,
+          * @pre Bid's symbol must be system token,
+          * @pre Bidder account has to be different than current highest bidder,
+          * @pre Bid must increase current bid by 10%,
+          * @pre Auction must still be opened.
+          */
+         [[eosio::action]]
+         void bidname( const name& bidder, const name& newname, const asset& bid );
+
+         /**
+          * Bid refund action, allows the account `bidder` to get back the amount it bid so far on a `newname` name.
+          *
+          * @param bidder - the account that gets refunded,
+          * @param newname - the name for which the bid was placed and now it gets refunded for.
+          */
+         [[eosio::action]]
+         void bidrefund( const name& bidder, const name& newname );
+
+         /**
+          * Change the annual inflation rate of 
