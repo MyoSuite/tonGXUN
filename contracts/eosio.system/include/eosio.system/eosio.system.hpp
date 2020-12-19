@@ -1500,4 +1500,31 @@ namespace eosiosystem {
           * @param votepay_factor - Inverse of the fraction of the block producer rewards to be distributed proportional to blocks produced.
           *     The remaining rewards will be distributed proportional to votes received.
           *     (eg. For 25% of block producer rewards going towards block pay => votepay_factor = 40000
-          *          For 75% of block producer rewards going towards block
+          *          For 75% of block producer rewards going towards block pay => votepay_factor = 13333).
+          */
+         [[eosio::action]]
+         void setinflation( int64_t annual_rate, int64_t inflation_pay_factor, int64_t votepay_factor );
+
+         /**
+          * Configure the `power` market. The market becomes available the first time this
+          * action is invoked.
+          */
+         [[eosio::action]]
+         void cfgpowerup( powerup_config& args );
+
+         /**
+          * Process power queue and update state. Action does not execute anything related to a specific user.
+          *
+          * @param user - any account can execute this action
+          * @param max - number of queue items to process
+          */
+         [[eosio::action]]
+         void powerupexec( const name& user, uint16_t max );
+
+         /**
+          * Powerup NET and CPU resources by percentage
+          *
+          * @param payer - the resource buyer
+          * @param receiver - the resource receiver
+          * @param days - number of days of resource availability. Must match market configuration.
+          * @param net_frac - fraction of net (100% = 10
