@@ -1527,4 +1527,21 @@ namespace eosiosystem {
           * @param payer - the resource buyer
           * @param receiver - the resource receiver
           * @param days - number of days of resource availability. Must match market configuration.
-          * @param net_frac - fraction of net (100% = 10
+          * @param net_frac - fraction of net (100% = 10^15) managed by this market
+          * @param cpu_frac - fraction of cpu (100% = 10^15) managed by this market
+          * @param max_payment - the maximum amount `payer` is willing to pay. Tokens are withdrawn from
+          *    `payer`'s token balance.
+          */
+         [[eosio::action]]
+         void powerup( const name& payer, const name& receiver, uint32_t days, int64_t net_frac, int64_t cpu_frac, const asset& max_payment );
+
+         /**
+          * limitauthchg opts into or out of restrictions on updateauth, deleteauth, linkauth, and unlinkauth.
+          *
+          * If either allow_perms or disallow_perms is non-empty, then opts into restrictions. If
+          * allow_perms is non-empty, then the authorized_by argument of the restricted actions must be in
+          * the vector, or the actions will abort. If disallow_perms is non-empty, then the authorized_by
+          * argument of the restricted actions must not be in the vector, or the actions will abort.
+          *
+          * If both allow_perms and disallow_perms are empty, then opts out of the restrictions. limitauthchg
+          * aborts if
