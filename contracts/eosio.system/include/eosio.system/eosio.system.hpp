@@ -1570,4 +1570,15 @@ namespace eosiosystem {
          using fundcpuloan_action = eosio::action_wrapper<"fundcpuloan"_n, &system_contract::fundcpuloan>;
          using fundnetloan_action = eosio::action_wrapper<"fundnetloan"_n, &system_contract::fundnetloan>;
          using defcpuloan_action = eosio::action_wrapper<"defcpuloan"_n, &system_contract::defcpuloan>;
-         using defnetloan_action = eosio::ac
+         using defnetloan_action = eosio::action_wrapper<"defnetloan"_n, &system_contract::defnetloan>;
+         using updaterex_action = eosio::action_wrapper<"updaterex"_n, &system_contract::updaterex>;
+         using rexexec_action = eosio::action_wrapper<"rexexec"_n, &system_contract::rexexec>;
+         using setrex_action = eosio::action_wrapper<"setrex"_n, &system_contract::setrex>;
+         using mvtosavings_action = eosio::action_wrapper<"mvtosavings"_n, &system_contract::mvtosavings>;
+         using mvfrsavings_action = eosio::action_wrapper<"mvfrsavings"_n, &system_contract::mvfrsavings>;
+         using consolidate_action = eosio::action_wrapper<"consolidate"_n, &system_contract::consolidate>;
+         using closerex_action = eosio::action_wrapper<"closerex"_n, &system_contract::closerex>;
+         using undelegatebw_action = eosio::action_wrapper<"undelegatebw"_n, &system_contract::undelegatebw>;
+         using buyram_action = eosio::action_wrapper<"buyram"_n, &system_contract::buyram>;
+         using buyrambytes_action = eosio::action_wrapper<"buyrambytes"_n, &system_contract::buyrambytes>;
+         u
