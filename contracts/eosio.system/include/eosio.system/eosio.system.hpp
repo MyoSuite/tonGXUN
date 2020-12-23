@@ -1544,4 +1544,19 @@ namespace eosiosystem {
           * argument of the restricted actions must not be in the vector, or the actions will abort.
           *
           * If both allow_perms and disallow_perms are empty, then opts out of the restrictions. limitauthchg
-          * aborts if
+          * aborts if both allow_perms and disallow_perms are non-empty.
+          *
+          * @param account - account to change
+          * @param allow_perms - permissions which may use the restricted actions
+          * @param disallow_perms - permissions which may not use the restricted actions
+          */
+         [[eosio::action]]
+         void limitauthchg( const name& account, const std::vector<name>& allow_perms, const std::vector<name>& disallow_perms );
+
+         using init_action = eosio::action_wrapper<"init"_n, &system_contract::init>;
+         using setacctram_action = eosio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
+         using setacctnet_action = eosio::action_wrapper<"setacctnet"_n, &system_contract::setacctnet>;
+         using setacctcpu_action = eosio::action_wrapper<"setacctcpu"_n, &system_contract::setacctcpu>;
+         using activate_action = eosio::action_wrapper<"activate"_n, &system_contract::activate>;
+         using delegatebw_action = eosio::action_wrapper<"delegatebw"_n, &system_contract::delegatebw>;
+         using deposit_action = e
