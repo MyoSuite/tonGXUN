@@ -1559,4 +1559,15 @@ namespace eosiosystem {
          using setacctcpu_action = eosio::action_wrapper<"setacctcpu"_n, &system_contract::setacctcpu>;
          using activate_action = eosio::action_wrapper<"activate"_n, &system_contract::activate>;
          using delegatebw_action = eosio::action_wrapper<"delegatebw"_n, &system_contract::delegatebw>;
-         using deposit_action = e
+         using deposit_action = eosio::action_wrapper<"deposit"_n, &system_contract::deposit>;
+         using withdraw_action = eosio::action_wrapper<"withdraw"_n, &system_contract::withdraw>;
+         using buyrex_action = eosio::action_wrapper<"buyrex"_n, &system_contract::buyrex>;
+         using unstaketorex_action = eosio::action_wrapper<"unstaketorex"_n, &system_contract::unstaketorex>;
+         using sellrex_action = eosio::action_wrapper<"sellrex"_n, &system_contract::sellrex>;
+         using cnclrexorder_action = eosio::action_wrapper<"cnclrexorder"_n, &system_contract::cnclrexorder>;
+         using rentcpu_action = eosio::action_wrapper<"rentcpu"_n, &system_contract::rentcpu>;
+         using rentnet_action = eosio::action_wrapper<"rentnet"_n, &system_contract::rentnet>;
+         using fundcpuloan_action = eosio::action_wrapper<"fundcpuloan"_n, &system_contract::fundcpuloan>;
+         using fundnetloan_action = eosio::action_wrapper<"fundnetloan"_n, &system_contract::fundnetloan>;
+         using defcpuloan_action = eosio::action_wrapper<"defcpuloan"_n, &system_contract::defcpuloan>;
+         using defnetloan_action = eosio::ac
