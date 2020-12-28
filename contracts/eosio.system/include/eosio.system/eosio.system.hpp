@@ -1581,4 +1581,15 @@ namespace eosiosystem {
          using undelegatebw_action = eosio::action_wrapper<"undelegatebw"_n, &system_contract::undelegatebw>;
          using buyram_action = eosio::action_wrapper<"buyram"_n, &system_contract::buyram>;
          using buyrambytes_action = eosio::action_wrapper<"buyrambytes"_n, &system_contract::buyrambytes>;
-         u
+         using sellram_action = eosio::action_wrapper<"sellram"_n, &system_contract::sellram>;
+         using refund_action = eosio::action_wrapper<"refund"_n, &system_contract::refund>;
+         using regproducer_action = eosio::action_wrapper<"regproducer"_n, &system_contract::regproducer>;
+         using regproducer2_action = eosio::action_wrapper<"regproducer2"_n, &system_contract::regproducer2>;
+         using unregprod_action = eosio::action_wrapper<"unregprod"_n, &system_contract::unregprod>;
+         using setram_action = eosio::action_wrapper<"setram"_n, &system_contract::setram>;
+         using setramrate_action = eosio::action_wrapper<"setramrate"_n, &system_contract::setramrate>;
+         using voteproducer_action = eosio::action_wrapper<"voteproducer"_n, &system_contract::voteproducer>;
+         using voteupdate_action = eosio::action_wrapper<"voteupdate"_n, &system_contract::voteupdate>;
+         using regproxy_action = eosio::action_wrapper<"regproxy"_n, &system_contract::regproxy>;
+         using claimrewards_action = eosio::action_wrapper<"claimrewards"_n, &system_contract::claimrewards>;
+         using rmvproducer_action = 
