@@ -1592,4 +1592,16 @@ namespace eosiosystem {
          using voteupdate_action = eosio::action_wrapper<"voteupdate"_n, &system_contract::voteupdate>;
          using regproxy_action = eosio::action_wrapper<"regproxy"_n, &system_contract::regproxy>;
          using claimrewards_action = eosio::action_wrapper<"claimrewards"_n, &system_contract::claimrewards>;
-         using rmvproducer_action = 
+         using rmvproducer_action = eosio::action_wrapper<"rmvproducer"_n, &system_contract::rmvproducer>;
+         using updtrevision_action = eosio::action_wrapper<"updtrevision"_n, &system_contract::updtrevision>;
+         using bidname_action = eosio::action_wrapper<"bidname"_n, &system_contract::bidname>;
+         using bidrefund_action = eosio::action_wrapper<"bidrefund"_n, &system_contract::bidrefund>;
+         using setpriv_action = eosio::action_wrapper<"setpriv"_n, &system_contract::setpriv>;
+         using setalimits_action = eosio::action_wrapper<"setalimits"_n, &system_contract::setalimits>;
+         using setparams_action = eosio::action_wrapper<"setparams"_n, &system_contract::setparams>;
+         using setinflation_action = eosio::action_wrapper<"setinflation"_n, &system_contract::setinflation>;
+         using cfgpowerup_action = eosio::action_wrapper<"cfgpowerup"_n, &system_contract::cfgpowerup>;
+         using powerupexec_action = eosio::action_wrapper<"powerupexec"_n, &system_contract::powerupexec>;
+         using powerup_action = eosio::action_wrapper<"powerup"_n, &system_contract::powerup>;
+
+      
