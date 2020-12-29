@@ -1630,4 +1630,24 @@ namespace eosiosystem {
          static symbol get_core_symbol( const rammarket& rm ) {
             auto itr = rm.find(ramcore_symbol.raw());
             check(itr != rm.end(), "system contract must first be initialized");
-            return itr->quote.
+            return itr->quote.balance.symbol;
+         }
+
+         //defined in eosio.system.cpp
+         static eosio_global_state get_default_parameters();
+         static eosio_global_state4 get_default_inflation_parameters();
+         symbol core_symbol()const;
+         void update_ram_supply();
+
+         // defined in rex.cpp
+         void runrex( uint16_t max );
+         void update_rex_pool();
+         void update_resource_limits( const name& from, const name& receiver, int64_t delta_net, int64_t delta_cpu );
+         void check_voting_requirement( const name& owner,
+                                        const char* error_msg = "must vote for at least 21 producers or for a proxy before buying REX" )const;
+         rex_order_outcome fill_rex_order( const rex_balance_table::const_iterator& bitr, const asset& rex );
+         asset update_rex_account( const name& owner, const asset& proceeds, const asset& unstake_quant, bool force_vote_update = false );
+         void channel_to_rex( const name& from, const asset& amount, bool required = false );
+         void channel_namebid_to_rex( const int64_t highest_bid );
+         template <typename T>
+       
