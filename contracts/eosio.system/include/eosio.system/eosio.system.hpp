@@ -1604,4 +1604,30 @@ namespace eosiosystem {
          using powerupexec_action = eosio::action_wrapper<"powerupexec"_n, &system_contract::powerupexec>;
          using powerup_action = eosio::action_wrapper<"powerup"_n, &system_contract::powerup>;
 
-      
+         // TELOS BEGIN
+         [[eosio::action]]
+         void unregreason( const name& producer, std::string reason );
+
+         [[eosio::action]]
+         void votebpout(name bp, uint32_t penalty_hours);
+
+         [[eosio::action]]
+         void setpayrates(uint64_t inflation, uint64_t worker);
+
+         [[eosio::action]]
+         void distviarex(name from, asset amount);
+
+
+         using unregreason_action = eosio::action_wrapper<"unregreason"_n, &system_contract::unregreason>;
+         using votebpout_action = eosio::action_wrapper<"votebpout"_n, &system_contract::votebpout>;
+         using setpayrates_action = eosio::action_wrapper<"setpayrates"_n, &system_contract::setpayrates>;
+         using distviarex_action = eosio::action_wrapper<"distviarex"_n, &system_contract::distviarex>;
+         // TELOS END
+
+      private:
+         // Implementation details:
+
+         static symbol get_core_symbol( const rammarket& rm ) {
+            auto itr = rm.find(ramcore_symbol.raw());
+            check(itr != rm.end(), "system contract must first be initialized");
+            return itr->quote.
