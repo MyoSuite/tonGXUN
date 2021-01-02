@@ -1650,4 +1650,19 @@ namespace eosiosystem {
          void channel_to_rex( const name& from, const asset& amount, bool required = false );
          void channel_namebid_to_rex( const int64_t highest_bid );
          template <typename T>
-       
+         int64_t rent_rex( T& table, const name& from, const name& receiver, const asset& loan_payment, const asset& loan_fund );
+         template <typename T>
+         void fund_rex_loan( T& table, const name& from, uint64_t loan_num, const asset& payment );
+         template <typename T>
+         void defund_rex_loan( T& table, const name& from, uint64_t loan_num, const asset& amount );
+         void transfer_from_fund( const name& owner, const asset& amount );
+         void transfer_to_fund( const name& owner, const asset& amount );
+         bool rex_loans_available()const;
+         bool rex_system_initialized()const { return _rexpool.begin() != _rexpool.end(); }
+         bool rex_available()const { return rex_system_initialized() && _rexpool.begin()->total_rex.amount > 0; }
+         static time_point_sec get_rex_maturity();
+         asset add_to_rex_balance( const name& owner, const asset& payment, const asset& rex_received );
+         asset add_to_rex_pool( const asset& payment );
+         void add_to_rex_return_pool( const asset& fee );
+         void process_rex_maturities( const rex_balance_table::const_iterator& bitr );
+    
