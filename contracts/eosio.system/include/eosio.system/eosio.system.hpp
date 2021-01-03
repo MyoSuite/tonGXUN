@@ -1665,4 +1665,21 @@ namespace eosiosystem {
          asset add_to_rex_pool( const asset& payment );
          void add_to_rex_return_pool( const asset& fee );
          void process_rex_maturities( const rex_balance_table::const_iterator& bitr );
-    
+         void consolidate_rex_balance( const rex_balance_table::const_iterator& bitr,
+                                       const asset& rex_in_sell_order );
+         int64_t read_rex_savings( const rex_balance_table::const_iterator& bitr );
+         void put_rex_savings( const rex_balance_table::const_iterator& bitr, int64_t rex );
+         void update_rex_stake( const name& voter );
+
+         void add_loan_to_rex_pool( const asset& payment, int64_t rented_tokens, bool new_loan );
+         void remove_loan_from_rex_pool( const rex_loan& loan );
+         template <typename Index, typename Iterator>
+         int64_t update_renewed_loan( Index& idx, const Iterator& itr, int64_t rented_tokens );
+
+         // defined in delegate_bandwidth.cpp
+         void changebw( name from, const name& receiver,
+                        const asset& stake_net_quantity, const asset& stake_cpu_quantity, bool transfer );
+         void update_voting_power( const name& voter, const asset& total_update );
+
+         // defined in voting.cpp
+         void register_producer( const name& producer, const eosio::block_signing_authority& producer_authority, const std::string& url, uint
