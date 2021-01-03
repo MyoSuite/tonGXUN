@@ -1682,4 +1682,22 @@ namespace eosiosystem {
          void update_voting_power( const name& voter, const asset& total_update );
 
          // defined in voting.cpp
-         void register_producer( const name& producer, const eosio::block_signing_authority& producer_authority, const std::string& url, uint
+         void register_producer( const name& producer, const eosio::block_signing_authority& producer_authority, const std::string& url, uint16_t location );
+         void update_elected_producers( const block_timestamp& timestamp );
+         void update_votes( const name& voter, const name& proxy, const std::vector<name>& producers, bool voting );
+         void propagate_weight_change( const voter_info& voter );
+         double update_producer_votepay_share( const producers_table2::const_iterator& prod_itr,
+                                               const time_point& ct,
+                                               double shares_rate, bool reset_to_zero = false );
+         double update_total_votepay_share( const time_point& ct,
+                                            double additional_shares_delta = 0.0, double shares_rate_delta = 0.0 );
+
+         template <auto system_contract::*...Ptrs>
+         class registration {
+            public:
+               template <auto system_contract::*P, auto system_contract::*...Ps>
+               struct for_each {
+                  template <typename... Args>
+                  static constexpr void call( system_contract* this_contract, Args&&... args )
+                  {
+                     std::invoke( P, this_contract, args.
