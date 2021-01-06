@@ -1727,4 +1727,29 @@ namespace eosiosystem {
          // defined in power.cpp
          void adjust_resources(name payer, name account, symbol core_symbol, int64_t net_delta, int64_t cpu_delta, bool must_not_be_managed = false);
          void process_powerup_queue(
-           
+            time_point_sec now, symbol core_symbol, powerup_state& state,
+            powerup_order_table& orders, uint32_t max_items, int64_t& net_delta_available,
+            int64_t& cpu_delta_available);
+
+         // defined in block_info.cpp
+         void add_to_blockinfo_table(const eosio::checksum256& previous_block_id, const eosio::block_timestamp timestamp) const;
+
+         // TELOS BEGIN
+         // defined in producer_pay.cpp
+         void claimrewards_snapshot();
+
+
+         double inverse_vote_weight(double staked, double amountVotedProducers);
+         void recalculate_votes();
+
+         //defined in system_kick.cpp
+         bool crossed_missed_blocks_threshold(uint32_t amountBlocksMissed, uint32_t schedule_size);
+         void reset_schedule_metrics(name producer);
+         void update_producer_missed_blocks(name producer);
+         bool is_new_schedule_activated(name active_schedule[], uint32_t size);
+         bool is_new_schedule_activated(std::vector<name>& schedule);
+         bool check_missed_blocks(block_timestamp timestamp, name producer);
+
+         //define in system_rotation.cpp
+         void set_bps_rotation(name bpOut, name sbpIn);
+         void update_rotation
