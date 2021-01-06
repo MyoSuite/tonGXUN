@@ -1700,4 +1700,31 @@ namespace eosiosystem {
                   template <typename... Args>
                   static constexpr void call( system_contract* this_contract, Args&&... args )
                   {
-                     std::invoke( P, this_contract, args.
+                     std::invoke( P, this_contract, args... );
+                     for_each<Ps...>::call( this_contract, std::forward<Args>(args)... );
+                  }
+               };
+               template <auto system_contract::*P>
+               struct for_each<P> {
+                  template <typename... Args>
+                  static constexpr void call( system_contract* this_contract, Args&&... args )
+                  {
+                     std::invoke( P, this_contract, std::forward<Args>(args)... );
+                  }
+               };
+
+               template <typename... Args>
+               constexpr void operator() ( Args&&... args )
+               {
+                  for_each<Ptrs...>::call( this_contract, std::forward<Args>(args)... );
+               }
+
+               system_contract* this_contract;
+         };
+
+         registration<&system_contract::update_rex_stake> vote_stake_updater{ this };
+
+         // defined in power.cpp
+         void adjust_resources(name payer, name account, symbol core_symbol, int64_t net_delta, int64_t cpu_delta, bool must_not_be_managed = false);
+         void process_powerup_queue(
+           
