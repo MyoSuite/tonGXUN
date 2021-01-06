@@ -1752,4 +1752,12 @@ namespace eosiosystem {
 
          //define in system_rotation.cpp
          void set_bps_rotation(name bpOut, name sbpIn);
-         void update_rotation
+         void update_rotation_time(block_timestamp block_time);
+         void update_missed_blocks_per_rotation();
+         void restart_missed_blocks_per_rotation(std::vector<producer_location_pair> prods);
+         bool is_in_range(int32_t index, int32_t low_bound, int32_t up_bound);
+         std::vector<producer_location_pair> check_rotation_state(std::vector<producer_location_pair> producers, block_timestamp block_time);
+         // TELOS END
+   };
+
+}
