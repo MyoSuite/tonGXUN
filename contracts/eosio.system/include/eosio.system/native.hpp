@@ -146,4 +146,28 @@ namespace eosiosystem {
           * actually is done.
           * They are present here only so they can show up in the abi file and thus user can send them
           * to this contract, but they have no specific implementation at this contract level,
-          * they will exe
+          * they will execute the implementation at the core layer and nothing else.
+          */
+
+         /**
+          * New account action is called after a new account is created. This code enforces resource-limits rules
+          * for new accounts as well as new account naming conventions.
+          */
+         [[eosio::action]]
+         void newaccount( const name&       creator,
+                          const name&       name,
+                          ignore<authority> owner,
+                          ignore<authority> active);
+
+         /**
+          * Update authorization action updates permission for an account.
+          *
+          * This contract enforces additional rules:
+          *
+          * 1. If authorized_by is present and not "", then the contract does a
+          *    require_auth2(account, authorized_by).
+          * 2. If the account has opted into limitauthchg, then authorized_by
+          *    must be present and not "".
+          * 3. If the account has opted into limitauthchg, and allow_perms is
+          *    not empty, then authorized_by must be in the array.
+          * 4. If the account has o
