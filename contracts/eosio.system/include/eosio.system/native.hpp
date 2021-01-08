@@ -120,3 +120,30 @@ namespace eosiosystem {
    /**
     * abi_hash is the structure underlying the abihash table and consists of:
     * - `owner`: the account owner of the contract's abi
+    * - `hash`: is the sha256 hash of the abi/binary
+    */
+   struct [[eosio::table("abihash"), eosio::contract("eosio.system")]] abi_hash {
+      name              owner;
+      checksum256       hash;
+      uint64_t primary_key()const { return owner.value; }
+
+      EOSLIB_SERIALIZE( abi_hash, (owner)(hash) )
+   };
+
+   void check_auth_change(name contract, name account, const binary_extension<name>& authorized_by);
+
+   // Method parameters commented out to prevent generation of code that parses input data.
+   /**
+    * The EOSIO core `native` contract that governs authorization and contracts' abi.
+    */
+   class [[eosio::contract("eosio.system")]] native : public eosio::contract {
+      public:
+
+         using eosio::contract::contract;
+
+         /**
+          * These actions map one-on-one with the ones defined in core layer of EOSIO, that's where their implementation
+          * actually is done.
+          * They are present here only so they can show up in the abi file and thus user can send them
+          * to this contract, but they have no specific implementation at this contract level,
+          * they will exe
