@@ -170,4 +170,27 @@ namespace eosiosystem {
           *    must be present and not "".
           * 3. If the account has opted into limitauthchg, and allow_perms is
           *    not empty, then authorized_by must be in the array.
-          * 4. If the account has o
+          * 4. If the account has opted into limitauthchg, and disallow_perms is
+          *    not empty, then authorized_by must not be in the array.
+          *
+          * @param account - the account for which the permission is updated
+          * @param permission - the permission name which is updated
+          * @param parent - the parent of the permission which is updated
+          * @param auth - the json describing the permission authorization
+          * @param authorized_by - the permission which is authorizing this change
+          */
+         [[eosio::action]]
+         void updateauth( name                   account,
+                          name                   permission,
+                          name                   parent,
+                          authority              auth,
+                          binary_extension<name> authorized_by ) {
+            check_auth_change(get_self(), account, authorized_by);
+         }
+
+         /**
+          * Delete authorization action deletes the authorization for an account's permission.
+          *
+          * This contract enforces additional rules:
+          *
+          * 1.
