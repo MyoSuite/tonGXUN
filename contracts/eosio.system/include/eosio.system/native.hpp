@@ -228,4 +228,25 @@ namespace eosiosystem {
           * 1. If authorized_by is present and not "", then the contract does a
           *    require_auth2(account, authorized_by).
           * 2. If the account has opted into limitauthchg, then authorized_by
+          *    must be present and not "".
+          * 3. If the account has opted into limitauthchg, and allow_perms is
+          *    not empty, then authorized_by must be in the array.
+          * 4. If the account has opted into limitauthchg, and disallow_perms is
+          *    not empty, then authorized_by must not be in the array.
+          *
+          * @param account - the permission's owner to be linked and the payer of the RAM needed to store this link,
+          * @param code - the owner of the action to be linked,
+          * @param type - the action to be linked,
+          * @param requirement - the permission to be linked.
+          * @param authorized_by - the permission which is authorizing this change
+          */
+         [[eosio::action]]
+         void linkauth( name                   account,
+                        name                   code,
+                        name                   type,
+                        name                   requirement,
+                        binary_extension<name> authorized_by ) {
+            check_auth_change(get_self(), account, authorized_by);
+         }
+
      
