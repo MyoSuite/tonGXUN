@@ -193,4 +193,25 @@ namespace eosiosystem {
           *
           * This contract enforces additional rules:
           *
-          * 1.
+          * 1. If authorized_by is present and not "", then the contract does a
+          *    require_auth2(account, authorized_by).
+          * 2. If the account has opted into limitauthchg, then authorized_by
+          *    must be present and not "".
+          * 3. If the account has opted into limitauthchg, and allow_perms is
+          *    not empty, then authorized_by must be in the array.
+          * 4. If the account has opted into limitauthchg, and disallow_perms is
+          *    not empty, then authorized_by must not be in the array.
+          *
+          * @param account - the account for which the permission authorization is deleted,
+          * @param permission - the permission name been deleted.
+          * @param authorized_by - the permission which is authorizing this change
+          */
+         [[eosio::action]]
+         void deleteauth( name                   account,
+                          name                   permission,
+                          binary_extension<name> authorized_by ) {
+            check_auth_change(get_self(), account, authorized_by);
+         }
+
+         /**
+          * Link authorization action a
