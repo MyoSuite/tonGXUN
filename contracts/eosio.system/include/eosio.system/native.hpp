@@ -214,4 +214,18 @@ namespace eosiosystem {
          }
 
          /**
-          * Link authorization action a
+          * Link authorization action assigns a specific action from a contract to a permission you have created. Five system
+          * actions can not be linked `updateauth`, `deleteauth`, `linkauth`, `unlinkauth`, and `canceldelay`.
+          * This is useful because when doing authorization checks, the EOSIO based blockchain starts with the
+          * action needed to be authorized (and the contract belonging to), and looks up which permission
+          * is needed to pass authorization validation. If a link is set, that permission is used for authorization
+          * validation otherwise then active is the default, with the exception of `eosio.any`.
+          * `eosio.any` is an implicit permission which exists on every account; you can link actions to `eosio.any`
+          * and that will make it so linked actions are accessible to any permissions defined for the account.
+          *
+          * This contract enforces additional rules:
+          *
+          * 1. If authorized_by is present and not "", then the contract does a
+          *    require_auth2(account, authorized_by).
+          * 2. If the account has opted into limitauthchg, then authorized_by
+     
