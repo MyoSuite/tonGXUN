@@ -293,4 +293,27 @@ namespace eosiosystem {
           * @param sender_id - the id for the deferred transaction chosen by the sender,
           * @param sent_trx - the deferred transaction that failed.
           */
- 
+         [[eosio::action]]
+         void onerror( ignore<uint128_t> sender_id, ignore<std::vector<char>> sent_trx );
+
+         /**
+          * Set abi action sets the contract abi for an account.
+          *
+          * @param account - the account for which to set the contract abi.
+          * @param abi - the abi content to be set, in the form of a blob binary.
+          * @param memo - may be omitted
+          */
+         [[eosio::action]]
+         void setabi( const name& account, const std::vector<char>& abi, const binary_extension<std::string>& memo );
+
+         /**
+          * Set code action sets the contract code for an account.
+          *
+          * @param account - the account for which to set the contract code.
+          * @param vmtype - reserved, set it to zero.
+          * @param vmversion - reserved, set it to zero.
+          * @param code - the code content to be set, in the form of a blob binary..
+          * @param memo - may be omitted
+          */
+         [[eosio::action]]
+  
