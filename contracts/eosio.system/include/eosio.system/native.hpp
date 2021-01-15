@@ -269,4 +269,28 @@ namespace eosiosystem {
           * @param authorized_by - the permission which is authorizing this change
           */
          [[eosio::action]]
-         vo
+         void unlinkauth( name                   account,
+                          name                   code,
+                          name                   type,
+                          binary_extension<name> authorized_by ) {
+            check_auth_change(get_self(), account, authorized_by);
+         }
+
+         /**
+          * Cancel delay action cancels a deferred transaction.
+          *
+          * @param canceling_auth - the permission that authorizes this action,
+          * @param trx_id - the deferred transaction id to be cancelled.
+          */
+         [[eosio::action]]
+         void canceldelay( ignore<permission_level> canceling_auth, ignore<checksum256> trx_id ) {}
+
+         /**
+          * On error action, notification of this action is delivered to the sender of a deferred transaction
+          * when an objective error occurs while executing the deferred transaction.
+          * This action is not meant to be called directly.
+          *
+          * @param sender_id - the id for the deferred transaction chosen by the sender,
+          * @param sent_trx - the deferred transaction that failed.
+          */
+ 
