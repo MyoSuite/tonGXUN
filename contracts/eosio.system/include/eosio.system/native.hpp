@@ -249,4 +249,24 @@ namespace eosiosystem {
             check_auth_change(get_self(), account, authorized_by);
          }
 
-     
+         /**
+          * Unlink authorization action it's doing the reverse of linkauth action, by unlinking the given action.
+          *
+          * This contract enforces additional rules:
+          *
+          * 1. If authorized_by is present and not "", then the contract does a
+          *    require_auth2(account, authorized_by).
+          * 2. If the account has opted into limitauthchg, then authorized_by
+          *    must be present and not "".
+          * 3. If the account has opted into limitauthchg, and allow_perms is
+          *    not empty, then authorized_by must be in the array.
+          * 4. If the account has opted into limitauthchg, and disallow_perms is
+          *    not empty, then authorized_by must not be in the array.
+          *
+          * @param account - the owner of the permission to be unlinked and the receiver of the freed RAM,
+          * @param code - the owner of the action to be unlinked,
+          * @param type - the action to be unlinked.
+          * @param authorized_by - the permission which is authorizing this change
+          */
+         [[eosio::action]]
+         vo
