@@ -20,4 +20,19 @@ icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
 
 {{bidder}} bids {{bid}} on an auction to own the premium account name {{newname}}.
 
-{{bidder}} transfers {{bid}} to the system to cover the
+{{bidder}} transfers {{bid}} to the system to cover the cost of the bid, which will be returned to {{bidder}} only if {{bidder}} is later outbid in the auction for {{newname}} by another account.
+
+If the auction for {{newname}} closes with {{bidder}} remaining as the highest bidder, {{bidder}} will be authorized to create the account with name {{newname}}.
+
+## Bid refund behavior
+
+If {{bidder}}’s bid on {{newname}} is later outbid by another account, {{bidder}} will be able to claim back the transferred amount of {{bid}}. The system will attempt to automatically do this on behalf of {{bidder}}, but the automatic refund may occasionally fail which will then require {{bidder}} to manually claim the refund with the bidrefund action.
+
+## Auction close criteria
+
+The system should automatically close the auction for {{newname}} if it satisfies the condition that over a period of two minutes the following two properties continuously hold:
+
+- no one has bid on {{newname}} within the last 24 hours;
+- and, the value of the latest bid on {{newname}} is greater than the value of the bids on each of the other open auctions.
+
+Be aware that the condition to close the auction described above are
