@@ -1,0 +1,23 @@
+<h1 class="contract">activate</h1>
+
+---
+spec_version: "0.2.0"
+title: Activate Protocol Feature
+summary: 'Activate protocol feature {{nowrap feature_digest}}'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} activates the protocol feature with a digest of {{feature_digest}}.
+
+<h1 class="contract">bidname</h1>
+
+---
+spec_version: "0.2.0"
+title: Bid On a Premium Account Name
+summary: '{{nowrap bidder}} bids on the premium account name {{nowrap newname}}'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+{{bidder}} bids {{bid}} on an auction to own the premium account name {{newname}}.
+
+{{bidder}} transfers {{bid}} to the system to cover the

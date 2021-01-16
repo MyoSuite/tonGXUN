@@ -48,4 +48,12 @@ class [[eosio::contract("rex.results")]] rex_results : eosio::contract {
        * Rentresult action.
        *
        * @param rented_tokens - amount of rented tokens
-     
+       */
+      [[eosio::action]]
+      void rentresult( const asset& rented_tokens );
+
+      using buyresult_action   = action_wrapper<"buyresult"_n,   &rex_results::buyresult>;
+      using sellresult_action  = action_wrapper<"sellresult"_n,  &rex_results::sellresult>;
+      using orderresult_action = action_wrapper<"orderresult"_n, &rex_results::orderresult>;
+      using rentresult_action  = action_wrapper<"rentresult"_n,  &rex_results::rentresult>;
+};
