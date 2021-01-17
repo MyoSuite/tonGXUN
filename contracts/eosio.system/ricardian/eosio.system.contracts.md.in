@@ -65,4 +65,27 @@ icon: @ICON_BASE_URL@/@RESOURCE_ICON_URI@
 spec_version: "0.2.0"
 title: Buy RAM
 summary: '{{nowrap payer}} buys {{nowrap bytes}} bytes of RAM on behalf of {{nowrap receiver}}'
-icon: @ICON_BASE_URL@/@RESOURC
+icon: @ICON_BASE_URL@/@RESOURCE_ICON_URI@
+---
+
+{{payer}} buys approximately {{bytes}} bytes of RAM on behalf of {{receiver}} by paying market rates for RAM. This transaction will incur a 0.5% fee and the cost will depend on market rates.
+
+<h1 class="contract">buyrex</h1>
+
+---
+spec_version: "0.2.0"
+title: Buy REX Tokens
+summary: '{{nowrap from}} buys REX tokens in exchange for {{nowrap amount}} and their vote stake increases by {{nowrap amount}}'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{amount}} is taken out of {{from}}’s REX fund and used to purchase REX tokens at the current market exchange rate. In order for the action to succeed, {{from}} must have voted for a proxy or at least 21 block producers. {{amount}} is added to {{from}}’s vote stake.
+
+A sell order of the purchased amount can only be initiated after waiting for the maturity period of 4 to 5 days to pass. Even then, depending on the market conditions, the initiated sell order may not be executed immediately.
+
+<h1 class="contract">canceldelay</h1>
+
+---
+spec_version: "0.2.0"
+title: Cancel Delayed Transaction
+summary: '{{nowra
