@@ -88,4 +88,48 @@ A sell order of the purchased amount can only be initiated after waiting for the
 ---
 spec_version: "0.2.0"
 title: Cancel Delayed Transaction
-summary: '{{nowra
+summary: '{{nowrap canceling_auth.actor}} cancels a delayed transaction'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+{{canceling_auth.actor}} cancels the delayed transaction with id {{trx_id}}.
+
+<h1 class="contract">claimrewards</h1>
+
+---
+spec_version: "0.2.0"
+title: Claim Block Producer Rewards
+summary: '{{nowrap owner}} claims block and vote rewards'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{owner}} claims block and vote rewards from the system.
+
+<h1 class="contract">closerex</h1>
+
+---
+spec_version: "0.2.0"
+title: Cleanup Unused REX Data
+summary: 'Delete REX related DB entries and free associated RAM'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+Delete REX related DB entries and free associated RAM for {{owner}}.
+
+To fully delete all REX related DB entries, {{owner}} must ensure that their REX balance and REX fund amounts are both zero and they have no outstanding loans.
+
+<h1 class="contract">cnclrexorder</h1>
+
+---
+spec_version: "0.2.0"
+title: Cancel Scheduled REX Sell Order
+summary: '{{nowrap owner}} cancels a scheduled sell order if not yet filled'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{owner}} cancels their open sell order.
+
+<h1 class="contract">consolidate</h1>
+
+---
+s
