@@ -132,4 +132,38 @@ icon: @ICON_BASE_URL@/@REX_ICON_URI@
 <h1 class="contract">consolidate</h1>
 
 ---
-s
+spec_version: "0.2.0"
+title: Consolidate REX Maturity Buckets Into One
+summary: 'Consolidate REX maturity buckets into one'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+Consolidate REX maturity buckets into one bucket that {{owner}} will not be able to sell until 4 to 5 days later.
+
+<h1 class="contract">defcpuloan</h1>
+
+---
+spec_version: "0.2.0"
+title: Withdraw from the Fund of a Specific CPU Loan
+summary: '{{nowrap from}} transfers {{nowrap amount}} from the fund of CPU loan number {{nowrap loan_num}} back to REX fund'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{from}} transfers {{amount}} from the fund of CPU loan number {{loan_num}} back to REX fund.
+
+<h1 class="contract">defnetloan</h1>
+
+---
+spec_version: "0.2.0"
+title: Withdraw from the Fund of a Specific NET Loan
+summary: '{{nowrap from}} transfers {{nowrap amount}} from the fund of NET loan number {{nowrap loan_num}} back to REX fund'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{from}} transfers {{amount}} from the fund of NET loan number {{loan_num}} back to REX fund.
+
+<h1 class="contract">delegatebw</h1>
+
+---
+spec_version: "0.2.0"
+title: Stake Tokens for NET and/or
