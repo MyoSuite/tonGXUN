@@ -35,4 +35,34 @@ The system should automatically close the auction for {{newname}} if it satisfie
 - no one has bid on {{newname}} within the last 24 hours;
 - and, the value of the latest bid on {{newname}} is greater than the value of the bids on each of the other open auctions.
 
-Be aware that the condition to close the auction described above are
+Be aware that the condition to close the auction described above are sufficient but not necessary. The auction for {{newname}} cannot close unless both of the properties are simultaneously satisfied, but it may be closed without requiring the properties to hold for a period of 2 minutes.
+
+<h1 class="contract">bidrefund</h1>
+
+---
+spec_version: "0.2.0"
+title: Claim Refund on Name Bid
+summary: 'Claim refund on {{nowrap newname}} bid'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+{{bidder}} claims refund on {{newname}} bid after being outbid by someone else.
+
+<h1 class="contract">buyram</h1>
+
+---
+spec_version: "0.2.0"
+title: Buy RAM
+summary: '{{nowrap payer}} buys RAM on behalf of {{nowrap receiver}} by paying {{nowrap quant}}'
+icon: @ICON_BASE_URL@/@RESOURCE_ICON_URI@
+---
+
+{{payer}} buys RAM on behalf of {{receiver}} by paying {{quant}}. This transaction will incur a 0.5% fee out of {{quant}} and the amount of RAM delivered will depend on market rates.
+
+<h1 class="contract">buyrambytes</h1>
+
+---
+spec_version: "0.2.0"
+title: Buy RAM
+summary: '{{nowrap payer}} buys {{nowrap bytes}} bytes of RAM on behalf of {{nowrap receiver}}'
+icon: @ICON_BASE_URL@/@RESOURC
