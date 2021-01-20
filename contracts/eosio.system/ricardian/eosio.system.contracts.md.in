@@ -265,4 +265,43 @@ owner permission with authority:
 active permission with authority:
 {{to_json active}}
 
-<h1 class="co
+<h1 class="contract">mvfrsavings</h1>
+
+---
+spec_version: "0.2.0"
+title: Unlock REX Tokens
+summary: '{{nowrap owner}} unlocks REX Tokens'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{owner}} unlocks {{rex}} by moving it out of the REX savings bucket. The unlocked REX tokens cannot be sold until 4 to 5 days later.
+
+<h1 class="contract">mvtosavings</h1>
+
+---
+spec_version: "0.2.0"
+title: Lock REX Tokens
+summary: '{{nowrap owner}} locks REX Tokens'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{owner}} locks {{rex}} by moving it into the REX savings bucket. The locked REX tokens cannot be sold directly and will have to be unlocked explicitly before selling.
+
+<h1 class="contract">refund</h1>
+
+---
+spec_version: "0.2.0"
+title: Claim Unstaked Tokens
+summary: 'Return previously unstaked tokens to {{nowrap owner}}'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+Return previously unstaked tokens to {{owner}} after the unstaking period has elapsed.
+
+<h1 class="contract">regproducer</h1>
+
+---
+spec_version: "0.2.0"
+title: Register as a Block Producer Candidate
+summary: 'Register {{nowrap producer}} account as a block producer candidate'
+icon: @ICON_BASE_URL@/@VOT
