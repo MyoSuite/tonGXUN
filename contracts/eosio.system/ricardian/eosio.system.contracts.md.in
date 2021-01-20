@@ -196,4 +196,37 @@ Delete the {{permission}} permission of {{account}}.
 ---
 spec_version: "0.2.0"
 title: Deposit Into REX Fund
-summary: 'Add to {{nowrap owner}}’s REX fund by transferring {{nowrap amount}} from {{nowr
+summary: 'Add to {{nowrap owner}}’s REX fund by transferring {{nowrap amount}} from {{nowrap owner}}’s liquid balance'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+Transfer {{amount}} from {{owner}}’s liquid balance to {{owner}}’s REX fund. All proceeds and expenses related to REX are added to or taken out of this fund.
+
+<h1 class="contract">fundcpuloan</h1>
+
+---
+spec_version: "0.2.0"
+title: Deposit into the Fund of a Specific CPU Loan
+summary: '{{nowrap from}} funds a CPU loan'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{from}} transfers {{payment}} from REX fund to the fund of CPU loan number {{loan_num}} in order to be used in loan renewal at expiry. {{from}} can withdraw the total balance of the loan fund at any time.
+
+<h1 class="contract">fundnetloan</h1>
+
+---
+spec_version: "0.2.0"
+title: Deposit into the Fund of a Specific NET Loan
+summary: '{{nowrap from}} funds a NET loan'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{from}} transfers {{payment}} from REX fund to the fund of NET loan number {{loan_num}} in order to be used in loan renewal at expiry. {{from}} can withdraw the total balance of the loan fund at any time.
+
+<h1 class="contract">init</h1>
+
+---
+spec_version: "0.2.0"
+title: Initialize System Contract
+summary: 'Ini
