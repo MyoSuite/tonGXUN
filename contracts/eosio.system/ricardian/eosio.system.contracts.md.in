@@ -347,4 +347,20 @@ icon: @ICON_BASE_URL@/@VOTING_ICON_URI@
 {{#if isproxy}}
 {{proxy}} registers as a proxy that can vote on behalf of accounts that appoint it as their proxy.
 {{else}}
-{{proxy}} unregisters as a proxy that can vote on behalf of accounts that appoint i
+{{proxy}} unregisters as a proxy that can vote on behalf of accounts that appoint it as their proxy.
+{{/if}}
+
+<h1 class="contract">rentcpu</h1>
+
+---
+spec_version: "0.2.0"
+title: Rent CPU Bandwidth for 30 Days
+summary: '{{nowrap from}} pays {{nowrap loan_payment}} to rent CPU bandwidth for {{nowrap receiver}}'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{from}} pays {{loan_payment}} to rent CPU bandwidth on behalf of {{receiver}} for a period of 30 days.
+
+{{loan_payment}} is taken out of {{from}}’s REX fund. The market price determines the number of tokens to be staked to {{receiver}}’s CPU resources. In addition, {{from}} provides {{loan_fund}}, which is also taken out of {{from}}’s REX fund, to be used for automatic renewal of the loan.
+
+At expiration, if the loan has less funds than {{loan_payment}}, it is closed and lent tokens that have been staked are taken out of {{receiver}}’s CPU bandwidth. Otherwise, it is renewed at the market price at the time of renewal, that is, the number of staked tokens is recalculated and {{receiver}}’s CPU bandwidth is updated accordingly. {{from}} can fund or defund a loan at any time before expiration. When the 
