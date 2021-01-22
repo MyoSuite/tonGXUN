@@ -378,4 +378,34 @@ icon: @ICON_BASE_URL@/@REX_ICON_URI@
 
 {{loan_payment}} is taken out of {{from}}’s REX fund. The market price determines the number of tokens to be staked to {{receiver}}’s NET resources for 30 days. In addition, {{from}} provides {{loan_fund}}, which is also taken out of {{from}}’s REX fund, to be used for automatic renewal of the loan.
 
-At expiration, if the loan has less funds than {{loan_payment}}, it is closed and lent tokens that have been staked are taken out of {{receiver}}’s NET bandwidth. Otherwise, it is renewed at the market price at the time of renewal, that is, the number of staked tokens is recalculated and {{receiver}}’s NET bandwidth is updated accordingly. {{from}} can fund or defund a loan at any time 
+At expiration, if the loan has less funds than {{loan_payment}}, it is closed and lent tokens that have been staked are taken out of {{receiver}}’s NET bandwidth. Otherwise, it is renewed at the market price at the time of renewal, that is, the number of staked tokens is recalculated and {{receiver}}’s NET bandwidth is updated accordingly. {{from}} can fund or defund a loan at any time before expiration. When the loan is closed, {{from}} is refunded any tokens remaining in the loan fund.
+
+<h1 class="contract">rexexec</h1>
+
+---
+spec_version: "0.2.0"
+title: Perform REX Maintenance
+summary: 'Process sell orders and expired loans'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+Performs REX maintenance by processing a maximum of {{max}} REX sell orders and expired loans. Any account can execute this action.
+
+<h1 class="contract">rmvproducer</h1>
+
+---
+spec_version: "0.2.0"
+title: Forcibly Unregister a Block Producer Candidate
+summary: '{{nowrap producer}} is unregistered as a block producer candidate'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} unregisters {{producer}} as a block producer candidate. {{producer}} account will retain its votes and those votes can change based on voter stake changes or votes removed from {{producer}}. However new voters will not be able to vote for {{producer}} while it remains unregistered.
+
+<h1 class="contract">sellram</h1>
+
+---
+spec_version: "0.2.0"
+title: Sell RAM From Account
+summary: 'Sell unused RAM from {{nowrap account}}'
+icon: @IC
