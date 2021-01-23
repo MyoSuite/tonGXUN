@@ -424,4 +424,31 @@ icon: @ICON_BASE_URL@/@REX_ICON_URI@
 
 {{from}} initiates a sell order to sell {{rex}} tokens at the market exchange rate during the time at which the order is ultimately executed. If {{from}} already has an open sell order in the sell queue, {{rex}} will be added to the amount of the sell order without change the position of the sell order within the queue. Once the sell order is executed, proceeds are added to {{from}}’s REX fund, the value of sold REX tokens is deducted from {{from}}’s vote stake, and votes are updated accordingly.
 
-Depending on the market conditions, it may not be possible to fill the entire sell order immediately. In such a case, the sell order is added to the back of a sell queue. A sell order at the front of the sell queue will
+Depending on the market conditions, it may not be possible to fill the entire sell order immediately. In such a case, the sell order is added to the back of a sell queue. A sell order at the front of the sell queue will automatically be executed when the market conditions allow for the entire order to be filled. Regardless of the market conditions, the system is designed to execute this sell order within 30 days. {{from}} can cancel the order at any time before it is filled using the cnclrexorder action.
+
+<h1 class="contract">setabi</h1>
+
+---
+spec_version: "0.2.0"
+title: Deploy Contract ABI
+summary: 'Deploy contract ABI on account {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+Deploy the ABI file associated with the contract on account {{account}}.
+
+<h1 class="contract">setacctcpu</h1>
+
+---
+spec_version: "0.2.0"
+title: Explicitly Manage the CPU Quota of Account
+summary: 'Explicitly manage the CPU bandwidth quota of account {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{#if_has_value cpu_weight}}
+Explicitly manage the CPU bandwidth quota of account {{account}} by pinning it to a weight of {{cpu_weight}}.
+
+{{account}} can stake and unstake, however, it will not change their CPU bandwidth quota as long as it remains pinned.
+{{else}}
+Unpin the CPU bandwidth quota of account {{account
