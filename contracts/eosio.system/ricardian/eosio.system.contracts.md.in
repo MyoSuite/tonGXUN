@@ -451,4 +451,34 @@ Explicitly manage the CPU bandwidth quota of account {{account}} by pinning it t
 
 {{account}} can stake and unstake, however, it will not change their CPU bandwidth quota as long as it remains pinned.
 {{else}}
-Unpin the CPU bandwidth quota of account {{account
+Unpin the CPU bandwidth quota of account {{account}}. The CPU bandwidth quota of {{account}} will be driven by the current tokens staked for CPU bandwidth by {{account}}.
+{{/if_has_value}}
+
+<h1 class="contract">setacctnet</h1>
+
+---
+spec_version: "0.2.0"
+title: Explicitly Manage the NET Quota of Account
+summary: 'Explicitly manage the NET bandwidth quota of account {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{#if_has_value net_weight}}
+Explicitly manage the network bandwidth quota of account {{account}} by pinning it to a weight of {{net_weight}}.
+
+{{account}} can stake and unstake, however, it will not change their NET bandwidth quota as long as it remains pinned.
+{{else}}
+Unpin the NET bandwidth quota of account {{account}}. The NET bandwidth quota of {{account}} will be driven by the current tokens staked for NET bandwidth by {{account}}.
+{{/if_has_value}}
+
+<h1 class="contract">setacctram</h1>
+
+---
+spec_version: "0.2.0"
+title: Explicitly Manage the RAM Quota of Account
+summary: 'Explicitly manage the RAM quota of account {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{#if_has_value ram_bytes}}
+Explicitly manage the RAM quota of account 
