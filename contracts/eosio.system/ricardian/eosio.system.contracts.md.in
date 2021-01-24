@@ -516,4 +516,51 @@ Deploy compiled contract code to the account {{account}}.
 spec_version: "0.2.0"
 title: Set System Parameters
 summary: 'Set System Parameters'
-icon: @ICON_B
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} sets system parameters to:
+{{to_json params}}
+
+<h1 class="contract">setpriv</h1>
+
+---
+spec_version: "0.2.0"
+title: Make an Account Privileged or Unprivileged
+summary: '{{#if is_priv}}Make {{nowrap account}} privileged{{else}}Remove privileged status of {{nowrap account}}{{/if}}'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{#if is_priv}}
+{{$action.account}} makes {{account}} privileged.
+{{else}}
+{{$action.account}} removes privileged status of {{account}}.
+{{/if}}
+
+<h1 class="contract">setram</h1>
+
+---
+spec_version: "0.2.0"
+title: Configure the Available RAM
+summary: 'Configure the available RAM'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} configures the available RAM to {{max_ram_size}} bytes.
+
+<h1 class="contract">setramrate</h1>
+
+---
+spec_version: "0.2.0"
+title: Set the Rate of Increase of RAM
+summary: 'Set the rate of increase of RAM per block'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} sets the rate of increase of RAM to {{bytes_per_block}} bytes/block.
+
+<h1 class="contract">setrex</h1>
+
+---
+spec_version: "0.2.0"
+title: Adjust REX Poo
