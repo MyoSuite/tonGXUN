@@ -481,4 +481,39 @@ icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
 ---
 
 {{#if_has_value ram_bytes}}
-Explicitly manage the RAM quota of account 
+Explicitly manage the RAM quota of account {{account}} by pinning it to {{ram_bytes}} bytes.
+
+{{account}} can buy and sell RAM, however, it will not change their RAM quota as long as it remains pinned.
+{{else}}
+Unpin the RAM quota of account {{account}}. The RAM quota of {{account}} will be driven by the current RAM holdings of {{account}}.
+{{/if_has_value}}
+
+<h1 class="contract">setalimits</h1>
+
+---
+spec_version: "0.2.0"
+title: Adjust Resource Limits of Account
+summary: 'Adjust resource limits of account {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ADMIN_ICON_URI@
+---
+
+{{$action.account}} updates {{account}}’s resource limits to have a RAM quota of {{ram_bytes}} bytes, a NET bandwidth quota of {{net_weight}} and a CPU bandwidth quota of {{cpu_weight}}.
+
+<h1 class="contract">setcode</h1>
+
+---
+spec_version: "0.2.0"
+title: Deploy Contract Code
+summary: 'Deploy contract code on account {{nowrap account}}'
+icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
+---
+
+Deploy compiled contract code to the account {{account}}.
+
+<h1 class="contract">setparams</h1>
+
+---
+spec_version: "0.2.0"
+title: Set System Parameters
+summary: 'Set System Parameters'
+icon: @ICON_B
