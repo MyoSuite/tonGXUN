@@ -616,4 +616,21 @@ icon: @ICON_BASE_URL@/@ACCOUNT_ICON_URI@
 ---
 spec_version: "0.2.0"
 title: Unregister as a Block Producer Candidate
-summary: '{{nowrap pro
+summary: '{{nowrap producer}} unregisters as a block producer candidate'
+icon: @ICON_BASE_URL@/@VOTING_ICON_URI@
+---
+
+{{producer}} unregisters as a block producer candidate. {{producer}} account will retain its votes and those votes can change based on voter stake changes or votes removed from {{producer}}. However new voters will not be able to vote for {{producer}} while it remains unregistered.
+
+<h1 class="contract">unstaketorex</h1>
+
+---
+spec_version: "0.2.0"
+title: Buy REX Tokens Using Staked Tokens
+summary: '{{nowrap owner}} buys REX tokens in exchange for tokens currently staked to NET and/or CPU'
+icon: @ICON_BASE_URL@/@REX_ICON_URI@
+---
+
+{{from_net}} and {{from_cpu}} are withdrawn from {{receiver}}’s NET and CPU bandwidths respectively. These funds are used to purchase REX tokens at the current market exchange rate. In order for the action to succeed, {{owner}} must have voted for a proxy or at least 21 block producers.
+
+A sell order of the purchased amount can only be initiated after waiting for the maturity period of 4 to 5 days to pass. Even then, depending on the market conditions
