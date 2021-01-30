@@ -24,4 +24,24 @@ void system_contract::add_to_blockinfo_table(const eosio::checksum256&    previo
 
    if (block_info::rolling_window_size > 0) {
       // Add new entry to blockinfo table for the new block.
-      t.emplace(get_self(), [&](block_info::block_info_r
+      t.emplace(get_self(), [&](block_info::block_info_record& r) {
+         r.block_height    = new_block_height;
+         r.block_timestamp = new_block_timestamp;
+      });
+   }
+
+   // Erase up to two entries that have fallen out of the rolling window.
+
+   const uint32_t last_prunable_block_height =
+      std::max(new_block_height, block_info::rolling_window_size) - block_info::rolling_window_size;
+
+   int count = 2;
+   for (auto itr = t.begin(), end = t.end();                                        //
+        itr != end && itr->block_height <= last_prunable_block_height && 0 < count; //
+        --count)                                                                    //
+   {
+      itr = t.erase(itr);
+   }
+}
+
+} // namespace eosiosystem
