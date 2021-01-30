@@ -706,4 +706,9 @@ Withdraws {{amount}} from {{owner}}â€™s REX fund and transfer them to {{owner}}â
 
 ---
 spec_version: "0.2.0"
-title: Powerup resour
+title: Powerup resources
+summary: 'User may powerup to reserve resources'
+icon: @ICON_BASE_URL@/@RESOURCE_ICON_URI@
+---
+
+Users may use the powerup action to reserve resources.
