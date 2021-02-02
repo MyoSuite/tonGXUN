@@ -35,4 +35,22 @@ namespace eosiosystem {
    }
 
    void check_auth_change(name contract, name account, const binary_extension<name>& authorized_by) {
-      name by(authorize
+      name by(authorized_by.has_value() ? authorized_by.value().value : 0);
+      if(by.value)
+         eosio::require_auth({account, by});
+      limit_auth_change_table table(contract, contract.value);
+      auto it = table.find(account.value);
+      if(it == table.end())
+         return;
+      eosio::check(by.value, "authorized_by is required for this account");
+      if(!it->allow_perms.empty())
+         eosio::check(
+            std::find(it->allow_perms.begin(), it->allow_perms.end(), by) != it->allow_perms.end(),
+            "authorized_by does not appear in allow_perms");
+      else
+         eosio::check(
+            std::find(it->disallow_perms.begin(), it->disallow_perms.end(), by) == it->disallow_perms.end(),
+            "authorized_by appears in disallow_perms");
+   }
+
+} // namespace eosiosystem
