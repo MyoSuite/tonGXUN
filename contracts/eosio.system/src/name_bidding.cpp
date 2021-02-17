@@ -28,4 +28,29 @@ namespace eosiosystem {
             b.newname = newname;
             b.high_bidder = bidder;
             b.high_bid = bid.amount;
-            b.l
+            b.last_bid_time = current_time_point();
+         });
+      } else {
+         check( current->high_bid > 0, "this auction has already closed" );
+         check( bid.amount - current->high_bid > (current->high_bid / 10), "must increase bid by 10%" );
+         check( current->high_bidder != bidder, "account is already highest bidder" );
+
+         bid_refund_table refunds_table(get_self(), newname.value);
+
+         auto it = refunds_table.find( current->high_bidder.value );
+         if ( it != refunds_table.end() ) {
+            refunds_table.modify( it, same_payer, [&](auto& r) {
+                  r.amount += asset( current->high_bid, core_symbol() );
+               });
+         } else {
+            refunds_table.emplace( bidder, [&](auto& r) {
+                  r.bidder = current->high_bidder;
+                  r.amount = asset( current->high_bid, core_symbol() );
+               });
+         }
+
+         eosio::transaction t;
+         t.actions.emplace_back( permission_level{current->high_bidder, active_permission},
+                                 get_self(), "bidrefund"_n,
+                                 std::make_tuple( current->high_bidder, newname )
+        
