@@ -53,4 +53,28 @@ namespace eosiosystem {
          t.actions.emplace_back( permission_level{current->high_bidder, active_permission},
                                  get_self(), "bidrefund"_n,
                                  std::make_tuple( current->high_bidder, newname )
-        
+         );
+         t.delay_sec = 0;
+         uint128_t deferred_id = (uint128_t(newname.value) << 64) | current->high_bidder.value;
+         eosio::cancel_deferred( deferred_id );
+         t.send( deferred_id, bidder );
+
+         bids.modify( current, bidder, [&]( auto& b ) {
+            b.high_bidder = bidder;
+            b.high_bid = bid.amount;
+            b.last_bid_time = current_time_point();
+         });
+      }
+   }
+
+   void system_contract::bidrefund( const name& bidder, const name& newname ) {
+      bid_refund_table refunds_table(get_self(), newname.value);
+      auto it = refunds_table.find( bidder.value );
+      check( it != refunds_table.end(), "refund not found" );
+
+      token::transfer_action transfer_act{ token_account, { {names_account, active_permission}, {bidder, active_permission} } };
+      transfer_act.send( names_account, bidder, asset(it->amount), std::string("refund bid on name ")+(name{newname}).to_string() );
+      refunds_table.erase( it );
+   }
+
+}
