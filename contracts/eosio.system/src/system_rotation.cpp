@@ -18,4 +18,30 @@ void system_contract::set_bps_rotation(name bpOut, name sbpIn) {
 }
 
 void system_contract::update_rotation_time(block_timestamp block_time) {
-  _grotat
+  _grotation.last_rotation_time = block_time;
+  _grotation.next_rotation_time = block_timestamp(
+      block_time.to_time_point() + time_point(microseconds(TWELVE_HOURS_US)));
+}
+
+void system_contract::update_missed_blocks_per_rotation() {
+  auto active_schedule_size =
+      std::distance(_gschedule_metrics.producers_metric.begin(),
+                    _gschedule_metrics.producers_metric.end());
+  uint16_t max_kick_bps = uint16_t(active_schedule_size / 7);
+
+  std::vector<producer_info> prods;
+
+  for (auto &pm : _gschedule_metrics.producers_metric) {
+    auto pitr = _producers.find(pm.bp_name.value);
+    if (pitr != _producers.end() && pitr->is_active) {
+      if (pm.missed_blocks_per_cycle > 0) {
+        //  print("\nblock producer: ", name{pm.name}, " missed ",
+        //  pm.missed_blocks_per_cycle, " blocks.");
+        _producers.modify(pitr, same_payer, [&](auto &p) {
+          p.missed_blocks_per_rotation += pm.missed_blocks_per_cycle;
+          //   print("\ntotal missed blocks: ", p.missed_blocks_per_rotation);
+        });
+      }
+
+      if (pitr->missed_blocks_per_rotation > 0)
+        prods.empla
