@@ -44,4 +44,36 @@ void system_contract::update_missed_blocks_per_rotation() {
       }
 
       if (pitr->missed_blocks_per_rotation > 0)
-        prods.empla
+        prods.emplace_back(*pitr);
+    }
+  }
+
+  std::sort(prods.begin(), prods.end(), [](const producer_info &p1,
+                                           const producer_info &p2) {
+    if (p1.missed_blocks_per_rotation != p2.missed_blocks_per_rotation)
+      return p1.missed_blocks_per_rotation > p2.missed_blocks_per_rotation;
+    else
+      return p1.total_votes < p2.total_votes;
+  });
+
+  for (auto &prod : prods) {
+    auto pitr = _producers.find(prod.owner.value);
+
+    if (crossed_missed_blocks_threshold(pitr->missed_blocks_per_rotation,
+                                        uint32_t(active_schedule_size)) &&
+        max_kick_bps > 0) {
+      _producers.modify(pitr, same_payer, [&](auto &p) {
+        p.lifetime_missed_blocks += p.missed_blocks_per_rotation;
+        p.kick(kick_type::REACHED_TRESHOLD);
+      });
+      max_kick_bps--;
+    } else
+      break;
+  }
+}
+
+void system_contract::restart_missed_blocks_per_rotation(
+    std::vector<producer_location_pair> prods) {
+  // restart all missed blocks to bps and sbps
+  for (size_t i = 0; i < prods.size(); i++) {
+    auto bp_name = prods[i].first.p
