@@ -76,4 +76,31 @@ void system_contract::restart_missed_blocks_per_rotation(
     std::vector<producer_location_pair> prods) {
   // restart all missed blocks to bps and sbps
   for (size_t i = 0; i < prods.size(); i++) {
-    auto bp_name = prods[i].first.p
+    auto bp_name = prods[i].first.producer_name;
+    auto pitr = _producers.find(bp_name.value);
+
+    if (pitr != _producers.end()) {
+      _producers.modify(pitr, same_payer, [&](auto &p) {
+        if (p.times_kicked > 0 && p.missed_blocks_per_rotation == 0) {
+          p.times_kicked--;
+        }
+        p.lifetime_missed_blocks += p.missed_blocks_per_rotation;
+        p.missed_blocks_per_rotation = 0;
+      });
+    }
+  }
+}
+
+ bool system_contract::is_in_range(int32_t index, int32_t low_bound, int32_t up_bound) {
+     return index >= low_bound && index < up_bound;
+   } 
+
+std::vector<producer_location_pair> system_contract::check_rotation_state( std::vector<producer_location_pair> prods, block_timestamp block_time) {
+      uint32_t total_active_voted_prods = prods.size(); 
+      std::vector<producer_location_pair>::iterator it_bp = prods.end();
+      std::vector<producer_location_pair>::iterator it_sbp = prods.end();
+
+      if (_grotation.next_rotation_time <= block_time) {
+
+        if (total_active_voted_prods > TOP_PRODUCERS) {
+          _grotation.bp_out_index = _grotation.bp_out_index >= TOP_PRODUCERS - 1 ? 0
