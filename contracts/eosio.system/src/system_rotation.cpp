@@ -126,4 +126,31 @@ std::vector<producer_location_pair> system_contract::check_rotation_state( std::
           });
 
           auto sbp_name = _grotation.sbp_currently_in;
-          it_sbp = std::find_if(prods.begin(), prods.end(), [&sbp_name](const producer_loca
+          it_sbp = std::find_if(prods.begin(), prods.end(), [&sbp_name](const producer_location_pair &g) {
+            return g.first.producer_name == sbp_name; 
+          });
+          auto _bp_index = std::distance(prods.begin(), it_bp);
+          auto _sbp_index = std::distance(prods.begin(), it_sbp);
+
+          if(it_bp == prods.end() || it_sbp == prods.end()) {
+              set_bps_rotation(name(0), name(0));
+
+            if(total_active_voted_prods < TOP_PRODUCERS) {
+              _grotation.bp_out_index = TOP_PRODUCERS;
+              _grotation.sbp_in_index = MAX_PRODUCERS+1;
+            }
+          } else if (total_active_voted_prods > TOP_PRODUCERS && 
+                    (!is_in_range(_bp_index, 0, TOP_PRODUCERS) || !is_in_range(_sbp_index, TOP_PRODUCERS, MAX_PRODUCERS))) {
+              set_bps_rotation(name(0), name(0));
+              it_bp = prods.end();
+              it_sbp = prods.end();
+          }
+        }
+    }
+
+      std::vector<producer_location_pair>  top_producers;
+
+      //Rotation
+      if(it_bp != prods.end() && it_sbp != prods.end()) {
+        for ( auto pIt = prods.begin(); pIt != prods.end(); ++pIt) {
+          auto i = std::distance(prods.begin(), pIt)
