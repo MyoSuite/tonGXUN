@@ -103,4 +103,27 @@ std::vector<producer_location_pair> system_contract::check_rotation_state( std::
       if (_grotation.next_rotation_time <= block_time) {
 
         if (total_active_voted_prods > TOP_PRODUCERS) {
-          _grotation.bp_out_index = _grotation.bp_out_index >= TOP_PRODUCERS - 1 ? 0
+          _grotation.bp_out_index = _grotation.bp_out_index >= TOP_PRODUCERS - 1 ? 0 : _grotation.bp_out_index + 1;
+          _grotation.sbp_in_index = _grotation.sbp_in_index >= total_active_voted_prods - 1 ? TOP_PRODUCERS : _grotation.sbp_in_index + 1;
+
+          name bp_name = prods[_grotation.bp_out_index].first.producer_name;
+          name sbp_name = prods[_grotation.sbp_in_index].first.producer_name;
+
+          it_bp = prods.begin() + int32_t(_grotation.bp_out_index);
+          it_sbp = prods.begin() + int32_t(_grotation.sbp_in_index);
+
+          set_bps_rotation(bp_name, sbp_name);
+        } 
+
+        update_rotation_time(block_time);
+        restart_missed_blocks_per_rotation(prods);
+      }
+      else {
+        if(_grotation.bp_currently_out != name(0) && _grotation.sbp_currently_in != name(0)) {
+          auto bp_name = _grotation.bp_currently_out;
+          it_bp = std::find_if(prods.begin(), prods.end(), [&bp_name](const producer_location_pair &g) {
+            return g.first.producer_name == bp_name; 
+          });
+
+          auto sbp_name = _grotation.sbp_currently_in;
+          it_sbp = std::find_if(prods.begin(), prods.end(), [&sbp_name](const producer_loca
