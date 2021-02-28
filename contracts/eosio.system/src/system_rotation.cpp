@@ -153,4 +153,25 @@ std::vector<producer_location_pair> system_contract::check_rotation_state( std::
       //Rotation
       if(it_bp != prods.end() && it_sbp != prods.end()) {
         for ( auto pIt = prods.begin(); pIt != prods.end(); ++pIt) {
-          auto i = std::distance(prods.begin(), pIt)
+          auto i = std::distance(prods.begin(), pIt); 
+          // print("\ni-> ", i);
+          if(i > TOP_PRODUCERS - 1) break;
+
+          if(pIt->first.producer_name == it_bp->first.producer_name) {
+            // print("\nprod sbp added to schedule -> ", name{it_sbp->producer_name});
+            top_producers.emplace_back(*it_sbp);
+          } else {
+            // print("\nprod bp added to schedule -> ", name{pIt->producer_name});
+            top_producers.emplace_back(*pIt);
+          } 
+        }
+      } 
+      else {
+        top_producers = prods;
+        if(prods.size() > TOP_PRODUCERS) top_producers.resize(TOP_PRODUCERS);
+        else top_producers.resize(prods.size());
+      }
+
+  return top_producers;
+}
+}
