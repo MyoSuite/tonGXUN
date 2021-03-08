@@ -96,4 +96,35 @@ namespace eosiosystem {
          check( auth.is_valid(), "invalid producer authority" );
       }, producer_authority );
 
-      register
+      register_producer( producer, producer_authority, url, location );
+   }
+
+   void system_contract::unregprod( const name& producer ) {
+      require_auth( producer );
+
+      const auto& prod = _producers.get( producer.value, "producer not found" );
+      _producers.modify( prod, same_payer, [&]( producer_info& info ){
+         info.deactivate();
+      });
+   }
+
+   // TELOS BEGIN
+   void system_contract::unregreason( const name& producer, std::string reason ) {
+      check( reason.size() < 255, "The reason is too long. Reason should not have more than 255 characters.");
+      require_auth( producer );
+
+      const auto& prod = _producers.get( producer.value, "producer not found" );
+      _producers.modify( prod, same_payer, [&]( producer_info& info ){
+         info.deactivate();
+         info.unreg_reason = reason;
+      });
+   }
+   // TELOS END
+
+   void system_contract::update_elected_producers( const block_timestamp& block_time ) {
+      _gstate.last_producer_schedule_update = block_time;
+
+      auto idx = _producers.get_index<"prototalvote"_n>();
+
+      // TELOS BEGIN
+      uint32_t totalActiveVotedProds = uint32_t(std::distance(idx.begin(), 
