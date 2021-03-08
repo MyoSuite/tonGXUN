@@ -68,4 +68,32 @@ namespace eosiosystem {
             info.total_votes        = 0;
             info.producer_key       = producer_key;
             info.is_active          = true;
-            info.url          
+            info.url                = url;
+            info.location           = location;
+            info.last_claim_time    = ct;
+            info.producer_authority.emplace( producer_authority );
+         });
+         _producers2.emplace( producer, [&]( producer_info2& info ){
+            info.owner                     = producer;
+            info.last_votepay_share_update = ct;
+         });
+      }
+
+   }
+
+   void system_contract::regproducer( const name& producer, const eosio::public_key& producer_key, const std::string& url, uint16_t location ) {
+      require_auth( producer );
+      check( url.size() < 512, "url too long" );
+
+      register_producer( producer, convert_to_block_signing_authority( producer_key ), url, location );
+   }
+
+   void system_contract::regproducer2( const name& producer, const eosio::block_signing_authority& producer_authority, const std::string& url, uint16_t location ) {
+      require_auth( producer );
+      check( url.size() < 512, "url too long" );
+
+      std::visit( [&](auto&& auth ) {
+         check( auth.is_valid(), "invalid producer authority" );
+      }, producer_authority );
+
+      register
