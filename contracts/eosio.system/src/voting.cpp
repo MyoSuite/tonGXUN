@@ -127,4 +127,28 @@ namespace eosiosystem {
       auto idx = _producers.get_index<"prototalvote"_n>();
 
       // TELOS BEGIN
-      uint32_t totalActiveVotedProds = uint32_t(std::distance(idx.begin(), 
+      uint32_t totalActiveVotedProds = uint32_t(std::distance(idx.begin(), idx.end()));
+      totalActiveVotedProds = totalActiveVotedProds > MAX_PRODUCERS ? MAX_PRODUCERS : totalActiveVotedProds;
+
+      std::vector< producer_location_pair > active_producers, top_producers;
+      active_producers.reserve(totalActiveVotedProds);
+
+      for( auto it = idx.cbegin(); it != idx.cend() && active_producers.size() < totalActiveVotedProds /*TELOS*/ && 0 < it->total_votes && it->active(); ++it ) {
+         active_producers.emplace_back(
+            eosio::producer_authority{
+               .producer_name = it->owner,
+               .authority     = it->get_producer_authority()
+            },
+            it->location
+         );
+      }
+
+      if( active_producers.size() == 0 || active_producers.size() < _gstate.last_producer_schedule_size ) {
+         return;
+      }
+
+      top_producers = check_rotation_state(active_producers, block_time);
+      // TELOS END
+
+      std::sort( top_producers.begin(), top_producers.end(), []( const producer_location_pair& lhs, const producer_location_pair& rhs ) {
+         //return lhs.first.producer_name < rhs.first.producer_name; // sort by pr
