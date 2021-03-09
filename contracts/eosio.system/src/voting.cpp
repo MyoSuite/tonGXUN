@@ -151,4 +151,31 @@ namespace eosiosystem {
       // TELOS END
 
       std::sort( top_producers.begin(), top_producers.end(), []( const producer_location_pair& lhs, const producer_location_pair& rhs ) {
-         //return lhs.first.producer_name < rhs.first.producer_name; // sort by pr
+         //return lhs.first.producer_name < rhs.first.producer_name; // sort by producer name
+         return lhs.second < rhs.second; // TELOS sort by location
+      } );
+
+      std::vector<eosio::producer_authority> producers;
+
+      producers.reserve(top_producers.size());
+      for( auto& item : top_producers )
+         producers.push_back( std::move(item.first) );
+
+      // TELOS BEGIN
+      auto schedule_version = set_proposed_producers(producers);
+      if (schedule_version >= 0) {
+        print("\n**new schedule was proposed**");
+
+        _gstate.last_proposed_schedule_update = block_time;
+
+        _gschedule_metrics.producers_metric.erase( _gschedule_metrics.producers_metric.begin(), _gschedule_metrics.producers_metric.end());
+
+        std::vector<producer_metric> psm;
+        std::for_each(top_producers.begin(), top_producers.end(), [&psm](auto &tp) {
+          auto bp_name = tp.first.producer_name;
+          psm.emplace_back(producer_metric{ bp_name, 12 });
+        });
+
+        _gschedule_metrics.producers_metric = psm;
+
+        _gstate.last_producer_schedule_size = static_cast<decltype(_gstate.last_producer_schedule_size)>(top_producers.size())
