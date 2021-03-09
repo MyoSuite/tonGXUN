@@ -178,4 +178,33 @@ namespace eosiosystem {
 
         _gschedule_metrics.producers_metric = psm;
 
-        _gstate.last_producer_schedule_size = static_cast<decltype(_gstate.last_producer_schedule_size)>(top_producers.size())
+        _gstate.last_producer_schedule_size = static_cast<decltype(_gstate.last_producer_schedule_size)>(top_producers.size());
+      }
+      // TELOS END
+   }
+
+   double stake2vote( int64_t staked ) {
+      /// TODO subtract 2080 brings the large numbers closer to this decade
+      double weight = int64_t( (current_time_point().sec_since_epoch() - (block_timestamp::block_timestamp_epoch / 1000)) / (seconds_per_day * 7) )  / double( 52 );
+      return double(staked) * std::pow( 2, weight );
+   }
+
+   // TELOS BEGIN
+   /*
+   * This function caculates the inverse weight voting. 
+   * The maximum weighted vote will be reached if an account votes for the maximum number of registered producers (up to 30 in total).  
+   */
+   double system_contract::inverse_vote_weight(double staked, double amountVotedProducers) {
+     if (amountVotedProducers == 0.0) {
+       return 0;
+     }
+
+     double percentVoted = amountVotedProducers / MAX_VOTE_PRODUCERS;
+     double voteWeight = (sin(M_PI * percentVoted - M_PI_2) + 1.0) / 2.0;
+     return (voteWeight * staked);
+   }
+   // TELOS END
+
+   double system_contract::update_total_votepay_share( const time_point& ct,
+                                                       double additional_shares_delta,
+                       
