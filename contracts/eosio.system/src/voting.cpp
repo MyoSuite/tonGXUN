@@ -233,4 +233,31 @@ namespace eosiosystem {
       return _gstate2.total_producer_votepay_share;
    }
 
-   double system_con
+   double system_contract::update_producer_votepay_share( const producers_table2::const_iterator& prod_itr,
+                                                          const time_point& ct,
+                                                          double shares_rate,
+                                                          bool reset_to_zero )
+   {
+      double delta_votepay_share = 0.0;
+      if( shares_rate > 0.0 && ct > prod_itr->last_votepay_share_update ) {
+         delta_votepay_share = shares_rate * double( (ct - prod_itr->last_votepay_share_update).count() / 1E6 ); // cannot be negative
+      }
+
+      double new_votepay_share = prod_itr->votepay_share + delta_votepay_share;
+      _producers2.modify( prod_itr, same_payer, [&](auto& p) {
+         if( reset_to_zero )
+            p.votepay_share = 0.0;
+         else
+            p.votepay_share = new_votepay_share;
+
+         p.last_votepay_share_update = ct;
+      } );
+
+      return new_votepay_share;
+   }
+
+   void system_contract::voteproducer( const name& voter_name, const name& proxy, const std::vector<name>& producers ) {
+      // TELOS BEGIN
+      require_auth( voter_name);
+      /*
+     
