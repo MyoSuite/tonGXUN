@@ -207,4 +207,30 @@ namespace eosiosystem {
 
    double system_contract::update_total_votepay_share( const time_point& ct,
                                                        double additional_shares_delta,
-                       
+                                                       double shares_rate_delta )
+   {
+      double delta_total_votepay_share = 0.0;
+      if( ct > _gstate3.last_vpay_state_update ) {
+         delta_total_votepay_share = _gstate3.total_vpay_share_change_rate
+                                       * double( (ct - _gstate3.last_vpay_state_update).count() / 1E6 );
+      }
+
+      delta_total_votepay_share += additional_shares_delta;
+      if( delta_total_votepay_share < 0 && _gstate2.total_producer_votepay_share < -delta_total_votepay_share ) {
+         _gstate2.total_producer_votepay_share = 0.0;
+      } else {
+         _gstate2.total_producer_votepay_share += delta_total_votepay_share;
+      }
+
+      if( shares_rate_delta < 0 && _gstate3.total_vpay_share_change_rate < -shares_rate_delta ) {
+         _gstate3.total_vpay_share_change_rate = 0.0;
+      } else {
+         _gstate3.total_vpay_share_change_rate += shares_rate_delta;
+      }
+
+      _gstate3.last_vpay_state_update = ct;
+
+      return _gstate2.total_producer_votepay_share;
+   }
+
+   double system_con
