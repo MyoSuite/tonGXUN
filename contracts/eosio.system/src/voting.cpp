@@ -367,4 +367,35 @@ namespace eosiosystem {
                _gstate.total_activated_stake += totalStaked - voter->last_stake;
                propagate_weight_change( *old_proxy );
             }
-    
+         } else {
+            for( const auto& p : voter->producers ) {
+               auto& d = producer_deltas[p];
+               d.first -= voter->last_vote_weight;
+               d.second = false;
+            }
+         }
+      }
+
+      if( proxy ) {
+         auto new_proxy = _voters.find( proxy.value );
+         check( new_proxy != _voters.end(), "invalid proxy specified" ); //if ( !voting ) { data corruption } else { wrong vote }
+         check( !voting || new_proxy->is_proxy, "proxy not found" );
+
+         _voters.modify( new_proxy, same_payer, [&]( auto& vp ) {
+            vp.proxied_vote_weight += voter->staked;
+         });
+
+         if((*new_proxy).last_vote_weight > 0){
+            _gstate.total_activated_stake += totalStaked - voter->last_stake;
+            propagate_weight_change( *new_proxy );
+         }
+      } else {
+         if( new_vote_weight >= 0 ) {
+            for( const auto& p : producers ) {
+               auto& d = producer_deltas[p]; 
+               d.first += new_vote_weight;
+               d.second = true;
+            }
+         }
+      }
+
