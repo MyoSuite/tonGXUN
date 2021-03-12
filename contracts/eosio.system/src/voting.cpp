@@ -342,4 +342,29 @@ namespace eosiosystem {
       // any proxy stake handling should be done when the proxy votes or on weight propagation
       // if(_gstate.thresh_activated_stake_time == 0 && !proxy && !voter->proxy){
       if(!proxy && !voter->proxy){
-         _gstate.total_activated_stake += tota
+         _gstate.total_activated_stake += totalStaked - voter->last_stake;
+      }
+
+      auto new_vote_weight = inverse_vote_weight((double)totalStaked, (double) producers.size());
+      boost::container::flat_map<name, std::pair< double, bool > > producer_deltas;
+
+      // print("\n Voter : ", voter->last_stake, " = ", voter->last_vote_weight, " = ", proxy, " = ", producers.size(), " = ", totalStaked, " = ", new_vote_weight);
+
+      //Voter from second vote
+      if ( voter->last_stake > 0 ) {
+
+         //if voter account has set proxy to another voter account
+         if( voter->proxy ) { 
+            auto old_proxy = _voters.find( voter->proxy.value );
+            check( old_proxy != _voters.end(), "old proxy not found" ); //data corruption
+            _voters.modify( old_proxy, same_payer, [&]( auto& vp ) {
+               vp.proxied_vote_weight -= voter->last_stake;
+            });
+
+            // propagate weight here only when switching proxies
+            // otherwise propagate happens in the case below
+            if( proxy != voter->proxy ) {  
+               _gstate.total_activated_stake += totalStaked - voter->last_stake;
+               propagate_weight_change( *old_proxy );
+            }
+    
