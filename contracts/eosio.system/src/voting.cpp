@@ -318,4 +318,28 @@ namespace eosiosystem {
       } else {
          check( producers.size() <= 30, "attempt to vote for too many producers" );
          for( size_t i = 1; i < producers.size(); ++i ) {
-            check( p
+            check( producers[i-1] < producers[i], "producer votes must be unique and sorted" );
+         }
+      }
+
+      auto voter = _voters.find( voter_name.value );
+      check( voter != _voters.end(), "user must stake before they can vote" ); /// staking creates voter object
+      check( !proxy || !voter->is_proxy, "account registered as a proxy is not allowed to use a proxy" );
+
+      // TELOS BEGIN
+      auto totalStaked = voter->staked;
+      if(voter->is_proxy){
+         totalStaked += voter->proxied_vote_weight;
+      }
+
+      // when unvoting, set the stake used for calculations to 0
+      // since it is the equivalent to retracting your stake
+      if(voting && !proxy && producers.size() == 0){
+         totalStaked = 0;
+      }
+
+      // when a voter or a proxy votes or changes stake, the total_activated stake should be re-calculated
+      // any proxy stake handling should be done when the proxy votes or on weight propagation
+      // if(_gstate.thresh_activated_stake_time == 0 && !proxy && !voter->proxy){
+      if(!proxy && !voter->proxy){
+         _gstate.total_activated_stake += tota
