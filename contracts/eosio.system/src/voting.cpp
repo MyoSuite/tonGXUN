@@ -290,4 +290,32 @@ namespace eosiosystem {
       auto rex_itr = _rexbalance.find( voter_name.value );
       if( rex_itr != _rexbalance.end() && rex_itr->rex_balance.amount > 0 ) {
          new_staked += rex_itr->vote_stake.amount;
-    
+      }
+      del_bandwidth_table     del_tbl( get_self(), voter_name.value );
+
+      auto del_itr = del_tbl.begin();
+      while(del_itr != del_tbl.end()) {
+         new_staked += del_itr->net_weight.amount + del_itr->cpu_weight.amount;
+         del_itr++;
+      }
+
+      if( voter->staked != new_staked){
+         // check if staked and new_staked are different and only
+         _voters.modify( voter, same_payer, [&]( auto& av ) {
+            av.staked = new_staked;
+         });
+      }
+
+      update_votes(voter_name, voter->proxy, voter->producers, true);
+   } // voteupdate
+
+
+   void system_contract::update_votes( const name& voter_name, const name& proxy, const std::vector<name>& producers, bool voting ) {
+      //validate input
+      if ( proxy ) {
+         check( producers.size() == 0, "cannot vote for producers and proxy at same time" );
+         check( voter_name != proxy, "cannot proxy to self" );
+      } else {
+         check( producers.size() <= 30, "attempt to vote for too many producers" );
+         for( size_t i = 1; i < producers.size(); ++i ) {
+            check( p
