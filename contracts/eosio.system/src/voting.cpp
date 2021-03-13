@@ -424,4 +424,36 @@ namespace eosiosystem {
          av.last_vote_weight = new_vote_weight;
          av.last_stake = int64_t(totalStaked);
          av.producers = producers;
-         av.proxy 
+         av.proxy     = proxy;
+      });
+      // TELOS END
+   }
+
+   void system_contract::regproxy( const name& proxy, bool isproxy ) {
+      // TELOS BEGIN
+      // require_auth( proxy );
+      check ( !isproxy, "proxy voting is disabled" );
+      // TELOS END
+
+      auto pitr = _voters.find( proxy.value );
+      if ( pitr != _voters.end() ) {
+         check( isproxy != pitr->is_proxy, "action has no effect" );
+         check( !isproxy || !pitr->proxy, "account that uses a proxy is not allowed to become a proxy" );
+         _voters.modify( pitr, same_payer, [&]( auto& p ) {
+               p.is_proxy = isproxy;
+            });
+         // TELOS BEGIN
+         // propagate_weight_change( *pitr );
+         update_votes(pitr->owner, pitr->proxy, pitr->producers, true);
+         // TELOS END
+      } else {
+         _voters.emplace( proxy, [&]( auto& p ) {
+               p.owner  = proxy;
+               p.is_proxy = isproxy;
+            });
+      }
+   }
+
+   void system_contract::propagate_weight_change( const voter_info& voter ) {
+      check( !voter.proxy || !voter.is_proxy, "account registered as a proxy is not allowed to use a proxy" );
+      // TELOS REPLACE BEG
