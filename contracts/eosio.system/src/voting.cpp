@@ -399,3 +399,29 @@ namespace eosiosystem {
          }
       }
 
+      for( const auto& pd : producer_deltas ) {
+         auto pitr = _producers.find( pd.first.value );
+         if( pitr != _producers.end() ) {
+            if( voting && !pitr->active() && pd.second.second /* from new set */ ) {
+               check( false, ( "producer " + pitr->owner.to_string() + " is not currently registered" ).data() );
+            }
+            _producers.modify( pitr, same_payer, [&]( auto& p ) {
+               p.total_votes += pd.second.first;
+               if ( p.total_votes < 0 ) { // floating point arithmetics can give small negative numbers
+                  p.total_votes = 0;
+               }
+               _gstate.total_producer_vote_weight += pd.second.first;
+               //check( p.total_votes >= 0, "something bad happened" );
+            });
+         } else {
+            if( pd.second.second ) {
+               check( false, ( "producer " + pd.first.to_string() + " is not registered" ).data() );
+            }
+         }
+      }
+
+      _voters.modify( voter, same_payer, [&]( auto& av ) {
+         av.last_vote_weight = new_vote_weight;
+         av.last_stake = int64_t(totalStaked);
+         av.producers = producers;
+         av.proxy 
