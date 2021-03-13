@@ -456,4 +456,28 @@ namespace eosiosystem {
 
    void system_contract::propagate_weight_change( const voter_info& voter ) {
       check( !voter.proxy || !voter.is_proxy, "account registered as a proxy is not allowed to use a proxy" );
-      // TELOS REPLACE BEG
+      // TELOS REPLACE BEGIN
+      /*
+      double new_weight = stake2vote( voter.staked );
+      if ( voter.is_proxy ) {
+         new_weight += voter.proxied_vote_weight;
+      }
+
+      /// don't propagate small changes (1 ~= epsilon)
+      if ( fabs( new_weight - voter.last_vote_weight ) > 1 )  {
+         if ( voter.proxy ) {
+            auto& proxy = _voters.get( voter.proxy.value, "proxy not found" ); //data corruption
+            _voters.modify( proxy, same_payer, [&]( auto& p ) {
+                  p.proxied_vote_weight += new_weight - voter.last_vote_weight;
+               }
+            );
+            propagate_weight_change( proxy );
+         } else {
+            auto delta = new_weight - voter.last_vote_weight;
+            const auto ct = current_time_point();
+            double delta_change_rate         = 0;
+            double total_inactive_vpay_share = 0;
+            for ( auto acnt : voter.producers ) {
+               auto& prod = _producers.get( acnt.value, "producer not found" ); //data corruption
+               const double init_total_votes = prod.total_votes;
+               _producers.modify( prod, same_payer,
