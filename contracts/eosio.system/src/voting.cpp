@@ -525,4 +525,33 @@ namespace eosiosystem {
          if(voter.last_stake != totalStake){
             auto &proxy = _voters.get(voter.proxy.value, "proxy not found"); // data corruption
             _voters.modify(proxy, same_payer, [&](auto &p) { 
-               
+               p.proxied_vote_weight += totalStake - voter.last_stake;
+            });
+
+            propagate_weight_change(proxy);
+         }
+      } else {
+         for (auto acnt : voter.producers) {
+            auto &pitr = _producers.get(acnt.value, "producer not found"); // data corruption
+            _producers.modify(pitr, same_payer, [&](auto &p) {
+               p.total_votes += delta;
+               _gstate.total_producer_vote_weight += delta;
+            });
+         }
+      }
+
+      _voters.modify(voter, same_payer, [&](auto &v) { 
+         v.last_vote_weight = new_weight; 
+         v.last_stake = totalStake;
+      });
+      // TELOS REPLACE END
+   }
+
+   // TELOS BEGIN
+   void system_contract::recalculate_votes(){
+    if (_gstate.total_producer_vote_weight <= -0.1){ // -0.1 threshold for floating point calc ?
+        _gstate.total_producer_vote_weight = 0;
+        _gstate.total_activated_stake = 0;
+        for(auto producer = _producers.begin(); producer != _producers.end(); ++producer){
+            _producers.modify(producer, same_payer, [&](auto &p) {
+                p.total_votes = 0
