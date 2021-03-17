@@ -480,4 +480,21 @@ namespace eosiosystem {
             for ( auto acnt : voter.producers ) {
                auto& prod = _producers.get( acnt.value, "producer not found" ); //data corruption
                const double init_total_votes = prod.total_votes;
-               _producers.modify( prod, same_payer,
+               _producers.modify( prod, same_payer, [&]( auto& p ) {
+                  p.total_votes += delta;
+                  _gstate.total_producer_vote_weight += delta;
+               });
+               auto prod2 = _producers2.find( acnt.value );
+               if ( prod2 != _producers2.end() ) {
+                  const auto last_claim_plus_3days = prod.last_claim_time + microseconds(3 * useconds_per_day);
+                  bool crossed_threshold       = (last_claim_plus_3days <= ct);
+                  bool updated_after_threshold = (last_claim_plus_3days <= prod2->last_votepay_share_update);
+                  // Note: updated_after_threshold implies cross_threshold
+
+                  double new_votepay_share = update_producer_votepay_share( prod2,
+                                                ct,
+                                                updated_after_threshold ? 0.0 : init_total_votes,
+                                                crossed_threshold && !updated_after_threshold // only reset votepay_share once after threshold
+                                             );
+
+                  if( !cro
