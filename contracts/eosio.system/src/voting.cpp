@@ -497,4 +497,32 @@ namespace eosiosystem {
                                                 crossed_threshold && !updated_after_threshold // only reset votepay_share once after threshold
                                              );
 
-                  if( !cro
+                  if( !crossed_threshold ) {
+                     delta_change_rate += delta;
+                  } else if( !updated_after_threshold ) {
+                     total_inactive_vpay_share += new_votepay_share;
+                     delta_change_rate -= init_total_votes;
+                  }
+               }
+            }
+
+            update_total_votepay_share( ct, -total_inactive_vpay_share, delta_change_rate );
+         }
+      }
+      _voters.modify( voter, same_payer, [&]( auto& v ) {
+            v.last_vote_weight = new_weight;
+         }
+      );
+      */
+      auto totalStake = voter.staked;
+      if(voter.is_proxy){
+         totalStake += voter.proxied_vote_weight;
+      }
+      double new_weight = inverse_vote_weight((double)totalStake, voter.producers.size());
+      double delta = new_weight - voter.last_vote_weight;
+
+      if (voter.proxy) { // this part should never happen since the function is called only on proxies
+         if(voter.last_stake != totalStake){
+            auto &proxy = _voters.get(voter.proxy.value, "proxy not found"); // data corruption
+            _voters.modify(proxy, same_payer, [&](auto &p) { 
+               
