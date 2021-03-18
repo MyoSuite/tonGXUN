@@ -582,4 +582,4 @@ namespace eosiosystem {
    }
    // TELOS END
 
-} /// name
+} /// namespace eosiosystem
