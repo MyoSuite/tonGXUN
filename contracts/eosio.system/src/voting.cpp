@@ -554,4 +554,32 @@ namespace eosiosystem {
         _gstate.total_activated_stake = 0;
         for(auto producer = _producers.begin(); producer != _producers.end(); ++producer){
             _producers.modify(producer, same_payer, [&](auto &p) {
-                p.total_votes = 0
+                p.total_votes = 0;
+            });
+        }
+        boost::container::flat_map< name, bool> processed_proxies;
+        for (auto voter = _voters.begin(); voter != _voters.end(); ++voter) {
+            if(voter->proxy && !processed_proxies[voter->proxy]){
+                auto proxy = _voters.find(voter->proxy.value);
+                _voters.modify( proxy, same_payer, [&]( auto& av ) {
+                    av.last_vote_weight = 0;
+                    av.last_stake = 0;
+                    av.proxied_vote_weight = 0;
+                });
+                processed_proxies[voter->proxy] = true;
+            }
+            if(!voter->is_proxy || !processed_proxies[voter->owner]){
+                _voters.modify( voter, same_payer, [&]( auto& av ) {
+                    av.last_vote_weight = 0;
+                    av.last_stake = 0;
+                    av.proxied_vote_weight = 0;
+                });
+                processed_proxies[voter->owner] = true;
+            }
+            update_votes(voter->owner, voter->proxy, voter->producers, true);
+        }
+    }
+   }
+   // TELOS END
+
+} /// name
