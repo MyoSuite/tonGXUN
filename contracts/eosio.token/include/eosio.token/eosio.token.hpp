@@ -35,4 +35,30 @@ namespace eosio {
           * @pre Token symbol has to be valid,
           * @pre Token symbol must not be already created,
           * @pre maximum_supply has to be smaller than the maximum supply allowed by the system: 1^62 - 1.
-          * @pre Maxi
+          * @pre Maximum supply must be positive;
+          */
+         [[eosio::action]]
+         void create( const name&   issuer,
+                      const asset&  maximum_supply);
+         /**
+          *  This action issues to `to` account a `quantity` of tokens.
+          *
+          * @param to - the account to issue tokens to, it must be the same as the issuer,
+          * @param quantity - the amount of tokens to be issued,
+          * @memo - the memo string that accompanies the token issue transaction.
+          */
+         [[eosio::action]]
+         void issue( const name& to, const asset& quantity, const string& memo );
+
+         /**
+          * The opposite for create action, if all validations succeed,
+          * it debits the statstable.supply amount.
+          *
+          * @param quantity - the quantity of tokens to retire,
+          * @param memo - the memo string to accompany the transaction.
+          */
+         [[eosio::action]]
+         void retire( const asset& quantity, const string& memo );
+
+         /**
+          * Allows `from` account to transfer to `to` account the `quantity` to
