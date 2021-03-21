@@ -20,4 +20,19 @@ namespace eosio {
     * 
     * The `eosio.token` contract manages the set of tokens, accounts and their corresponding balances, by using two internal multi-index structures: the `accounts` and `stats`. The `accounts` multi-index table holds, for each row, instances of `account` object and the `account` object holds information about the balance of one token. The `accounts` table is scoped to an EOSIO account, and it keeps the rows indexed based on the token's symbol.  This means that when one queries the `accounts` multi-index table for an account name the result is all the tokens that account holds at the moment.
     * 
-    * Similarly, the `stats` multi-index table, holds in
+    * Similarly, the `stats` multi-index table, holds instances of `currency_stats` objects for each row, which contains information about current supply, maximum supply, and the creator account for a symbol token. The `stats` table is scoped to the token symbol.  Therefore, when one queries the `stats` table for a token symbol the result is one single entry/row corresponding to the queried symbol token if it was previously created, or nothing, otherwise.
+    */
+   class [[eosio::contract("eosio.token")]] token : public contract {
+      public:
+         using contract::contract;
+
+         /**
+          * Allows `issuer` account to create a token in supply of `maximum_supply`. If validation is successful a new entry in statstable for token symbol scope gets created.
+          *
+          * @param issuer - the account that creates the token,
+          * @param maximum_supply - the maximum supply set for the token created.
+          *
+          * @pre Token symbol has to be valid,
+          * @pre Token symbol must not be already created,
+          * @pre maximum_supply has to be smaller than the maximum supply allowed by the system: 1^62 - 1.
+          * @pre Maxi
