@@ -61,4 +61,27 @@ namespace eosio {
          void retire( const asset& quantity, const string& memo );
 
          /**
-          * Allows `from` account to transfer to `to` account the `quantity` to
+          * Allows `from` account to transfer to `to` account the `quantity` tokens.
+          * One account is debited and the other is credited with quantity tokens.
+          *
+          * @param from - the account to transfer from,
+          * @param to - the account to be transferred to,
+          * @param quantity - the quantity of tokens to be transferred,
+          * @param memo - the memo string to accompany the transaction.
+          */
+         [[eosio::action]]
+         void transfer( const name&    from,
+                        const name&    to,
+                        const asset&   quantity,
+                        const string&  memo );
+         /**
+          * Allows `ram_payer` to create an account `owner` with zero balance for
+          * token `symbol` at the expense of `ram_payer`.
+          *
+          * @param owner - the account to be created,
+          * @param symbol - the token to be payed with by `ram_payer`,
+          * @param ram_payer - the account that supports the cost of this action.
+          *
+          * More information can be read [here](https://github.com/EOSIO/eosio.contracts/issues/62)
+          * and [here](https://github.com/EOSIO/eosio.contracts/issues/61).
+          *
