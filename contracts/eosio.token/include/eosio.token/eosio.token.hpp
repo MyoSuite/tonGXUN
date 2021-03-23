@@ -84,4 +84,28 @@ namespace eosio {
           *
           * More information can be read [here](https://github.com/EOSIO/eosio.contracts/issues/62)
           * and [here](https://github.com/EOSIO/eosio.contracts/issues/61).
+          */
+         [[eosio::action]]
+         void open( const name& owner, const symbol& symbol, const name& ram_payer );
+
+         /**
+          * This action is the opposite for open, it closes the account `owner`
+          * for token `symbol`.
           *
+          * @param owner - the owner account to execute the close action for,
+          * @param symbol - the symbol of the token to execute the close action for.
+          *
+          * @pre The pair of owner plus symbol has to exist otherwise no action is executed,
+          * @pre If the pair of owner plus symbol exists, the balance has to be zero.
+          */
+         [[eosio::action]]
+         void close( const name& owner, const symbol& symbol );
+
+         static asset get_supply( const name& token_contract_account, const symbol_code& sym_code )
+         {
+            stats statstable( token_contract_account, sym_code.raw() );
+            const auto& st = statstable.get( sym_code.raw(), "invalid supply symbol code" );
+            return st.supply;
+         }
+
+         static asset get_balance( const name& token_contrac
