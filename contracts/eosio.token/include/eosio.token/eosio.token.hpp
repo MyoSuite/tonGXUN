@@ -108,4 +108,27 @@ namespace eosio {
             return st.supply;
          }
 
-         static asset get_balance( const name& token_contrac
+         static asset get_balance( const name& token_contract_account, const name& owner, const symbol_code& sym_code )
+         {
+            accounts accountstable( token_contract_account, owner.value );
+            const auto& ac = accountstable.get( sym_code.raw(), "no balance with specified symbol" );
+            return ac.balance;
+         }
+
+         using create_action = eosio::action_wrapper<"create"_n, &token::create>;
+         using issue_action = eosio::action_wrapper<"issue"_n, &token::issue>;
+         using retire_action = eosio::action_wrapper<"retire"_n, &token::retire>;
+         using transfer_action = eosio::action_wrapper<"transfer"_n, &token::transfer>;
+         using open_action = eosio::action_wrapper<"open"_n, &token::open>;
+         using close_action = eosio::action_wrapper<"close"_n, &token::close>;
+      private:
+         struct [[eosio::table]] account {
+            asset    balance;
+
+            uint64_t primary_key()const { return balance.symbol.code().raw(); }
+         };
+
+         struct [[eosio::table]] currency_stats {
+            asset    supply;
+            asset    max_supply;
+            na
