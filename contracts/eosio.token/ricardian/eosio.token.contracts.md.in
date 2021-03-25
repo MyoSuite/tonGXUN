@@ -1,0 +1,25 @@
+<h1 class="contract">close</h1>
+
+---
+spec_version: "0.2.0"
+title: Close Token Balance
+summary: 'Close {{nowrap owner}}’s zero quantity balance'
+icon: @ICON_BASE_URL@/@TOKEN_ICON_URI@
+---
+
+{{owner}} agrees to close their zero quantity balance for the {{symbol_to_symbol_code symbol}} token.
+
+RAM will be refunded to the RAM payer of the {{symbol_to_symbol_code symbol}} token balance for {{owner}}.
+
+<h1 class="contract">create</h1>
+
+---
+spec_version: "0.2.0"
+title: Create New Token
+summary: 'Create a new token'
+icon: @ICON_BASE_URL@/@TOKEN_ICON_URI@
+---
+
+{{$action.account}} agrees to create a new token with symbol {{asset_to_symbol_code maximum_supply}} to be managed by {{issuer}}.
+
+This action will not resul
