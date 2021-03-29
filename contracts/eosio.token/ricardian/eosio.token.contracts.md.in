@@ -45,4 +45,39 @@ The token manager agrees to issue {{quantity}} into circulation, and transfer it
 
 If {{to}} does not have a balance for {{asset_to_symbol_code quantity}}, or the token manager does not have a balance for {{asset_to_symbol_code quantity}}, the token manager will be designated as the RAM payer of the {{asset_to_symbol_code quantity}} token balance for {{to}}. As a result, RAM will be deducted from the token manager’s resources to create the necessary records.
 
-This action does not allow the total quantity to exceed the max allowed s
+This action does not allow the total quantity to exceed the max allowed supply of the token.
+
+<h1 class="contract">open</h1>
+
+---
+spec_version: "0.2.0"
+title: Open Token Balance
+summary: 'Open a zero quantity balance for {{nowrap owner}}'
+icon: @ICON_BASE_URL@/@TOKEN_ICON_URI@
+---
+
+{{ram_payer}} agrees to establish a zero quantity balance for {{owner}} for the {{symbol_to_symbol_code symbol}} token.
+
+If {{owner}} does not have a balance for {{symbol_to_symbol_code symbol}}, {{ram_payer}} will be designated as the RAM payer of the {{symbol_to_symbol_code symbol}} token balance for {{owner}}. As a result, RAM will be deducted from {{ram_payer}}’s resources to create the necessary records.
+
+<h1 class="contract">retire</h1>
+
+---
+spec_version: "0.2.0"
+title: Remove Tokens from Circulation
+summary: 'Remove {{nowrap quantity}} from circulation'
+icon: @ICON_BASE_URL@/@TOKEN_ICON_URI@
+---
+
+The token manager agrees to remove {{quantity}} from circulation, taken from their own account.
+
+{{#if memo}} There is a memo attached to the action stating:
+{{memo}}
+{{/if}}
+
+<h1 class="contract">transfer</h1>
+
+---
+spec_version: "0.2.0"
+title: Transfer Tokens
+summary: 'Send {{nowrap quantity
