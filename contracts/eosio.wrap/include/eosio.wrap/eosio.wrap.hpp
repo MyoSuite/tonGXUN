@@ -27,4 +27,12 @@ namespace eosio {
           * Postconditions:
           * - Deferred transaction RAM usage is billed to 'executer'          *
           * 
-          * @param executer - account execu
+          * @param executer - account executing the transaction,
+          * @param trx - the transaction to be executed.
+          */
+         [[eosio::action]]
+         void exec( ignore<name> executer, ignore<transaction> trx );
+
+         using exec_action = eosio::action_wrapper<"exec"_n, &wrap::exec>;
+   };
+} /// namespace eosio
