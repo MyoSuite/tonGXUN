@@ -51,4 +51,49 @@ struct block_batch_info
    uint32_t   batch_start_height;
    time_point batch_start_timestamp;
    uint32_t   batch_current_end_height;
-   time_point batch_curren
+   time_point batch_current_end_timestamp;
+};
+
+#else
+
+using eosiosystem::block_info::block_batch_info;
+
+#endif
+
+/**
+ * @brief Output data structure for `get_latest_block_batch_info` RPC
+ */
+struct latest_block_batch_info_result
+{
+   enum error_code_enum : uint32_t
+   {
+      no_error,
+      invalid_input,
+      unsupported_version,
+      insufficient_data
+   };
+
+   std::optional<block_batch_info> result;
+   varint                          error_code = no_error;
+
+   bool has_error() const { return !(error_code.value == no_error && result.has_value()); }
+
+   error_code_enum get_error() const { return static_cast<error_code_enum>(error_code.value); }
+
+#ifndef TEST_INCLUDE
+
+   EOSLIB_SERIALIZE(latest_block_batch_info_result, (result)(error_code))
+
+#endif
+};
+
+using input_type = std::variant<get_latest_block_batch_info>;
+
+using output_type = std::variant<latest_block_batch_info_result>;
+
+} // namespace system_contracts::testing::test_contracts::blockinfo_tester
+
+#ifdef TEST_INCLUDE
+
+FC_REFLECT(system_contracts::testing::test_contracts::blockinfo_tester::get_latest_block_batch_info,
+           (batch_start_height_offset)(b
