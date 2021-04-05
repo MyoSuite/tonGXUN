@@ -96,4 +96,13 @@ using output_type = std::variant<latest_block_batch_info_result>;
 #ifdef TEST_INCLUDE
 
 FC_REFLECT(system_contracts::testing::test_contracts::blockinfo_tester::get_latest_block_batch_info,
-           (batch_start_height_offset)(b
+           (batch_start_height_offset)(batch_size))
+FC_REFLECT(system_contracts::testing::test_contracts::blockinfo_tester::block_batch_info,
+           (batch_start_height)(batch_start_timestamp)(batch_current_end_height)(batch_current_end_timestamp))
+FC_REFLECT_ENUM(
+   system_contracts::testing::test_contracts::blockinfo_tester::latest_block_batch_info_result::error_code_enum,
+   (no_error)(invalid_input)(unsupported_version)(insufficient_data))
+FC_REFLECT(system_contracts::testing::test_contracts::blockinfo_tester::latest_block_batch_info_result,
+           (result)(error_code))
+
+#endif
