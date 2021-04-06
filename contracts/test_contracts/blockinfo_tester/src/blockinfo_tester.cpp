@@ -49,4 +49,33 @@ output_type process_call(input_type input)
    namespace ns = system_contracts::testing::test_contracts::blockinfo_tester;
 
    if (receiver == code) {
-      if (ac
+      if (action == "call"_n.value) {
+         ns::input_type input;
+
+         {
+            std::vector<char> buffer;
+            buffer.resize(eosio::action_data_size());
+            eosio::read_action_data(buffer.data(), buffer.size());
+
+            eosio::datastream<const char*> input_ds(static_cast<const char*>(buffer.data()), buffer.size());
+            input_ds >> input;
+         }
+
+         auto output = ns::process_call(std::move(input));
+         static_assert(std::is_same_v<decltype(output), ns::output_type>);
+
+         {
+            eosio::action return_action;
+            return_action.account = eosio::name{receiver};
+            return_action.name    = "return"_n;
+
+            eosio::datastream<size_t> output_size_ds;
+            output_size_ds << output;
+            return_action.data.resize(output_size_ds.tellp());
+            eosio::datastream<char*> output_ds(static_cast<char*>(return_action.data.data()),
+                                               return_action.data.size());
+            output_ds << output;
+
+            return_action.send();
+         }
+      } 
