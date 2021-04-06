@@ -78,4 +78,8 @@ output_type process_call(input_type input)
 
             return_action.send();
          }
-      } 
+      } else if (action == "abort"_n.value) {
+         eosio::check(false, 0ull);
+      }
+   }
+}
