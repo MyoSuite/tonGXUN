@@ -31,4 +31,8 @@ RAM is a very important system resource because of the following reasons:
 - The smart contract can not store any additional information if it consumes all its allocated RAM. To continue to save data in the blockchain database, one, or both of the following conditions must be met:
 
   - A portion of the occupied RAM is freed by the smart contract.
-  - More RAM is allocated to the smart contract account through the RAM bu
+  - More RAM is allocated to the smart contract account through the RAM buying process.
+
+RAM is a scarce resource priced according to the unique Bancor liquidity algorithm which is implemented in the system contract [here](https://github.com/AntelopeIO/reference-contracts/blob/main/contracts/eosio.system/include/eosio.system/exchange_state.hpp).
+
+The RAM system resource must be purchased using the system token. Refer to the [cleos manual](https://github.com/AntelopeIO/leap/blob/main/docs/02_cleos/02_how-to-guides/how-to-buy-ram.md) to learn how to buy RAM via the command line interface.
