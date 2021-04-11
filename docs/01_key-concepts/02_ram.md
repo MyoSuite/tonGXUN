@@ -24,4 +24,11 @@ The Antelope-based blockchains are known for their high performance, which is ac
 
 RAM is a very important system resource because of the following reasons:
 
-- It is a limited resource, each Antelope-based blockchain can have different policies and rules around RAM; for example the public EOS blo
+- It is a limited resource, each Antelope-based blockchain can have different policies and rules around RAM; for example the public EOS blockchain started with 64GB of RAM and after that the block producers decided to increase the memory with 1KB per block, thus increasing constantly the supply of RAM for its price to not grow too high due to the increased demand from blockchain applications.
+
+- RAM is used in executing many actions sent to the blockchain; creating a new account action, for example, it needs to store in the blockchain memory the new account's information; also when an account accepts a new type of token a new record has to be created, somewhere in the blockchain memory, that holds the balance of the new token accepted, and that memory, the storage space on the blockchain, has to be purchased either by the account that transfers the token or by the account that accepts the new token type.
+
+- The smart contract can not store any additional information if it consumes all its allocated RAM. To continue to save data in the blockchain database, one, or both of the following conditions must be met:
+
+  - A portion of the occupied RAM is freed by the smart contract.
+  - More RAM is allocated to the smart contract account through the RAM bu
