@@ -33,4 +33,13 @@ When an account uses the allocated resources, the amount that can be used in one
 
 Antelope-based blockchains replenish automatically the consumed CPU and NET system resources. Before a transaction is executed, by the blockchain, it first calculates how many resources the account executing the transaction can consume. The calculation uses an exponential moving average with linear extrapolation when data is missing, and it multiplies the currently accumulated average by `(number of blocks in the window - number of blocks since last update) / (number of blocks in the window)`. The window is set as 24 hours window.
 
-This formula has
+This formula has the following outcomes:
+
+* If an account waited `number of blocks in the window` without executing any transaction it resets to zero usage.
+
+* If an account issues a transaction with every block it would always be `(number of blocks in the window - 1) / (number of blocks in the window)`, a very small value, very close to zero. Mathematically it _never_ reaches zero but the Antelope implementation truncates off the tiny numbers to zero.
+
+* The accounts that execute transactions more often than the ones that execute less transactions, replenish their resources slower than the later. In other words, the more transactions an account executes the slower the replenish of resources.
+
+[[info]]
+| The blockchain calculates and updates the remaining resources, for the accounts which execute transactions, with each block, before each transaction is executed. As time passes, as explained above, the consumed system resources are gradually replenished, and the available system resources increase, or decrease, depending on how many transactions an account executes. After waiting for some time, if you che
