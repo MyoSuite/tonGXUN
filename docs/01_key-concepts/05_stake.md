@@ -27,4 +27,10 @@ If an account consumes all its allocated CPU and NET resources, it has two optio
 * It can wait for the blockchain to replenish the consumed resources. You can read more details below about the [system resources replenish algorithm].(05_stake.md#System-Resources-Replenish-Algorithm).
 * It can allocate more resources through the staking mechanism.
 
-When an account uses the allocated resources, the amount that can be used in one transaction is limited by predefine [maximum CPU](https://github.com/Antelop
+When an account uses the allocated resources, the amount that can be used in one transaction is limited by predefine [maximum CPU](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/contracts/eosio/privileged.hpp#L110), [minimum CPU](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/contracts/eosio/privileged.hpp#L116), and [maximum NET](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/contracts/eosio/privileged.hpp#L69) limits. Transactions executed by the blockchain contain one or more actions, and each transaction must consume an amount of CPU and NET which is in the limits defined by the aforementioned blockchain settings.
+
+#### System Resources Replenish Algorithm
+
+Antelope-based blockchains replenish automatically the consumed CPU and NET system resources. Before a transaction is executed, by the blockchain, it first calculates how many resources the account executing the transaction can consume. The calculation uses an exponential moving average with linear extrapolation when data is missing, and it multiplies the currently accumulated average by `(number of blocks in the window - number of blocks since last update) / (number of blocks in the window)`. The window is set as 24 hours window.
+
+This formula has
