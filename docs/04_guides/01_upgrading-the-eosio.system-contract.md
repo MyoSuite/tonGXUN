@@ -82,4 +82,15 @@ diff upgrade_system_contract_official_trx.json upgrade_system_contract_trx.json
 ```
 ```json
 2,4c2,4
-<   "expirati
+<   "expiration": "2018-06-15T22:17:10",
+<   "ref_block_num": 4552,
+<   "ref_block_prefix": 511016679,
+---
+>   "expiration": "2018-06-15T21:20:39",
+>   "ref_block_num": 4972,
+>   "ref_block_prefix": 195390844,
+```
+
+6. If the comparison is good, each block producer should proceed with signing the official upgrade transaction with the keys necessary to satisfy their active permission. If the block producer only has a single key (i.e the "active key") in the active permission of their block producing account, then they only need to generate one signature using that active key. This signing process can be done offline for extra security.
+
+First, the block producer should collect all the necessary information. Let us assume that the block producers active key pair is `(EOS5kBmh5kfo6c6pwB8j77vrznoAaygzoYvBsgLyMMmQ9B6j83i9c, 5JjpkhxAmEfynDgSn7gmEKEVcBqJTtu6HiQFf4AVgGv5A89LfG3)`. The block producer needs their active private key (`5JjpkhxAmEfynDgSn7gmEKEVcBqJTtu6HiQFf4AVgGv5A89LfG3` in this example), the `upgrade_system_contract_official_trx.json`, and the `chain_id` (`d0242fb30b71b82df9966d10ff6d09e4f5eb6be7ba85
