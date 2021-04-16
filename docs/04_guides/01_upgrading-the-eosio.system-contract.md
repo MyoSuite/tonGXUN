@@ -67,4 +67,19 @@ and the last few lines should be:
 }
 ```
 
-One of the top block producers should be chosen to lead the upgrade process. This lead producer should take their
+One of the top block producers should be chosen to lead the upgrade process. This lead producer should take their generated `upgrade_system_contract_trx.json`, rename it to `upgrade_system_contract_official_trx.json`, and do the following:
+
+3. Modify the `expiration` timestamp in `upgrade_system_contract_official_trx.json` to a time that is sufficiently far in the future to give enough time to collect all the necessary signatures, but not more than 9 hours from the time the transaction was generated. Also, keep in mind that the transaction will not be accepted into the blockchain if the expiration is more than 1 hour from the present time.
+
+4. Pass the `upgrade_system_contract_official_trx.json` file to all the other top 21 block producers.
+
+Then each of the top 21 block producers should do the following:
+
+5. Compare their generated `upgrade_system_contract_official_trx.json` file with the `upgrade_system_contract_official_trx.json` provided by the lead producer. The only difference should be in `expiration`, `ref_block_num`, `ref_block_prefix`, for example:
+
+```sh
+diff upgrade_system_contract_official_trx.json upgrade_system_contract_trx.json
+```
+```json
+2,4c2,4
+<   "expirati
