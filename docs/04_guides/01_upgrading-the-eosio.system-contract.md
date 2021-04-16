@@ -24,4 +24,47 @@ Each of the top 21 block producers should do the following:
 cleos get code -c original_system_contract.wast -a original_system_contract.abi eosio
 ```
 ```console
-code hash: cc0ffc30150a07c487d8247a484ce1caf9c95779521d
+code hash: cc0ffc30150a07c487d8247a484ce1caf9c95779521d8c230040c2cb0e2a3a60
+saving wast to original_system_contract.wast
+saving abi to original_system_contract.abi
+```
+
+2. Generate the unsigned transaction which upgrades the system contract:
+
+```sh
+cleos set contract -s -j -d eosio contracts/eosio.system | tail -n +4 > upgrade_system_contract_trx.json
+```
+
+The first few lines of the generated file should be something similar to (except with very different numbers for `expiration`, `ref_block_num`, and `ref_block_prefix`):
+
+```json
+{
+   "expiration": "2018-06-15T22:17:10",
+   "ref_block_num": 4552,
+   "ref_block_prefix": 511016679,
+   "max_net_usage_words": 0,
+   "max_cpu_usage_ms": 0,
+   "delay_sec": 0,
+   "context_free_actions": [],
+   "actions": [{
+      "account": "eosio",
+      "name": "setcode",
+      "authorization": [{
+          "actor": "eosio",
+          "permission": "active"
+        }
+      ],
+```
+
+and the last few lines should be:
+
+```json
+      }
+   ],
+   "transaction_extensions": [],
+   "signatures": [],
+   "context_free_data": []
+}
+```
+
+One of the top block producers should be chosen to lead the upgrade process. This lead producer should take their
