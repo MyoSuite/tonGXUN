@@ -145,4 +145,39 @@ cat upgrade_system_contract_official_trx_signed.json | tail -n 20
 8. Push the signed transaction to the blockchain:
 
 ```sh
-cleos push transaction --skip-sign u
+cleos push transaction --skip-sign upgrade_system_contract_official_trx_signed.json
+```
+```json
+{
+  "transaction_id": "202888b32e7a0f9de1b8483befac8118188c786380f6e62ced445f93fb2b1041",
+  "processed": {
+    "id": "202888b32e7a0f9de1b8483befac8118188c786380f6e62ced445f93fb2b1041",
+    "receipt": {
+      "status": "executed",
+      "cpu_usage_us": 4909,
+      "net_usage_words": 15124
+    },
+    "elapsed": 4909,
+    "net_usage": 120992,
+    "scheduled": false,
+    "action_traces": [{
+...
+```
+
+If you get an error message like the following:
+
+```console
+Error 3090003: provided keys, permissions, and delays do not satisfy declared authorizations
+Ensure that you have the related private keys inside your wallet and your wallet is unlocked.
+```
+
+That means that at least one of the signatures provided were bad. This may be because a producer signed the wrong transaction, used the wrong private key, or used the wrong chain ID.
+
+If you get an error message like the following:
+
+```console
+Error 3090002: irrelevant signature included
+Please remove the unnecessary signature from your transaction!
+```
+
+That means unnecessary signatures were included. If 
