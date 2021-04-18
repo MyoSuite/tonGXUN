@@ -93,4 +93,25 @@ diff upgrade_system_contract_official_trx.json upgrade_system_contract_trx.json
 
 6. If the comparison is good, each block producer should proceed with signing the official upgrade transaction with the keys necessary to satisfy their active permission. If the block producer only has a single key (i.e the "active key") in the active permission of their block producing account, then they only need to generate one signature using that active key. This signing process can be done offline for extra security.
 
-First, the block producer should collect all the necessary information. Let us assume that the block producers active key pair is `(EOS5kBmh5kfo6c6pwB8j77vrznoAaygzoYvBsgLyMMmQ9B6j83i9c, 5JjpkhxAmEfynDgSn7gmEKEVcBqJTtu6HiQFf4AVgGv5A89LfG3)`. The block producer needs their active private key (`5JjpkhxAmEfynDgSn7gmEKEVcBqJTtu6HiQFf4AVgGv5A89LfG3` in this example), the `upgrade_system_contract_official_trx.json`, and the `chain_id` (`d0242fb30b71b82df9966d10ff6d09e4f5eb6be7ba85
+First, the block producer should collect all the necessary information. Let us assume that the block producers active key pair is `(EOS5kBmh5kfo6c6pwB8j77vrznoAaygzoYvBsgLyMMmQ9B6j83i9c, 5JjpkhxAmEfynDgSn7gmEKEVcBqJTtu6HiQFf4AVgGv5A89LfG3)`. The block producer needs their active private key (`5JjpkhxAmEfynDgSn7gmEKEVcBqJTtu6HiQFf4AVgGv5A89LfG3` in this example), the `upgrade_system_contract_official_trx.json`, and the `chain_id` (`d0242fb30b71b82df9966d10ff6d09e4f5eb6be7ba85fd78f796937f1959315e` in this example) which can be retrieved through `cleos get info`.
+
+Then on a secure computer the producer can sign the transaction (the producer will need to paste in their private key when prompted):
+
+```sh
+cleos sign --chain-id d0242fb30b71b82df9966d10ff6d09e4f5eb6be7ba85fd78f796937f1959315e upgrade_system_contract_trx.json | tail -n 5
+```
+```json
+private key:   "signatures": [
+    "SIG_K1_JzABB9gzDGwUHaRmox68UNcfxMVwMnEXqqS1MvtsyUX8KGTbsZ5aZQZjHD5vREQa5BkZ7ft8CceLBLAj8eZ5erZb9cHuy5"
+  ],
+  "context_free_data": []
+}
+```
+
+Make sure to use the `chain_id` of the actual main-net blockchain that the transaction will be submitted to and not the example `chain_id` provided above.
+
+The output should include the signature (in this case `"SIG_K1_JzABB9gzDGwUHaRmox68UNcfxMVwMnEXqqS1MvtsyUX8KGTbsZ5aZQZjHD5vREQa5BkZ7ft8CceLBLAj8eZ5erZb9cHuy5"`) which the producer should then send to the lead producer.
+
+When the lead producer collects 15 producer signatures, the lead producer should do the following:
+
+7. Make a copy of the `upgrade_system_contract_official_trx.json` and call it `upgrade_sy
