@@ -128,4 +128,21 @@ cat upgrade_system_contract_official_trx_signed.json | tail -n 20
    "SIG_K1_KdQsE7ahHA9swE9SDGg4oF6XahpgHmZfEgQAy9KPBLd9HuwrF6c8m6jz43zizK2oo32Ejg1DYuMfoEvJgVfXo81jsqTHvA",
    "SIG_K1_K6228Hi2z1WabgVdf5bk2UdKyyDSVFwkMaagTn9oLVDV8rCX7aQcjY94c39ah2CkLTsTEqzTPAYknJ8m2m9B7npPkHaFzc",
    "SIG_K1_Jzdx75hBCA2WSaXgrupmrNbcQocUCsP8r1BKkPXMreiAKPZDwX9J3G8fS1HhyqWjc7FbukwZf8sVRdS3wKbJVpytqXe7Nn",
-   "SIG_K1_KW7Qu2SdPD3zuQKh2ziFLzn9QbKq
+   "SIG_K1_KW7Qu2SdPD3zuQKh2ziFLzn9QbKqeMpeiemULky5Bbg1Mst6ijbCX3k2AVFGNFLkNLA36PM1WAT5oipzu1B1K7ymRxTx1Z",
+   "SIG_K1_KXJf1KZNpz73YFKKE7u6jFgsQ8XcX3yA7rDX6ZmG1Qfnc9FLLmT1WViv4bwcPbxaEYfR6SNWfk5cCR9eao2si1soqkXq92",
+   "SIG_K1_JynjkHFT5UFGDpEcqdriXTzCGCwS36Xztq4UAWQHLQgRUZT2YFoLhUcc87kvUteqCUGVxsmSbfgWv1KLy24voKN4Qs5zTe",
+   "SIG_K1_JxhfCaGBhuNShpDHn7j1CryG3iSebvfi7FUnJsfkXNTiwLyq2NDBkeakwjCMWFbzr6qqWuMDLjfXbzdtU17f1wCXMjKSgk",
+   "SIG_K1_KcMSz89QG1ZRFNrXc69R63d5KXbJA8CBjNPYv1VEA3TRfjqVYuhyaHpGXQN4RSKDq4ygr3UTRYBQQVutkJnR6zZ4Ssgd7R",
+   "SIG_K1_JuxT6bhUAbDs6Q2ppuKyKauduvbaJLxvh4gBH4e4A9yRhvUBT7w3DcvMyhdaor27Kbu29jnqhTbvXcb57QqKWQDpboLv7e",
+   "SIG_K1_K8BuFYpCiC5FhpVK8ZAzc3VUg7vz6WwLoWBrGN6nnuqUjngGqvHp3UxDVzcwhqccHdv8kdPXvF6G1NszwF1dd3wjCrHBYw",
+   "SIG_K1_KfH5ZirPwDk1RQKvJv2AGPfsJyPXvXLegZ7LvcPmRtjtMiErs1STXLNT8kiBfhZr4xkWRA5NR1kMF3d49DFMJiB2iWMXJc",
+   "SIG_K1_KjJB8jtcqpVe3r5jouFiAa9wJeYqoLMh5xrUV6kBF6UWfbYjimMWBJWz2ZPomGDsk7JtdUESVrYj1AhYbdp3X48KLm5Cev"
+  ],
+  "context_free_data": []
+}
+```
+
+8. Push the signed transaction to the blockchain:
+
+```sh
+cleos push transaction --skip-sign u
