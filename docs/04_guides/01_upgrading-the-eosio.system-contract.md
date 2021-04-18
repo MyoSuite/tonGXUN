@@ -114,4 +114,18 @@ The output should include the signature (in this case `"SIG_K1_JzABB9gzDGwUHaRmo
 
 When the lead producer collects 15 producer signatures, the lead producer should do the following:
 
-7. Make a copy of the `upgrade_system_contract_official_trx.json` and call it `upgrade_sy
+7. Make a copy of the `upgrade_system_contract_official_trx.json` and call it `upgrade_system_contract_official_trx_signed.json`, and then modify the `upgrade_system_contract_official_trx_signed.json` so that the `signatures` field includes all 15 collected signatures. So the tail end of `upgrade_system_contract_official_trx_signed.json` could look something like:
+
+```sh
+cat upgrade_system_contract_official_trx_signed.json | tail -n 20
+```
+```json
+  "transaction_extensions": [],
+  "signatures": [
+   "SIG_K1_JzABB9gzDGwUHaRmox68UNcfxMVwMnEXqqS1MvtsyUX8KGTbsZ5aZQZjHD5vREQa5BkZ7ft8CceLBLAj8eZ5erZb9cHuy5",
+   "SIG_K1_Kj7XJxnPQSxEXZhMA8uK3Q1zAxp7AExzsRd7Xaa7ywcE4iUrhbVA3B6GWre5Ctgikb4q4CeU6Bvv5qmh9uJjqKEbbjd3sX",
+   "SIG_K1_KbE7qyz3A9LoQPYWzo4e6kg5ZVojQVAkDKuufUN2EwVUqtFhtjmGoC6QPQqLi8J7ftiysBp52wJBPjtNQUfZiGpGMsnZ1f",
+   "SIG_K1_KdQsE7ahHA9swE9SDGg4oF6XahpgHmZfEgQAy9KPBLd9HuwrF6c8m6jz43zizK2oo32Ejg1DYuMfoEvJgVfXo81jsqTHvA",
+   "SIG_K1_K6228Hi2z1WabgVdf5bk2UdKyyDSVFwkMaagTn9oLVDV8rCX7aQcjY94c39ah2CkLTsTEqzTPAYknJ8m2m9B7npPkHaFzc",
+   "SIG_K1_Jzdx75hBCA2WSaXgrupmrNbcQocUCsP8r1BKkPXMreiAKPZDwX9J3G8fS1HhyqWjc7FbukwZf8sVRdS3wKbJVpytqXe7Nn",
+   "SIG_K1_KW7Qu2SdPD3zuQKh2ziFLzn9QbKq
