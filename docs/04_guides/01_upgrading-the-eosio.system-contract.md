@@ -212,4 +212,17 @@ saving abi to new_system_contract.abi
 ```
 
 ```sh
-diff original_system_contract.a
+diff original_system_contract.abi new_system_contract.abi
+```
+```json
+584,592d583
+<         },{
+<           "name": "deferred_trx_id",
+<           "type": "uint32"
+<         },{
+<           "name": "last_unstake_time",
+<           "type": "time_point_sec"
+<         },{
+<           "name": "unstaking",
+<           "type": "asset"
+```
