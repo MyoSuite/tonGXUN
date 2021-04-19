@@ -180,4 +180,36 @@ Error 3090002: irrelevant signature included
 Please remove the unnecessary signature from your transaction!
 ```
 
-That means unnecessary signatures were included. If 
+That means unnecessary signatures were included. If there are 21 active producers, only signatures from exactly 15 of those 21 active producers are needed.
+
+If you get an error message like the following:
+
+```console
+Error 3040006: Transaction Expiration Too Far
+Please decrease the expiration time of your transaction!
+```
+
+That means that the expiration time is more than 1 hour in the future and you need to wait some time before being allowed to push the transaction.
+
+If you get an error message like the following:
+
+```console
+Error 3040005: Expired Transaction
+Please increase the expiration time of your transaction!
+```
+
+That means the expiration time of the signed transaction has passed and this entire process has to restart from step 1.
+
+9. Assuming the transaction successfully executes, everyone can then verify that the new contract is in place:
+
+```sh
+cleos get code -c new_system_contract.wast -a new_system_contract.abi eosio
+```
+```console
+code hash: 9fd195bc5a26d3cd82ae76b70bb71d8ce83dcfeb0e5e27e4e740998fdb7b98f8
+saving wast to new_system_contract.wast
+saving abi to new_system_contract.abi
+```
+
+```sh
+diff original_system_contract.a
