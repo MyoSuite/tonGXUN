@@ -19,4 +19,9 @@ The `reference-contracts` repository contains the reference system contracts enc
 1. [System](01_key-concepts/01_system.md)
 2. [RAM](01_key-concepts/02_ram.md)
 3. [CPU](01_key-concepts/03_cpu.md)
-4. [NET
+4. [NET](01_key-concepts/04_net.md)
+5. [Stake](01_key-concepts/05_stake.md)
+6. [Vote](01_key-concepts/06_vote.md)
+
+## Build and deploy
+To build and deploy the system contract follow the instruction from [Build and deploy](03_build-and-deploy.md) section.
