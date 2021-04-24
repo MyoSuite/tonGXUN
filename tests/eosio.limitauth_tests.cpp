@@ -379,3 +379,129 @@ BOOST_FIXTURE_TEST_CASE(disallow_perms_tests, limitauth_tester) try {
       limitauthchg({alice, active}, alice, {}, {freebie, owner, freebie2}));
    BOOST_REQUIRE_EQUAL(
       "",
+      limitauthchg({alice, active}, alice, {}, {freebie, freebie2}));
+
+   BOOST_REQUIRE_EQUAL(
+      "",
+      updateauth({alice, active}, alice, freebie, active, get_public_key(alice, "freebie"), active));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      updateauth({alice, active}, alice, admin, active, get_public_key(alice, "admin"), active));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      linkauth({alice, active}, alice, "eosio.null"_n, "noop"_n, freebie, active));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      linkauth({alice, active}, alice, "eosio.null"_n, "dosomething"_n, admin, active));
+
+   // Bob, who has the published freebie key, tries using updateauth to modify alice@freebie
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      updateauth({alice, freebie}, alice, freebie, active, get_public_key(bob, "attack")));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      updateauth({alice, freebie}, alice, freebie, active, get_public_key(bob, "attack"), ""_n));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by appears in disallow_perms",
+      updateauth({alice, freebie}, alice, freebie, active, get_public_key(bob, "attack"), freebie));
+   BOOST_REQUIRE_EQUAL(
+      "missing authority of alice1111111/active",
+      updateauth({alice, freebie}, alice, freebie, active, get_public_key(bob, "attack"), active));
+
+   // alice@freebie can't create alice@freebie2
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by appears in disallow_perms",
+      updateauth({alice, freebie}, alice, freebie2, freebie, get_public_key(alice, "freebie2"), freebie));
+
+   // alice@active can create alice@freebie2
+   BOOST_REQUIRE_EQUAL(
+      "",
+      updateauth({alice, active}, alice, freebie2, freebie, get_public_key(alice, "freebie2"), active));
+
+   // Bob, who has the published freebie key, tries using linkauth
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      linkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n, freebie2));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      linkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n, freebie2, ""_n));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by appears in disallow_perms",
+      linkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n, freebie2, freebie));
+   BOOST_REQUIRE_EQUAL(
+      "missing authority of alice1111111/active",
+      linkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n, freebie2, active));
+
+   // Bob, who has the published freebie key, tries using deleteauth
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      deleteauth({alice, freebie}, alice, freebie2));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      deleteauth({alice, freebie}, alice, freebie2, ""_n));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by appears in disallow_perms",
+      deleteauth({alice, freebie}, alice, freebie2, freebie));
+   BOOST_REQUIRE_EQUAL(
+      "missing authority of alice1111111/owner",
+      deleteauth({alice, freebie}, alice, freebie2, owner));
+
+   // Bob, who has the published freebie key, tries using unlinkauth
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      unlinkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by is required for this account",
+      unlinkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n, ""_n));
+   BOOST_REQUIRE_EQUAL(
+      "assertion failure with message: authorized_by appears in disallow_perms",
+      unlinkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n, freebie));
+   BOOST_REQUIRE_EQUAL(
+      "missing authority of alice1111111/active",
+      unlinkauth({alice, freebie}, alice, "eosio.null"_n, "noop"_n, active));
+
+   // alice@admin can do these
+   BOOST_REQUIRE_EQUAL(
+      "",
+      updateauth({alice, admin}, alice, admin2, admin, get_public_key(alice, "admin2"), admin));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      linkauth({alice, admin}, alice, "eosio.null"_n, "dosomething"_n, admin2, admin));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      unlinkauth({alice, admin}, alice, "eosio.null"_n, "dosomething"_n, admin));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      deleteauth({alice, admin}, alice, admin2, admin));
+
+   // alice@active can do these
+   BOOST_REQUIRE_EQUAL(
+      "",
+      updateauth({alice, active}, alice, admin2, admin, get_public_key(alice, "admin2"), active));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      linkauth({alice, active}, alice, "eosio.null"_n, "dosomething"_n, admin2, active));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      unlinkauth({alice, active}, alice, "eosio.null"_n, "dosomething"_n, active));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      deleteauth({alice, active}, alice, admin2, active));
+
+   // alice@owner can do these
+   BOOST_REQUIRE_EQUAL(
+      "",
+      updateauth({alice, owner}, alice, admin2, admin, get_public_key(alice, "admin2"), owner));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      linkauth({alice, owner}, alice, "eosio.null"_n, "dosomething"_n, admin2, owner));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      unlinkauth({alice, owner}, alice, "eosio.null"_n, "dosomething"_n, owner));
+   BOOST_REQUIRE_EQUAL(
+      "",
+      deleteauth({alice, owner}, alice, admin2, owner));
+} // disallow_perms_tests
+FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
