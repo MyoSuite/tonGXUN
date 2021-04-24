@@ -968,3 +968,88 @@ BOOST_FIXTURE_TEST_CASE( sendinline, eosio_msig_tester ) try {
    create_accounts( {"sendinline"_n} );
    set_code( "sendinline"_n, system_contracts::testing::test_contracts::sendinline_wasm() );
    set_abi( "sendinline"_n, system_contracts::testing::test_contracts::sendinline_abi().data() );
+
+   create_accounts( {"wrongcon"_n} );
+   set_code( "wrongcon"_n, system_contracts::testing::test_contracts::sendinline_wasm() );
+   set_abi( "wrongcon"_n, system_contracts::testing::test_contracts::sendinline_abi().data() );
+   produce_blocks();
+
+   action act = get_action( config::system_account_name, "reqauth"_n, {}, mvo()("from", "alice"));
+
+   BOOST_REQUIRE_EXCEPTION( base_tester::push_action( "sendinline"_n, "send"_n, "bob"_n, mvo()
+                                                       ("contract", "eosio")
+                                                       ("action_name", "reqauth")
+                                                       ("auths", std::vector<permission_level>{ {"alice"_n, config::active_name} })
+                                                       ("payload", act.data)
+                          ),
+                          unsatisfied_authorization,
+                          fc_exception_message_starts_with("transaction declares authority")
+   );
+
+   base_tester::push_action(config::system_account_name, "updateauth"_n, "alice"_n, mvo()
+                              ("account", "alice")
+                              ("permission", "perm")
+                              ("parent", "active")
+                              ("auth",  authority{ 1, {}, {permission_level_weight{ {"sendinline"_n, config::active_name}, 1}}, {} })
+   );
+   produce_blocks();
+
+   base_tester::push_action( config::system_account_name, "linkauth"_n, "alice"_n, mvo()
+                              ("account", "alice")
+                              ("code", "eosio")
+                              ("type", "reqauth")
+                              ("requirement", "perm")
+   );
+   produce_blocks();
+
+   transaction_trace_ptr trace = base_tester::push_action( "sendinline"_n, "send"_n, "bob"_n, mvo()
+                                                            ("contract", "eosio")
+                                                            ("action_name", "reqauth")
+                                                            ("auths", std::vector<permission_level>{ {"alice"_n, "perm"_n} })
+                                                            ("payload", act.data)
+   );
+   check_traces( trace, {
+                        {{"receiver", "sendinline"_n}, {"act_name", "send"_n}},
+                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        } );
+
+   produce_blocks();
+
+   action approve_act = get_action("eosio.msig"_n, "approve"_n, {}, mvo()
+                                    ("proposer", "bob")
+                                    ("proposal_name", "first")
+                                    ("level", permission_level{"sendinline"_n, config::active_name})
+   );
+
+   transaction trx = reqauth( "alice"_n, {permission_level{"alice"_n, "perm"_n}}, abi_serializer_max_time );
+
+   base_tester::push_action( "eosio.msig"_n, "propose"_n, "bob"_n, mvo()
+                              ("proposer", "bob")
+                              ("proposal_name", "first")
+                              ("trx", trx)
+                              ("requested", std::vector<permission_level>{{ "sendinline"_n, config::active_name}})
+   );
+   produce_blocks();
+
+   base_tester::push_action( "sendinline"_n, "send"_n, "bob"_n, mvo()
+                              ("contract", "eosio.msig")
+                              ("action_name", "approve")
+                              ("auths", std::vector<permission_level>{{"sendinline"_n, config::active_name}})
+                              ("payload", approve_act.data)
+   );
+   produce_blocks();
+
+   trace = base_tester::push_action( "eosio.msig"_n, "exec"_n, "bob"_n, mvo()
+                                          ("proposer", "bob")
+                                          ("proposal_name", "first")
+                                          ("executer", "bob")
+   );
+
+   check_traces( trace, {
+                        {{"receiver", "eosio.msig"_n}, {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        } );
+   
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
