@@ -111,4 +111,20 @@ BOOST_FIXTURE_TEST_CASE( buysell, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("10000000.0000") ) );
    BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("10000000.0000") ) );
    BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("10000000.0000") ) );
-   BOOST_REQUIRE_EQUAL( success(), buyram
+   BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("10000000.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("100000.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("100000.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("100000.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("300000.0000") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("49301242.4175"), get_balance( "alice1111111" ) );  // TELOS
+
+   auto finaltotal = get_total_stake( "alice1111111" );
+   auto endbytes = finaltotal["ram_bytes"].as_uint64();
+
+   bought_bytes = endbytes - startbytes;
+   wdump((startbytes)(endbytes)(bought_bytes) );
+
+   BOOST_REQUIRE_EQUAL( success(), sellram( "alice1111111", bought_bytes ) );
+
+   BOOST_REQUIRE_EQUAL( false, get_row_by_account( config::system_account_name, config::system_account_name,
+                                                   "rammarket"_n, account_name(symbol{SY(4,RAMCORE)}.value()) ).empty() )
