@@ -127,4 +127,24 @@ BOOST_FIXTURE_TEST_CASE( buysell, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), sellram( "alice1111111", bought_bytes ) );
 
    BOOST_REQUIRE_EQUAL( false, get_row_by_account( config::system_account_name, config::system_account_name,
-                                                   "rammarket"_n, account_name(symbol{SY(4,RAMCORE)}.value()) ).empty() )
+                                                   "rammarket"_n, account_name(symbol{SY(4,RAMCORE)}.value()) ).empty() );
+
+   auto get_ram_market = [this]() -> fc::variant {
+      vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name,
+                                              "rammarket"_n, account_name(symbol{SY(4,RAMCORE)}.value()) );
+      BOOST_REQUIRE( !data.empty() );
+      return abi_ser.binary_to_variant("exchange_state", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   };
+
+   {
+      transfer( config::system_account_name, "alice1111111"_n, core_sym::from_string("10000000.0000"), config::system_account_name );
+      uint64_t bytes0 = get_total_stake( "alice1111111" )["ram_bytes"].as_uint64();
+
+      auto market = get_ram_market();
+      const asset r0 = market["base"].as<connector>().balance;
+      const asset e0 = market["quote"].as<connector>().balance;
+      BOOST_REQUIRE_EQUAL( asset::from_string("0 RAM").get_symbol(),     r0.get_symbol() );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000").get_symbol(), e0.get_symbol() );
+
+      const asset payment = core_sym::from_string("10000000.0000");
+      BOOST_REQUIRE_EQUAL( success(), buyram( "ali
