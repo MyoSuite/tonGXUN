@@ -147,4 +147,24 @@ BOOST_FIXTURE_TEST_CASE( buysell, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000").get_symbol(), e0.get_symbol() );
 
       const asset payment = core_sym::from_string("10000000.0000");
-      BOOST_REQUIRE_EQUAL( success(), buyram( "ali
+      BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", payment ) );
+      uint64_t bytes1 = get_total_stake( "alice1111111" )["ram_bytes"].as_uint64();
+
+      const int64_t fee = (payment.get_amount() + 199) / 200;
+      const double net_payment = payment.get_amount() - fee;
+      const int64_t expected_delta = net_payment * r0.get_amount() / ( net_payment + e0.get_amount() );
+
+      BOOST_REQUIRE_EQUAL( expected_delta, bytes1 -  bytes0 );
+   }
+
+   {
+      transfer( config::system_account_name, "bob111111111"_n, core_sym::from_string("100000.0000"), config::system_account_name );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("must reserve a positive amount"),
+                           buyrambytes( "bob111111111", "bob111111111", 1 ) );
+
+      uint64_t bytes0 = get_total_stake( "bob111111111" )["ram_bytes"].as_uint64();
+      BOOST_REQUIRE_EQUAL( success(), buyrambytes( "bob111111111", "bob111111111", 1024 ) );
+      uint64_t bytes1 = get_total_stake( "bob111111111" )["ram_bytes"].as_uint64();
+      BOOST_REQUIRE( within_one( 1024, bytes1 - bytes0 ) );
+
+      BOOST_REQUIRE_EQUAL( success(), buyrambytes( "bob111111111", "bob111111111", 1024 * 1024) );
