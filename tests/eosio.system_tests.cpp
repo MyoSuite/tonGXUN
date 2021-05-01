@@ -168,3 +168,30 @@ BOOST_FIXTURE_TEST_CASE( buysell, eosio_system_tester ) try {
       BOOST_REQUIRE( within_one( 1024, bytes1 - bytes0 ) );
 
       BOOST_REQUIRE_EQUAL( success(), buyrambytes( "bob111111111", "bob111111111", 1024 * 1024) );
+      uint64_t bytes2 = get_total_stake( "bob111111111" )["ram_bytes"].as_uint64();
+      BOOST_REQUIRE( within_one( 1024 * 1024, bytes2 - bytes1 ) );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( stake_unstake, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   produce_blocks( 10 );
+   produce_block( fc::hours(3*24) );
+
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( "alice1111111" ) );
+   transfer( "eosio", "alice1111111", core_sym::from_string("1000.0000"), "eosio" );
+
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("1000.0000"), get_balance( "alice1111111" ) );
+   BOOST_REQUIRE_EQUAL( success(), stake( "eosio", "alice1111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+
+   auto total = get_total_stake("alice1111111");
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
+
+   const auto init_eosio_stake_balance = get_balance( "eosio.stake"_n );
+   BO
