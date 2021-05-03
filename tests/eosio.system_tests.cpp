@@ -252,4 +252,20 @@ BOOST_FIXTURE_TEST_CASE( stake_unstake_with_transfer, eosio_system_tester ) try 
 
    //eosio stakes for alice with transfer flag
 
-   transfer( "eosio", "bob111111111", core_sym::from_string("
+   transfer( "eosio", "bob111111111", core_sym::from_string("1000.0000"), "eosio" );
+   BOOST_REQUIRE_EQUAL( success(), stake_with_transfer( "bob111111111"_n, "alice1111111"_n, core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+
+   //check that alice has both bandwidth and voting power
+   auto total = get_total_stake("alice1111111");
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
+   REQUIRE_MATCHING_OBJECT( voter( "alice1111111", core_sym::from_string("300.0000")), get_voter_info( "alice1111111" ) );
+
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( "alice1111111" ) );
+
+   //alice stakes for herself
+   transfer( "eosio", "alice1111111", core_sym::from_string("1000.0000"), "eosio" );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "alice1111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+   //now alice's stake should be equal to transferred from eosio + own stake
+   total = get_total_stake("alice1111111");
+  
