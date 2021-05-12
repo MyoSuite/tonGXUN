@@ -368,4 +368,23 @@ BOOST_FIXTURE_TEST_CASE( stake_while_pending_refund, eosio_system_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( fail_without_auth, eosio_sy
+BOOST_FIXTURE_TEST_CASE( fail_without_auth, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+
+   BOOST_REQUIRE_EQUAL( success(), stake( "eosio", "alice1111111", core_sym::from_string("2000.0000"), core_sym::from_string("1000.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "bob111111111", core_sym::from_string("10.0000"), core_sym::from_string("10.0000") ) );
+
+   BOOST_REQUIRE_EQUAL( error("missing authority of alice1111111"),
+                        push_action( "alice1111111"_n, "delegatebw"_n, mvo()
+                                    ("from",     "alice1111111")
+                                    ("receiver", "bob111111111")
+                                    ("stake_net_quantity", core_sym::from_string("10.0000"))
+                                    ("stake_cpu_quantity", core_sym::from_string("10.0000"))
+                                    ("transfer", 0 )
+                                    ,false
+                        )
