@@ -388,3 +388,26 @@ BOOST_FIXTURE_TEST_CASE( fail_without_auth, eosio_system_tester ) try {
                                     ("transfer", 0 )
                                     ,false
                         )
+   );
+
+   BOOST_REQUIRE_EQUAL( error("missing authority of alice1111111"),
+                        push_action("alice1111111"_n, "undelegatebw"_n, mvo()
+                                    ("from",     "alice1111111")
+                                    ("receiver", "bob111111111")
+                                    ("unstake_net_quantity", core_sym::from_string("200.0000"))
+                                    ("unstake_cpu_quantity", core_sym::from_string("100.0000"))
+                                    ("transfer", 0 )
+                                    ,false
+                        )
+   );
+   //REQUIRE_MATCHING_OBJECT( , get_voter_info( "alice1111111" ) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( stake_negative, eosio_system_tester ) try {
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must stake a positive amount"),
+                        stake( "alice1111111", core_sym::from_string("-0.0001"), core_sym::from_string("0.0000") )
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must stake 
