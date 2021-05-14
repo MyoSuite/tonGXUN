@@ -433,4 +433,32 @@ BOOST_FIXTURE_TEST_CASE( unstake_negative, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "bob111111111", core_sym::from_string("200.0001"), core_sym::from_string("100.0001") ) );
 
    auto total = get_total_stake( "bob111111111" );
-   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0001"), total["net_wei
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0001"), total["net_weight"].as<asset>());
+   auto vinfo = get_voter_info("alice1111111" );
+   wdump((vinfo));
+   REQUIRE_MATCHING_OBJECT( voter( "alice1111111", core_sym::from_string("300.0002") ), get_voter_info( "alice1111111" ) );
+
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must unstake a positive amount"),
+                        unstake( "alice1111111", "bob111111111", core_sym::from_string("-1.0000"), core_sym::from_string("0.0000") )
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must unstake a positive amount"),
+                        unstake( "alice1111111", "bob111111111", core_sym::from_string("0.0000"), core_sym::from_string("-1.0000") )
+   );
+
+   //unstake all zeros
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must unstake a positive amount"),
+                        unstake( "alice1111111", "bob111111111", core_sym::from_string("0.0000"), core_sym::from_string("0.0000") )
+
+   );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( unstake_more_than_at_stake, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
