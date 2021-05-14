@@ -410,4 +410,27 @@ BOOST_FIXTURE_TEST_CASE( stake_negative, eosio_system_tester ) try {
                         stake( "alice1111111", core_sym::from_string("-0.0001"), core_sym::from_string("0.0000") )
    );
 
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must stake 
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must stake a positive amount"),
+                        stake( "alice1111111", core_sym::from_string("0.0000"), core_sym::from_string("-0.0001") )
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must stake a positive amount"),
+                        stake( "alice1111111", core_sym::from_string("00.0000"), core_sym::from_string("00.0000") )
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must stake a positive amount"),
+                        stake( "alice1111111", core_sym::from_string("0.0000"), core_sym::from_string("00.0000") )
+
+   );
+
+   BOOST_REQUIRE_EQUAL( true, get_voter_info( "alice1111111" ).is_null() );
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( unstake_negative, eosio_system_tester ) try {
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "bob111111111", core_sym::from_string("200.0001"), core_sym::from_string("100.0001") ) );
+
+   auto total = get_total_stake( "bob111111111" );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0001"), total["net_wei
