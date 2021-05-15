@@ -462,3 +462,25 @@ BOOST_FIXTURE_TEST_CASE( unstake_more_than_at_stake, eosio_system_tester ) try {
    // cross_15_percent_threshold();
    // TELOS END
 
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+
+   auto total = get_total_stake( "alice1111111" );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
+
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("700.0000"), get_balance( "alice1111111" ) );
+
+   //trying to unstake more net bandwidth than at stake
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient staked net bandwidth"),
+                        unstake( "alice1111111", core_sym::from_string("200.0001"), core_sym::from_string("0.0000") )
+   );
+
+   //trying to unstake more cpu bandwidth than at stake
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient staked cpu bandwidth"),
+                        unstake( "alice1111111", core_sym::from_string("0.0000"), core_sym::from_string("100.0001") )
+
+   );
+
+   //check that nothing has chang
