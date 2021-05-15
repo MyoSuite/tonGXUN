@@ -505,4 +505,21 @@ BOOST_FIXTURE_TEST_CASE( delegate_to_another_user, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
    BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
    BOOST_REQUIRE_EQUAL( core_sym::from_string("700.0000"), get_balance( "alice1111111" ) );
-   //all voting power 
+   //all voting power goes to alice1111111
+   REQUIRE_MATCHING_OBJECT( voter( "alice1111111", core_sym::from_string("300.0000") ), get_voter_info( "alice1111111" ) );
+   //but not to bob111111111
+   BOOST_REQUIRE_EQUAL( true, get_voter_info( "bob111111111" ).is_null() );
+
+   //bob111111111 should not be able to unstake what was staked by alice1111111
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient staked cpu bandwidth"),
+                        unstake( "bob111111111", core_sym::from_string("0.0000"), core_sym::from_string("10.0000") )
+
+   );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient staked net bandwidth"),
+                        unstake( "bob111111111", core_sym::from_string("10.0000"),  core_sym::from_string("0.0000") )
+   );
+
+   issue_and_transfer( "carol1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "carol1111111", "bob111111111", core_sym::from_string("20.0000"), core_sym::from_string("10.0000") ) );
+   total = get_total_stake( "bob111111111" );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("230.0000"), total["net_weight"].as<asset
