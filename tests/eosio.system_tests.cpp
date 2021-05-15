@@ -483,4 +483,26 @@ BOOST_FIXTURE_TEST_CASE( unstake_more_than_at_stake, eosio_system_tester ) try {
 
    );
 
-   //check that nothing has chang
+   //check that nothing has changed
+   total = get_total_stake( "alice1111111" );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("700.0000"), get_balance( "alice1111111" ) );
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( delegate_to_another_user, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+
+   BOOST_REQUIRE_EQUAL( success(), stake ( "alice1111111", "bob111111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+
+   auto total = get_total_stake( "bob111111111" );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("700.0000"), get_balance( "alice1111111" ) );
+   //all voting power 
