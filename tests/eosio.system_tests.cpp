@@ -718,4 +718,25 @@ BOOST_FIXTURE_TEST_CASE( stake_from_refund, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "alice1111111", core_sym::from_string("300.0000"), core_sym::from_string("200.0000") ) );
    total = get_total_stake( "alice1111111" );
    BOOST_REQUIRE_EQUAL( core_sym::from_string("310.0000"), total["net_weight"].as<asset>());
-   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["cpu_weight"].as<asset>()
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["cpu_weight"].as<asset>());
+   REQUIRE_MATCHING_OBJECT( voter( "alice1111111", core_sym::from_string("700.0000") ), get_voter_info( "alice1111111" ) );
+   refund = get_refund_request( "alice1111111"_n );
+   BOOST_TEST_REQUIRE( refund.is_null() );
+   //200 core tokens should be taken from alice's account
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("300.0000"), get_balance( "alice1111111" ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( stake_to_another_user_not_from_refund, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+
+   auto total = get_total_stake( "alice1111111" );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("700.000
