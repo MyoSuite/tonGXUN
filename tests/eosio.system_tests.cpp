@@ -755,4 +755,21 @@ BOOST_FIXTURE_TEST_CASE( stake_to_another_user_not_from_refund, eosio_system_tes
    BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "bob111111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
    total = get_total_stake( "bob111111111" );
    BOOST_REQUIRE_EQUAL( core_sym::from_string("210.0000"), total["net_weight"].as<asset>());
-   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total[
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("110.0000"), total["cpu_weight"].as<asset>());
+   //stake should be taken from alice's balance, and refund request should stay the same
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("400.0000"), get_balance( "alice1111111" ) );
+   refund = get_refund_request( "alice1111111"_n );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("200.0000"), refund["net_amount"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("100.0000"), refund["cpu_amount"].as<asset>() );
+   //BOOST_REQUIRE_EQUAL( orig_request_time, refund["request_time"].as_int64() );
+
+} FC_LOG_AND_RETHROW()
+
+// Tests for voting
+BOOST_FIXTURE_TEST_CASE( producer_register_unregister, eosio_system_tester ) try {
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+
+   //fc::variant params = producer_parameters_example(1);
+   auto key =  fc::crypto::public_key( std::string("EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV") ); // cspell:disable-line
+   BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
+                                             
