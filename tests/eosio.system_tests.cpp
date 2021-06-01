@@ -772,4 +772,26 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, eosio_system_tester ) try
    //fc::variant params = producer_parameters_example(1);
    auto key =  fc::crypto::public_key( std::string("EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV") ); // cspell:disable-line
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
-                                             
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", key )
+                                               ("url", "http://block.one")
+                                               ("location", 1)
+                        )
+   );
+
+   auto info = get_producer_info( "alice1111111" );
+   BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
+   BOOST_REQUIRE_EQUAL( 0, info["total_votes"].as_double() );
+   BOOST_REQUIRE_EQUAL( "http://block.one", info["url"].as_string() );
+
+   //change parameters one by one to check for things like #3783
+   //fc::variant params2 = producer_parameters_example(2);
+   BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", key )
+                                               ("url", "http://block.two")
+                                               ("location", 1)
+                        )
+   );
+   info = get_producer_info( "alice1111111" );
+   BOOST
