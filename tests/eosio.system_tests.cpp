@@ -794,4 +794,23 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, eosio_system_tester ) try
                         )
    );
    info = get_producer_info( "alice1111111" );
-   BOOST
+   BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
+   BOOST_REQUIRE_EQUAL( key, fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( "http://block.two", info["url"].as_string() );
+   BOOST_REQUIRE_EQUAL( 1, info["location"].as_int64() );
+
+   auto key2 =  fc::crypto::public_key( std::string("EOS5jnmSKrzdBHE9n8hw58y7yxFWBC8SNiG7m8S1crJH3KvAnf9o6") ); // cspell:disable-line
+   BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", key2 )
+                                               ("url", "http://block.two")
+                                               ("location", 2)
+                        )
+   );
+   info = get_producer_info( "alice1111111" );
+   BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
+   BOOST_REQUIRE_EQUAL( key2, fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( "http://block.two", info["url"].as_string() );
+   BOOST_REQUIRE_EQUAL( 2, info["location"].as_int64() );
+
+   //unr
