@@ -857,4 +857,28 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, eosio_system_tester ) try {
                                                ("location", 0 )
                         )
    );
-   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111"_n, core_sym::from_string("100000000.
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111"_n, core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( "alice1111111"_n, { "alice1111111"_n } ) );
+
+   block_signing_private_keys.emplace(get_public_key("alice1111111"_n, "bs1"), get_private_key("alice1111111"_n, "bs1"));
+
+   auto alice_prod_info = get_producer_info( "alice1111111"_n );
+   wdump((alice_prod_info));
+   BOOST_REQUIRE_EQUAL( alice_prod_info["is_active"], true );
+
+   produce_block();
+   produce_block( fc::minutes(2) );
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL( control->active_producers().version, 1u );
+   produce_block();
+   BOOST_REQUIRE_EQUAL( control->pending_block_producer(), "alice1111111"_n );
+   produce_block();
+
+   alice_signing_authority.threshold = 0;
+   alice_producer_authority.authority = alice_signing_authority;
+
+   // Ensure an authority with a threshold of 0 is rejected.
+   BOOST_REQUIRE_EQUAL( error("assertion failure with message: invalid producer authority"),
+                        push_action( "alice1111111"_n, "regproducer2"_n, mvo()
+                                       ("producer",  "alice1111111")
+                                       ("produce
