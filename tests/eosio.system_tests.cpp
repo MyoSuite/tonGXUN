@@ -842,4 +842,19 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, eosio_system_tester ) try {
    // cross_15_percent_threshold();
    // TELOS END
 
-   BOOST_
+   BOOST_REQUIRE_EQUAL( control->active_producers().version, 0u );
+
+   issue_and_transfer( "alice1111111"_n, core_sym::from_string("200000000.0000"),  config::system_account_name );
+   block_signing_authority_v0 alice_signing_authority;
+   alice_signing_authority.threshold = 1;
+   alice_signing_authority.keys.push_back( {.key = get_public_key( "alice1111111"_n, "bs1"), .weight = 1} );
+   alice_signing_authority.keys.push_back( {.key = get_public_key( "alice1111111"_n, "bs2"), .weight = 1} );
+   producer_authority alice_producer_authority = {.producer_name = "alice1111111"_n, .authority = alice_signing_authority};
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer2"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
+                                               ("url", "http://block.one")
+                                               ("location", 0 )
+                        )
+   );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111"_n, core_sym::from_string("100000000.
