@@ -881,4 +881,25 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( error("assertion failure with message: invalid producer authority"),
                         push_action( "alice1111111"_n, "regproducer2"_n, mvo()
                                        ("producer",  "alice1111111")
-                                       ("produce
+                                       ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
+                                       ("url", "http://block.one")
+                                       ("location", 0 )
+                        )
+   );
+
+   // Ensure an authority that is not satisfiable is rejected.
+   alice_signing_authority.threshold = 3;
+   alice_producer_authority.authority = alice_signing_authority;
+   BOOST_REQUIRE_EQUAL( error("assertion failure with message: invalid producer authority"),
+                        push_action( "alice1111111"_n, "regproducer2"_n, mvo()
+                                       ("producer",  "alice1111111")
+                                       ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
+                                       ("url", "http://block.one")
+                                       ("location", 0 )
+                        )
+   );
+
+   // Ensure an authority with duplicate keys is rejected.
+   alice_signing_authority.threshold = 1;
+   alice_signing_authority.keys[1] = alice_signing_authority.keys[0];
+   alice_producer_authority.authority = alice_signing_authority
