@@ -813,4 +813,33 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, eosio_system_tester ) try
    BOOST_REQUIRE_EQUAL( "http://block.two", info["url"].as_string() );
    BOOST_REQUIRE_EQUAL( 2, info["location"].as_int64() );
 
-   //unr
+   //unregister producer
+   BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "unregprod"_n, mvo()
+                                               ("producer",  "alice1111111")
+                        )
+   );
+   info = get_producer_info( "alice1111111" );
+   //key should be empty
+   BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key(info["producer_key"].as_string()) );
+   //everything else should stay the same
+   BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
+   BOOST_REQUIRE_EQUAL( 0, info["total_votes"].as_double() );
+   BOOST_REQUIRE_EQUAL( "http://block.two", info["url"].as_string() );
+
+   //unregister bob111111111 who is not a producer
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "producer not found" ),
+                        push_action( "bob111111111"_n, "unregprod"_n, mvo()
+                                     ("producer",  "bob111111111")
+                        )
+   );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( producer_wtmsig, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   BOOST_
