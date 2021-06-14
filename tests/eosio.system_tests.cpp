@@ -922,4 +922,30 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, eosio_system_tester ) try {
                                        ("url", "http://block.one")
                                        ("location", 0 )
                         )
- 
+   );
+
+   produce_block();
+   produce_block( fc::minutes(2) );
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL( control->active_producers().version, 2u );
+   produce_block();
+   BOOST_REQUIRE_EQUAL( control->pending_block_producer(), "alice1111111"_n );
+   produce_block();
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( producer_wtmsig_transition, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   BOOST_REQUIRE_EQUAL( control->active_producers().version, 0u );
+
+   set_code( config::system_account_name, contracts::util::system_wasm_old() );
+   set_abi(  config::system_account_name, contracts::util::system_abi_old().data() );
+
+   issue_and_transfer( "alice1111111"_n, core_sym::from_string("200000000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", get_public_key( "alice111
