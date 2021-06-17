@@ -948,4 +948,30 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig_transition, eosio_system_tester ) try {
    issue_and_transfer( "alice1111111"_n, core_sym::from_string("200000000.0000"),  config::system_account_name );
    BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
-                                               ("producer_key", get_public_key( "alice111
+                                               ("producer_key", get_public_key( "alice1111111"_n, "active") )
+                                               ("url","")
+                                               ("location", 0)
+                        )
+   );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111"_n, core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( "alice1111111"_n, { "alice1111111"_n } ) );
+
+   //auto alice_prod_info1 = get_producer_info( "alice1111111"_n );
+   //wdump((alice_prod_info1));
+
+   produce_block();
+   produce_block( fc::minutes(2) );
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL( control->active_producers().version, 1u );
+
+   auto convert_to_block_timestamp = [](const fc::variant& timestamp) -> eosio::chain::block_timestamp_type {
+      return fc::time_point::from_iso_string(timestamp.as_string());
+   };
+
+   const auto schedule_update1 = convert_to_block_timestamp(get_global_state()["last_producer_schedule_update"]);
+
+   const auto& rlm = control->get_resource_limits_manager();
+
+   auto alice_initial_ram_usage = rlm.get_account_ram_usage("alice1111111"_n);
+
+   set_code( config::system_account_name, c
