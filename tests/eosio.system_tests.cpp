@@ -990,4 +990,22 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig_transition, eosio_system_tester ) try {
    // in the producer object of the currently active producer alice1111111.
    // However, starting in v1.9.1, the producer object does not have a default block_signing_authority added to the
    // serialization of the producer object if it was not already present in the binary extension field
-   // producer_authority to begin with. This is verified below by ensuring the RAM usag
+   // producer_authority to begin with. This is verified below by ensuring the RAM usage of alice (who pays for the
+   // producer object) does not increase.
+
+   auto alice_ram_usage = rlm.get_account_ram_usage("alice1111111"_n);
+   BOOST_CHECK_EQUAL( alice_initial_ram_usage, alice_ram_usage );
+
+   auto alice_prod_info3 = get_producer_info( "alice1111111"_n );
+   if( alice_prod_info3.get_object().contains("producer_authority") ) {
+      BOOST_CHECK_EQUAL( alice_prod_info3["producer_authority"][1]["threshold"], 0 );
+   }
+
+   produce_block( fc::minutes(2) );
+   const auto schedule_update3 = convert_to_block_timestamp(get_global_state()["last_producer_schedule_update"]);
+
+   // The bug in v1.9.0 would cause alice to have an invalid producer authority (the default block_signing_authority).
+   // The v1.9.0 system contract would have attempted to set a proposed producer schedule including this invalid
+   // authority which would be rejected by the EOSIO native system and cause the onblock transaction to continue to fail.
+   // This could be observed by noticing that last_producer_schedule_update was not being updated even though it should.
+   // However, star
