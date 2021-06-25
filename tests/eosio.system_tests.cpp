@@ -974,4 +974,20 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig_transition, eosio_system_tester ) try {
 
    auto alice_initial_ram_usage = rlm.get_account_ram_usage("alice1111111"_n);
 
-   set_code( config::system_account_name, c
+   set_code( config::system_account_name, contracts::system_wasm() );
+   set_abi(  config::system_account_name, contracts::system_abi().data() );
+   produce_block();
+   BOOST_REQUIRE_EQUAL( control->pending_block_producer(), "alice1111111"_n );
+
+   auto alice_prod_info2 = get_producer_info( "alice1111111"_n );
+   BOOST_REQUIRE_EQUAL( alice_prod_info2["is_active"], true );
+
+   produce_block( fc::minutes(2) );
+   const auto schedule_update2 = convert_to_block_timestamp(get_global_state()["last_producer_schedule_update"]);
+   BOOST_REQUIRE( schedule_update1 < schedule_update2 ); // Ensure last_producer_schedule_update is increasing.
+
+   // Producing the above block would trigger the bug in v1.9.0 that sets the default block_signing_authority
+   // in the producer object of the currently active producer alice1111111.
+   // However, starting in v1.9.1, the producer object does not have a default block_signing_authority added to the
+   // serialization of the producer object if it was not already present in the binary extension field
+   // producer_authority to begin with. This is verified below by ensuring the RAM usag
