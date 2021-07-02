@@ -1021,4 +1021,30 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig_transition, eosio_system_tester ) try {
    // block signing authority.
 
    BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
-                                               ("producer",  "alice11111
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", get_public_key( "alice1111111"_n, "active") )
+                                               ("url","")
+                                               ("location", 0)
+                        )
+   );
+
+   produce_block();
+   produce_block( fc::minutes(2) );
+
+   auto alice_prod_info4 = get_producer_info( "alice1111111"_n );
+   BOOST_REQUIRE_EQUAL( alice_prod_info4["is_active"], true );
+   const auto schedule_update4 = convert_to_block_timestamp(get_global_state()["last_producer_schedule_update"]);
+   BOOST_REQUIRE( schedule_update2 < schedule_update4 );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( vote_for_producer, eosio_system_tester, * boost::unit_test::tolerance(1e+5) ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   fc::variant params = producer_parameters_example(1);
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
+                          
