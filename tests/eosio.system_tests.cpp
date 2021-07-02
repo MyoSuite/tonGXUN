@@ -1047,4 +1047,21 @@ BOOST_FIXTURE_TEST_CASE( vote_for_producer, eosio_system_tester, * boost::unit_t
    issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
    fc::variant params = producer_parameters_example(1);
    BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
-                          
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", get_public_key( "alice1111111"_n, "active") )
+                                               ("url", "http://block.one")
+                                               ("location", 0 )
+                        )
+   );
+   auto prod = get_producer_info( "alice1111111" );
+   BOOST_REQUIRE_EQUAL( "alice1111111", prod["owner"].as_string() );
+   BOOST_REQUIRE_EQUAL( 0, prod["total_votes"].as_double() );
+   BOOST_REQUIRE_EQUAL( "http://block.one", prod["url"].as_string() );
+
+   issue_and_transfer( "bob111111111", core_sym::from_string("2000.0000"),  config::system_account_name );
+   issue_and_transfer( "carol1111111", core_sym::from_string("3000.0000"),  config::system_account_name );
+
+   //bob111111111 makes stake
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("11.0000"), core_sym::from_string("0.1111") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("1988.8889"), get_balance( "bob111111111" ) );
+   REQUIRE_MATCHING_OBJECT( voter( "bob111111111", core_sym::from_string("11.1111") ), get_voter_i
