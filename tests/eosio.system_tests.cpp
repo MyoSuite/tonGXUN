@@ -1008,4 +1008,17 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig_transition, eosio_system_tester ) try {
    // The v1.9.0 system contract would have attempted to set a proposed producer schedule including this invalid
    // authority which would be rejected by the EOSIO native system and cause the onblock transaction to continue to fail.
    // This could be observed by noticing that last_producer_schedule_update was not being updated even though it should.
-   // However, star
+   // However, starting in v1.9.1, update_elected_producers is smarter about the producer schedule it constructs to
+   // propose to the system. It will recognize the default constructed authority (which shouldn't be created by the
+   // v1.9.1 system contract but may still exist in the tables if it was constructed by the buggy v1.9.0 system contract)
+   // and instead resort to constructing the block signing authority from the single producer key in the table.
+   // So newer system contracts should see onblock continue to function, which is verified by the check below.
+
+   BOOST_CHECK( schedule_update2 < schedule_update3 ); // Ensure last_producer_schedule_update is increasing.
+
+   // But even if the buggy v1.9.0 system contract was running, it should always still be possible to recover
+   // by having the producer with the invalid authority simply call regproducer or regproducer2 to correct their
+   // block signing authority.
+
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice11111
