@@ -1064,4 +1064,24 @@ BOOST_FIXTURE_TEST_CASE( vote_for_producer, eosio_system_tester, * boost::unit_t
    //bob111111111 makes stake
    BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("11.0000"), core_sym::from_string("0.1111") ) );
    BOOST_REQUIRE_EQUAL( core_sym::from_string("1988.8889"), get_balance( "bob111111111" ) );
-   REQUIRE_MATCHING_OBJECT( voter( "bob111111111", core_sym::from_string("11.1111") ), get_voter_i
+   REQUIRE_MATCHING_OBJECT( voter( "bob111111111", core_sym::from_string("11.1111") ), get_voter_info( "bob111111111" ) );
+
+   //bob111111111 votes for alice1111111
+   BOOST_REQUIRE_EQUAL( success(), vote( "bob111111111"_n, { "alice1111111"_n } ) );
+
+   //check that producer parameters stay the same after voting
+   prod = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("11.1111")) == prod["total_votes"].as_double() );
+   BOOST_REQUIRE_EQUAL( "alice1111111", prod["owner"].as_string() );
+   BOOST_REQUIRE_EQUAL( "http://block.one", prod["url"].as_string() );
+
+   //carol1111111 makes stake
+   BOOST_REQUIRE_EQUAL( success(), stake( "carol1111111", core_sym::from_string("22.0000"), core_sym::from_string("0.2222") ) );
+   REQUIRE_MATCHING_OBJECT( voter( "carol1111111", core_sym::from_string("22.2222") ), get_voter_info( "carol1111111" ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("2977.7778"), get_balance( "carol1111111" ) );
+   //carol1111111 votes for alice1111111
+   BOOST_REQUIRE_EQUAL( success(), vote( "carol1111111"_n, { "alice1111111"_n } ) );
+
+   //new stake votes be added to alice1111111's total_votes
+   prod = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_s
