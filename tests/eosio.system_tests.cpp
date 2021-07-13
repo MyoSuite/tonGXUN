@@ -1102,4 +1102,28 @@ BOOST_FIXTURE_TEST_CASE( vote_for_producer, eosio_system_tester, * boost::unit_t
    wdump((prod));
    BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("86.8886")) == prod["total_votes"].as_double() );
 
-   //bob111111111 revokes his v
+   //bob111111111 revokes his vote
+   BOOST_REQUIRE_EQUAL( success(), vote( "bob111111111"_n, vector<account_name>() ) );
+
+   //should decrease alice1111111's total_votes
+   prod = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("20.2220")) == prod["total_votes"].as_double() );
+   //but eos should still be at stake
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("1955.5556"), get_balance( "bob111111111" ) );
+
+   //carol1111111 unstakes rest of eos
+   BOOST_REQUIRE_EQUAL( success(), unstake( "carol1111111", core_sym::from_string("20.0000"), core_sym::from_string("0.2220") ) );
+   //should decrease alice1111111's total_votes to zero
+   prod = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( 0.0 == prod["total_votes"].as_double() );
+
+   //carol1111111 should receive funds in 3 days
+   produce_block( fc::days(3) );
+   produce_block();
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("3000.0000"), get_balance( "carol1111111" ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( unregistered_producer_voting, eosio_system_tester, * boost::unit_test::tolerance(1e+5) ) try {
+   issue_and_transf
