@@ -1140,4 +1140,26 @@ BOOST_FIXTURE_TEST_CASE( unregistered_producer_voting, eosio_system_tester, * bo
    BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", get_public_key( "alice1111111"_n, "active") )
-     
+                                               ("url", "")
+                                               ("location", 0)
+                        )
+   );
+   //and then unregisters
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "unregprod"_n, mvo()
+                                               ("producer",  "alice1111111")
+                        )
+   );
+   //key should be empty
+   auto prod = get_producer_info( "alice1111111" );
+   BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key(prod["producer_key"].as_string()) );
+
+   //bob111111111 should not be able to vote for alice1111111 who is an unregistered producer
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "producer alice1111111 is not currently registered" ),
+                        vote( "bob111111111"_n, { "alice1111111"_n } ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( more_than_30_producer_voting, eosio_system_tester ) try {
+   issue_and_transfer( "bob111111111", core_sym::from_string("2000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::
