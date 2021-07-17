@@ -1162,4 +1162,22 @@ BOOST_FIXTURE_TEST_CASE( unregistered_producer_voting, eosio_system_tester, * bo
 
 BOOST_FIXTURE_TEST_CASE( more_than_30_producer_voting, eosio_system_tester ) try {
    issue_and_transfer( "bob111111111", core_sym::from_string("2000.0000"),  config::system_account_name );
-   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("13.0000"), core_sym::from_string("0.5791") ) );
+   REQUIRE_MATCHING_OBJECT( voter( "bob111111111", core_sym::from_string("13.5791") ), get_voter_info( "bob111111111" ) );
+
+   //bob111111111 should not be able to vote for alice1111111 who is not a producer
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "attempt to vote for too many producers" ),
+                        vote( "bob111111111"_n, vector<account_name>(31, "alice1111111"_n) ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( vote_same_producer_30_times, eosio_system_tester ) try {
+   issue_and_transfer( "bob111111111", core_sym::from_string("2000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("50.0000"), core_sym::from_string("50.0000") ) );
+   REQUIRE_MATCHING_OBJECT( voter( "bob111111111", core_sym::from_string("100.0000") ), get_voter_info( "bob111111111" ) );
+
+   //alice1111111 becomes a producer
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   fc::variant params = producer_parameters_example(1);
+   BOOST_REQUIRE_EQUAL( succ
