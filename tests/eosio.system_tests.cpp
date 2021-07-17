@@ -1180,4 +1180,25 @@ BOOST_FIXTURE_TEST_CASE( vote_same_producer_30_times, eosio_system_tester ) try 
    //alice1111111 becomes a producer
    issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
    fc::variant params = producer_parameters_example(1);
-   BOOST_REQUIRE_EQUAL( succ
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", get_public_key("alice1111111"_n, "active") )
+                                               ("url", "")
+                                               ("location", 0)
+                        )
+   );
+
+   //bob111111111 should not be able to vote for alice1111111 who is not a producer
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "producer votes must be unique and sorted" ),
+                        vote( "bob111111111"_n, vector<account_name>(30, "alice1111111"_n) ) );
+
+   auto prod = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( 0 == prod["total_votes"].as_double() );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( producer_keep_votes, eosio_system_tester, * boost::unit_test::tolerance(1e+5) ) try {
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   fc::variant params = producer_parameters_example(1);
+   vector<char> key = 
