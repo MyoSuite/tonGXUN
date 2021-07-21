@@ -1260,4 +1260,25 @@ BOOST_FIXTURE_TEST_CASE( producer_keep_votes, eosio_system_tester, * boost::unit
    //votes should stay the same
    BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("13.5791")), prod["total_votes"].as_double() );
    //check parameters just in case
-   //REQUIRE_MATCHING_OBJECT( params, prod["pre
+   //REQUIRE_MATCHING_OBJECT( params, prod["prefs"]);
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( vote_for_two_producers, eosio_system_tester, * boost::unit_test::tolerance(1e+5) ) try {
+   //alice1111111 becomes a producer
+   fc::variant params = producer_parameters_example(1);
+   auto key = get_public_key( "alice1111111"_n, "active" );
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", get_public_key( "alice1111111"_n, "active") )
+                                               ("url","")
+                                               ("location", 0)
+                        )
+   );
+   //bob111111111 becomes a producer
+   params = producer_parameters_example(2);
+   key = get_public_key( "bob111111111"_n, "active" );
+   BOOST_REQUIRE_EQUAL( success(), push_action( "bob111111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "bob111111111")
+                                
