@@ -1219,4 +1219,24 @@ BOOST_FIXTURE_TEST_CASE( producer_keep_votes, eosio_system_tester, * boost::unit
    BOOST_REQUIRE_EQUAL( success(), vote("bob111111111"_n, { "alice1111111"_n } ) );
 
    auto prod = get_producer_info( "alice1111111" );
-   BOOST_TEST_REQU
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("13.5791")) == prod["total_votes"].as_double() );
+
+   //unregister producer
+   BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "unregprod"_n, mvo()
+                                               ("producer",  "alice1111111")
+                        )
+   );
+   prod = get_producer_info( "alice1111111" );
+   //key should be empty
+   BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key(prod["producer_key"].as_string()) );
+   //check parameters just in case
+   //REQUIRE_MATCHING_OBJECT( params, prod["prefs"]);
+   //votes should stay the same
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("13.5791")), prod["total_votes"].as_double() );
+
+   //regtister the same producer again
+   params = producer_parameters_example(2);
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", get_public_key( "alice1111111"_n, "active") )
+                     
