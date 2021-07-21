@@ -1201,4 +1201,22 @@ BOOST_FIXTURE_TEST_CASE( vote_same_producer_30_times, eosio_system_tester ) try 
 BOOST_FIXTURE_TEST_CASE( producer_keep_votes, eosio_system_tester, * boost::unit_test::tolerance(1e+5) ) try {
    issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
    fc::variant params = producer_parameters_example(1);
-   vector<char> key = 
+   vector<char> key = fc::raw::pack( get_public_key( "alice1111111"_n, "active" ) );
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer"_n, mvo()
+                                               ("producer",  "alice1111111")
+                                               ("producer_key", get_public_key( "alice1111111"_n, "active") )
+                                               ("url", "")
+                                               ("location", 0)
+                        )
+   );
+
+   //bob111111111 makes stake
+   issue_and_transfer( "bob111111111", core_sym::from_string("2000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("13.0000"), core_sym::from_string("0.5791") ) );
+   REQUIRE_MATCHING_OBJECT( voter( "bob111111111", core_sym::from_string("13.5791") ), get_voter_info( "bob111111111" ) );
+
+   //bob111111111 votes for alice1111111
+   BOOST_REQUIRE_EQUAL( success(), vote("bob111111111"_n, { "alice1111111"_n } ) );
+
+   auto prod = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQU
