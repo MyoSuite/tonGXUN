@@ -1281,4 +1281,21 @@ BOOST_FIXTURE_TEST_CASE( vote_for_two_producers, eosio_system_tester, * boost::u
    key = get_public_key( "bob111111111"_n, "active" );
    BOOST_REQUIRE_EQUAL( success(), push_action( "bob111111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "bob111111111")
-                                
+                                               ("producer_key", get_public_key( "alice1111111"_n, "active") )
+                                               ("url","")
+                                               ("location", 0)
+                        )
+   );
+
+   //carol1111111 votes for alice1111111 and bob111111111
+   issue_and_transfer( "carol1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "carol1111111", core_sym::from_string("15.0005"), core_sym::from_string("5.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( "carol1111111"_n, { "alice1111111"_n, "bob111111111"_n } ) );
+
+   auto alice_info = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("20.0005")) == alice_info["total_votes"].as_double() );
+   auto bob_info = get_producer_info( "bob111111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("20.0005")) == bob_info["total_votes"].as_double() );
+
+   //carol1111111 votes for alice1111111 (but revokes vote for bob111111111)
+   BOOST_REQUIRE_EQUAL( success(), vote( "
