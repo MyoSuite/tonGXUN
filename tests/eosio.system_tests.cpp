@@ -1318,4 +1318,25 @@ BOOST_FIXTURE_TEST_CASE( vote_for_two_producers, eosio_system_tester, * boost::u
 
 } FC_LOG_AND_RETHROW()
 
-// TELOS BEGIN: Some tests dont apply to our code
+// TELOS BEGIN: Some tests dont apply to our code, and the rest moved to custom `telos.system_tests.cpp` file.
+/*
+BOOST_FIXTURE_TEST_CASE( proxy_register_unregister_keeps_stake, eosio_system_tester ) try {
+   //register proxy by first action for this user ever
+   BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproxy"_n, mvo()
+                                               ("proxy",  "alice1111111")
+                                               ("isproxy", true )
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n ), get_voter_info( "alice1111111" ) );
+
+   //unregister proxy
+   BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproxy"_n, mvo()
+                                               ("proxy",  "alice1111111")
+                                               ("isproxy", false)
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( voter( "alice1111111" ), get_voter_info( "alice1111111" ) );
+
+   //stake and then register as a proxy
+   issue_and_transfer( "bob111111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_E
