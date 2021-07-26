@@ -1298,4 +1298,24 @@ BOOST_FIXTURE_TEST_CASE( vote_for_two_producers, eosio_system_tester, * boost::u
    BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("20.0005")) == bob_info["total_votes"].as_double() );
 
    //carol1111111 votes for alice1111111 (but revokes vote for bob111111111)
-   BOOST_REQUIRE_EQUAL( success(), vote( "
+   BOOST_REQUIRE_EQUAL( success(), vote( "carol1111111"_n, { "alice1111111"_n } ) );
+
+   alice_info = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("20.0005")) == alice_info["total_votes"].as_double() );
+   bob_info = get_producer_info( "bob111111111" );
+   BOOST_TEST_REQUIRE( 0 == bob_info["total_votes"].as_double() );
+
+   //alice1111111 votes for herself and bob111111111
+   issue_and_transfer( "alice1111111", core_sym::from_string("2.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", core_sym::from_string("1.0000"), core_sym::from_string("1.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), vote("alice1111111"_n, { "alice1111111"_n, "bob111111111"_n } ) );
+
+   alice_info = get_producer_info( "alice1111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("22.0005")) == alice_info["total_votes"].as_double() );
+
+   bob_info = get_producer_info( "bob111111111" );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("2.0000")) == bob_info["total_votes"].as_double() );
+
+} FC_LOG_AND_RETHROW()
+
+// TELOS BEGIN: Some tests dont apply to our code
