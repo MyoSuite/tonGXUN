@@ -1399,3 +1399,29 @@ BOOST_FIXTURE_TEST_CASE( proxy_stake_unstake_keeps_proxy_flag, eosio_system_test
    BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", core_sym::from_string("30.0000"), core_sym::from_string("20.0000") ) );
    //check that account is still a proxy
    REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )("staked", 2000000 ), get_voter_info( "alice1111111" ) );
+
+   //unstake more
+   BOOST_REQUIRE_EQUAL( success(), unstake( "alice1111111", core_sym::from_string("65.0000"), core_sym::from_string("35.0000") ) );
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )("staked", 1000000 ), get_voter_info( "alice1111111" ) );
+
+   //unstake the rest
+   BOOST_REQUIRE_EQUAL( success(), unstake( "alice1111111", core_sym::from_string("65.0000"), core_sym::from_string("35.0000") ) );
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )( "staked", 0 ), get_voter_info( "alice1111111" ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( proxy_actions_affect_producers, eosio_system_tester, * boost::unit_test::tolerance(1e+5) ) try {
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   create_accounts_with_resources( {  "defproducer1"_n, "defproducer2"_n, "defproducer3"_n } );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer1"_n, 1) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer2"_n, 2) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer3"_n, 3) );
+
+   //register as a proxy
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproxy"_n, mvo()
+                   
