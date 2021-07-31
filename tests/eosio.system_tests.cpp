@@ -1379,4 +1379,23 @@ BOOST_FIXTURE_TEST_CASE( proxy_register_unregister_keeps_stake, eosio_system_tes
 BOOST_FIXTURE_TEST_CASE( proxy_stake_unstake_keeps_proxy_flag, eosio_system_tester ) try {
    // TELOS BEGIN
    activate_network();
- 
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproxy"_n, mvo()
+                                               ("proxy",  "alice1111111")
+                                               ("isproxy", true)
+                        )
+   );
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n ), get_voter_info( "alice1111111" ) );
+
+   //stake
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", core_sym::from_string("100.0000"), core_sym::from_string("50.0000") ) );
+   //check that account is still a proxy
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )( "staked", 1500000 ), get_voter_info( "alice1111111" ) );
+
+   //stake more
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", core_sym::from_string("30.0000"), core_sym::from_string("20.0000") ) );
+   //check that account is still a proxy
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )("staked", 2000000 ), get_voter_info( "alice1111111" ) );
