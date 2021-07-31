@@ -1339,4 +1339,21 @@ BOOST_FIXTURE_TEST_CASE( proxy_register_unregister_keeps_stake, eosio_system_tes
 
    //stake and then register as a proxy
    issue_and_transfer( "bob111111111", core_sym::from_string("1000.0000"),  config::system_account_name );
-   BOOST_REQUIRE_E
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("200.0002"), core_sym::from_string("100.0001") ) );
+   BOOST_REQUIRE_EQUAL( success(), push_action( "bob111111111"_n, "regproxy"_n, mvo()
+                                               ("proxy",  "bob111111111")
+                                               ("isproxy", true)
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( proxy( "bob111111111"_n )( "staked", 3000003 ), get_voter_info( "bob111111111" ) );
+   //unrgister and check that stake is still in place
+   BOOST_REQUIRE_EQUAL( success(), push_action( "bob111111111"_n, "regproxy"_n, mvo()
+                                               ("proxy",  "bob111111111")
+                                               ("isproxy", false)
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( voter( "bob111111111", core_sym::from_string("300.0003") ), get_voter_info( "bob111111111" ) );
+
+   //register as a proxy and then stake
+   BOOST_REQUIRE_EQUAL( success(), push_action( "carol1111111"_n, "regproxy"_n, mvo()
+                                               ("pr
