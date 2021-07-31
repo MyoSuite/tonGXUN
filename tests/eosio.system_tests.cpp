@@ -1356,4 +1356,27 @@ BOOST_FIXTURE_TEST_CASE( proxy_register_unregister_keeps_stake, eosio_system_tes
 
    //register as a proxy and then stake
    BOOST_REQUIRE_EQUAL( success(), push_action( "carol1111111"_n, "regproxy"_n, mvo()
-                                               ("pr
+                                               ("proxy",  "carol1111111")
+                                               ("isproxy", true)
+                        )
+   );
+   issue_and_transfer( "carol1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "carol1111111", core_sym::from_string("246.0002"), core_sym::from_string("531.0001") ) );
+   //check that both proxy flag and stake a correct
+   REQUIRE_MATCHING_OBJECT( proxy( "carol1111111"_n )( "staked", 7770003 ), get_voter_info( "carol1111111" ) );
+
+   //unregister
+   BOOST_REQUIRE_EQUAL( success(), push_action( "carol1111111"_n, "regproxy"_n, mvo()
+                                                ("proxy",  "carol1111111")
+                                                ("isproxy", false)
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( voter( "carol1111111", core_sym::from_string("777.0003") ), get_voter_info( "carol1111111" ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( proxy_stake_unstake_keeps_proxy_flag, eosio_system_tester ) try {
+   // TELOS BEGIN
+   activate_network();
+ 
