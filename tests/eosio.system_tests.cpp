@@ -1424,4 +1424,18 @@ BOOST_FIXTURE_TEST_CASE( proxy_actions_affect_producers, eosio_system_tester, * 
 
    //register as a proxy
    BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproxy"_n, mvo()
-                   
+                                                ("proxy",  "alice1111111")
+                                                ("isproxy", true)
+                        )
+   );
+
+   //accumulate proxied votes
+   issue_and_transfer( "bob111111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("100.0002"), core_sym::from_string("50.0001") ) );
+   BOOST_REQUIRE_EQUAL( success(), vote("bob111111111"_n, vector<account_name>(), "alice1111111"_n ) );
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )( "proxied_vote_weight", stake2votes(core_sym::from_string("150.0003")) ), get_voter_info( "alice1111111" ) );
+
+   //vote for producers
+   BOOST_REQUIRE_EQUAL( success(), vote("alice1111111"_n, { "defproducer1"_n, "defproducer2"_n } ) );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_producer_info( "defproducer1" )["total_votes"].as_double() );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_producer_info( "defproducer2" )["total_votes"].a
