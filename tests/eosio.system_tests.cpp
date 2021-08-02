@@ -1438,4 +1438,20 @@ BOOST_FIXTURE_TEST_CASE( proxy_actions_affect_producers, eosio_system_tester, * 
    //vote for producers
    BOOST_REQUIRE_EQUAL( success(), vote("alice1111111"_n, { "defproducer1"_n, "defproducer2"_n } ) );
    BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_producer_info( "defproducer1" )["total_votes"].as_double() );
-   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_producer_info( "defproducer2" )["total_votes"].a
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_producer_info( "defproducer2" )["total_votes"].as_double() );
+   BOOST_TEST_REQUIRE( 0 == get_producer_info( "defproducer3" )["total_votes"].as_double() );
+
+   //vote for another producers
+   BOOST_REQUIRE_EQUAL( success(), vote( "alice1111111"_n, { "defproducer1"_n, "defproducer3"_n } ) );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_producer_info( "defproducer1" )["total_votes"].as_double() );
+   BOOST_REQUIRE_EQUAL( 0, get_producer_info( "defproducer2" )["total_votes"].as_double() );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_producer_info( "defproducer3" )["total_votes"].as_double() );
+
+   //unregister proxy
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproxy"_n, mvo()
+                                                ("proxy",  "alice1111111")
+                                                ("isproxy", false)
+                        )
+   );
+   //REQUIRE_MATCHING_OBJECT( voter( "alice1111111" )( "proxied_vote_weight", stake2votes(core_sym::from_string("150.0003")) ), get_voter_info( "alice1111111" ) );
+   BOOST_REQUIRE_EQUAL( 0, get_producer_info( "defproducer1" )["
