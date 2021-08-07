@@ -1485,4 +1485,21 @@ BOOST_FIXTURE_TEST_CASE( proxy_actions_affect_producers, eosio_system_tester, * 
 
 BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::tolerance(1e-10)) try {
 
-   const double continuous_rate = std::log1p(d
+   const double continuous_rate = std::log1p(double(0.05));
+   const double usecs_per_year  = 52 * 7 * 24 * 3600 * 1000000ll;
+   const double secs_per_year   = 52 * 7 * 24 * 3600;
+
+
+   const asset large_asset = core_sym::from_string("80.0000");
+   create_account_with_resources( "defproducera"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+   create_account_with_resources( "defproducerb"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+   create_account_with_resources( "defproducerc"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+
+   create_account_with_resources( "producvotera"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+   create_account_with_resources( "producvoterb"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+
+   BOOST_REQUIRE_EQUAL(success(), regproducer("defproducera"_n));
+   produce_block(fc::hours(24));
+   auto prod = get_producer_info( "defproducera"_n );
+   BOOST_REQUIRE_EQUAL("defproducera", prod["owner"].as_string());
+   BOOST_REQUI
