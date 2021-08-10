@@ -1502,4 +1502,18 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
    produce_block(fc::hours(24));
    auto prod = get_producer_info( "defproducera"_n );
    BOOST_REQUIRE_EQUAL("defproducera", prod["owner"].as_string());
-   BOOST_REQUI
+   BOOST_REQUIRE_EQUAL(0, prod["total_votes"].as_double());
+
+   transfer( config::system_account_name, "producvotera", core_sym::from_string("400000000.0000"), config::system_account_name);
+   BOOST_REQUIRE_EQUAL(success(), stake("producvotera", core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000")));
+   BOOST_REQUIRE_EQUAL(success(), vote( "producvotera"_n, { "defproducera"_n }));
+   // defproducera is the only active producer
+   // produce enough blocks so new schedule kicks in and defproducera produces some blocks
+   {
+      produce_blocks(50);
+
+      const auto     initial_global_state      = get_global_state();
+      const uint64_t initial_claim_time        = microseconds_since_epoch_of_iso_string( initial_global_state["last_pervote_bucket_fill"] );
+      const int64_t  initial_pervote_bucket    = initial_global_state["pervote_bucket"].as<int64_t>();
+      const int64_t  initial_perblock_bucket   = initial_global_state["perblock_bucket"].as<int64_t>();
+      const int64_t  initial_savings           = get_balance("eosio.saving"_n).get_amount
