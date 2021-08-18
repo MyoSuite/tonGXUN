@@ -1535,4 +1535,24 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
       const int64_t  pervote_bucket    = global_state["pervote_bucket"].as<int64_t>();
       const int64_t  perblock_bucket   = global_state["perblock_bucket"].as<int64_t>();
       const int64_t  savings           = get_balance("eosio.saving"_n).get_amount();
-      const uint32_t tot_unpaid_blocks = global_state["total_unpaid_blocks"].as<
+      const uint32_t tot_unpaid_blocks = global_state["total_unpaid_blocks"].as<uint32_t>();
+
+      prod = get_producer_info("defproducera");
+      BOOST_REQUIRE_EQUAL(1, prod["unpaid_blocks"].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(1, tot_unpaid_blocks);
+      const asset supply  = get_token_supply();
+      const asset balance = get_balance("defproducera"_n);
+
+      BOOST_REQUIRE_EQUAL(claim_time, microseconds_since_epoch_of_iso_string( prod["last_claim_time"] ));
+
+      auto usecs_between_fills = claim_time - initial_claim_time;
+      int32_t secs_between_fills = usecs_between_fills/1000000;
+
+      BOOST_REQUIRE_EQUAL(0, initial_savings);
+      BOOST_REQUIRE_EQUAL(0, initial_perblock_bucket);
+      BOOST_REQUIRE_EQUAL(0, initial_pervote_bucket);
+
+      BOOST_REQUIRE_EQUAL(int64_t( ( initial_supply.get_amount() * double(secs_between_fills) * continuous_rate ) / secs_per_year ),
+                          supply.get_amount() - initial_supply.get_amount());
+      BOOST_REQUIRE(within_one(int64_t( ( initial_supply.get_amount() * double(secs_between_fills) * (4.   * continuous_rate/ 5.) / secs_per_year ) ),
+                               savings - initial_savings));
