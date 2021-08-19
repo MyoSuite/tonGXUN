@@ -1556,3 +1556,22 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
                           supply.get_amount() - initial_supply.get_amount());
       BOOST_REQUIRE(within_one(int64_t( ( initial_supply.get_amount() * double(secs_between_fills) * (4.   * continuous_rate/ 5.) / secs_per_year ) ),
                                savings - initial_savings));
+      BOOST_REQUIRE(within_one(int64_t( ( initial_supply.get_amount() * double(secs_between_fills) * (0.25 * continuous_rate/ 5.) / secs_per_year ) ),
+                               balance.get_amount() - initial_balance.get_amount()));
+
+      int64_t from_perblock_bucket = int64_t( initial_supply.get_amount() * double(secs_between_fills) * (0.25 * continuous_rate/ 5.) / secs_per_year ) ;
+      int64_t from_pervote_bucket  = int64_t( initial_supply.get_amount() * double(secs_between_fills) * (0.75 * continuous_rate/ 5.) / secs_per_year ) ;
+
+
+      if (from_pervote_bucket >= 100 * 10000) {
+         BOOST_REQUIRE_EQUAL(from_perblock_bucket + from_pervote_bucket, balance.get_amount() - initial_balance.get_amount());
+         BOOST_REQUIRE_EQUAL(0, pervote_bucket);
+      } else {
+         BOOST_REQUIRE_EQUAL(from_perblock_bucket, balance.get_amount() - initial_balance.get_amount());
+         BOOST_REQUIRE_EQUAL(from_pervote_bucket, pervote_bucket);
+      }
+   }
+
+   {
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("already claimed rewards within past day"),
+                          push_
