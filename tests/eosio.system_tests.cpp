@@ -1574,4 +1574,23 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
 
    {
       BOOST_REQUIRE_EQUAL(wasm_assert_msg("already claimed rewards within past day"),
-                          push_
+                          push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
+   }
+
+   // defproducera waits for 23 hours and 55 minutes, can't claim rewards yet
+   {
+      produce_block(fc::seconds(23 * 3600 + 55 * 60));
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("already claimed rewards within past day"),
+                          push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
+   }
+
+   // wait 5 more minutes, defproducera can now claim rewards again
+   {
+      produce_block(fc::seconds(5 * 60));
+
+      const auto     initial_global_state      = get_global_state();
+      const uint64_t initial_claim_time        = microseconds_since_epoch_of_iso_string( initial_global_state["last_pervote_bucket_fill"] );
+      const int64_t  initial_pervote_bucket    = initial_global_state["pervote_bucket"].as<int64_t>();
+      const int64_t  initial_perblock_bucket   = initial_global_state["perblock_bucket"].as<int64_t>();
+      const int64_t  initial_savings           = get_balance("eosio.saving"_n).get_amount();
+      const uint32_t initial_tot_u
