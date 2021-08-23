@@ -1629,4 +1629,27 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
 
       BOOST_REQUIRE_EQUAL( int64_t( initial_supply.get_amount() * double(usecs_between_fills) * continuous_rate / usecs_per_year ),
                            supply.get_amount() - initial_supply.get_amount() );
-      BOOST_REQUIRE_EQUAL( (supply.get_amount() - 
+      BOOST_REQUIRE_EQUAL( (supply.get_amount() - initial_supply.get_amount()) - (supply.get_amount() - initial_supply.get_amount()) / 5,
+                           savings - initial_savings );
+
+      int64_t to_producer        = int64_t( initial_supply.get_amount() * double(usecs_between_fills) * continuous_rate / usecs_per_year ) / 5;
+      int64_t to_perblock_bucket = to_producer / 4;
+      int64_t to_pervote_bucket  = to_producer - to_perblock_bucket;
+
+      if (to_pervote_bucket + initial_pervote_bucket >= 100 * 10000) {
+         BOOST_REQUIRE_EQUAL(to_perblock_bucket + to_pervote_bucket + initial_pervote_bucket, balance.get_amount() - initial_balance.get_amount());
+         BOOST_REQUIRE_EQUAL(0, pervote_bucket);
+      } else {
+         BOOST_REQUIRE_EQUAL(to_perblock_bucket, balance.get_amount() - initial_balance.get_amount());
+         BOOST_REQUIRE_EQUAL(to_pervote_bucket + initial_pervote_bucket, pervote_bucket);
+      }
+   }
+
+   // defproducerb tries to claim rewards but he's not on the list
+   {
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("unable to find key"),
+                          push_action("defproducerb"_n, "claimrewards"_n, mvo()("owner", "defproducerb")));
+   }
+
+   // test stability over a year
+   {
