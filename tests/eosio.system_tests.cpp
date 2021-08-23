@@ -1593,4 +1593,23 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
       const int64_t  initial_pervote_bucket    = initial_global_state["pervote_bucket"].as<int64_t>();
       const int64_t  initial_perblock_bucket   = initial_global_state["perblock_bucket"].as<int64_t>();
       const int64_t  initial_savings           = get_balance("eosio.saving"_n).get_amount();
-      const uint32_t initial_tot_u
+      const uint32_t initial_tot_unpaid_blocks = initial_global_state["total_unpaid_blocks"].as<uint32_t>();
+      const double   initial_tot_vote_weight   = initial_global_state["total_producer_vote_weight"].as<double>();
+
+      prod = get_producer_info("defproducera");
+      const uint32_t unpaid_blocks = prod["unpaid_blocks"].as<uint32_t>();
+      BOOST_REQUIRE(1 < unpaid_blocks);
+      BOOST_REQUIRE_EQUAL(initial_tot_unpaid_blocks, unpaid_blocks);
+      BOOST_REQUIRE(0 < prod["total_votes"].as<double>());
+      BOOST_TEST(initial_tot_vote_weight, prod["total_votes"].as<double>());
+      BOOST_REQUIRE(0 < microseconds_since_epoch_of_iso_string( prod["last_claim_time"] ));
+
+      BOOST_REQUIRE_EQUAL(initial_tot_unpaid_blocks, unpaid_blocks);
+
+      const asset initial_supply  = get_token_supply();
+      const asset initial_balance = get_balance("defproducera"_n);
+
+      BOOST_REQUIRE_EQUAL(success(), push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
+
+      const auto global_state          = get_global_state();
+      const uint64_t claim_time        = microseconds_since_epoch_of_iso_string( glo
