@@ -1653,3 +1653,20 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
 
    // test stability over a year
    {
+      regproducer("defproducerb"_n);
+      regproducer("defproducerc"_n);
+      produce_block(fc::hours(24));
+      const asset   initial_supply  = get_token_supply();
+      const int64_t initial_savings = get_balance("eosio.saving"_n).get_amount();
+      for (uint32_t i = 0; i < 7 * 52; ++i) {
+         produce_block(fc::seconds(8 * 3600));
+         BOOST_REQUIRE_EQUAL(success(), push_action("defproducerc"_n, "claimrewards"_n, mvo()("owner", "defproducerc")));
+         produce_block(fc::seconds(8 * 3600));
+         BOOST_REQUIRE_EQUAL(success(), push_action("defproducerb"_n, "claimrewards"_n, mvo()("owner", "defproducerb")));
+         produce_block(fc::seconds(8 * 3600));
+         BOOST_REQUIRE_EQUAL(success(), push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
+      }
+      const asset   supply  = get_token_supply();
+      const int64_t savings = get_balance("eosio.saving"_n).get_amount();
+      // Amount issued per year is very close to the 5% inflation target. Small difference (500 tokens out of 50'000'000 issued)
+      // is due to compounding every 8 hours in this test as op
