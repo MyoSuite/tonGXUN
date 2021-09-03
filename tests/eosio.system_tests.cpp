@@ -1669,4 +1669,25 @@ BOOST_FIXTURE_TEST_CASE(producer_pay, eosio_system_tester, * boost::unit_test::t
       const asset   supply  = get_token_supply();
       const int64_t savings = get_balance("eosio.saving"_n).get_amount();
       // Amount issued per year is very close to the 5% inflation target. Small difference (500 tokens out of 50'000'000 issued)
-      // is due to compounding every 8 hours in this test as op
+      // is due to compounding every 8 hours in this test as opposed to theoretical continuous compounding
+      BOOST_REQUIRE(500 * 10000 > int64_t(double(initial_supply.get_amount()) * double(0.05)) - (supply.get_amount() - initial_supply.get_amount()));
+      BOOST_REQUIRE(500 * 10000 > int64_t(double(initial_supply.get_amount()) * double(0.04)) - (savings - initial_savings));
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(change_inflation, eosio_system_tester) try {
+
+   {
+      BOOST_REQUIRE_EQUAL( success(),
+                           setinflation(0, 10000, 10000) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("annual_rate can't be negative"),
+                           setinflation(-1, 10000, 10000) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("inflation_pay_factor must not be less than 10000"),
+                           setinflation(1, 9999, 10000) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("votepay_factor must not be less than 10000"),
+                           setinflation(1, 10000, 9999) );
+   }
+
+   {
+      const asset large_asset = core_sym::from_string("80.0000");
+      create_account_with_resources( "defproducera"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large
