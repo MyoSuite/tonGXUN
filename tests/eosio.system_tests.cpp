@@ -1690,4 +1690,18 @@ BOOST_FIXTURE_TEST_CASE(change_inflation, eosio_system_tester) try {
 
    {
       const asset large_asset = core_sym::from_string("80.0000");
-      create_account_with_resources( "defproducera"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large
+      create_account_with_resources( "defproducera"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+      create_account_with_resources( "defproducerb"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+      create_account_with_resources( "defproducerc"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+
+      create_account_with_resources( "producvotera"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+      create_account_with_resources( "producvoterb"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+
+      BOOST_REQUIRE_EQUAL(success(), regproducer("defproducera"_n));
+      BOOST_REQUIRE_EQUAL(success(), regproducer("defproducerb"_n));
+      BOOST_REQUIRE_EQUAL(success(), regproducer("defproducerc"_n));
+
+      produce_block(fc::hours(24));
+
+      transfer( config::system_account_name, "producvotera", core_sym::from_string("400000000.0000"), config::system_account_name);
+      BOOST_REQUIRE_EQUAL(success(), stake("producvotera", core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000
