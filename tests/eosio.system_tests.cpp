@@ -1704,4 +1704,26 @@ BOOST_FIXTURE_TEST_CASE(change_inflation, eosio_system_tester) try {
       produce_block(fc::hours(24));
 
       transfer( config::system_account_name, "producvotera", core_sym::from_string("400000000.0000"), config::system_account_name);
-      BOOST_REQUIRE_EQUAL(success(), stake("producvotera", core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000
+      BOOST_REQUIRE_EQUAL(success(), stake("producvotera", core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000")));
+      BOOST_REQUIRE_EQUAL(success(), vote( "producvotera"_n, { "defproducera"_n,"defproducerb"_n,"defproducerc"_n }));
+
+      auto run_for_1year = [this](int64_t annual_rate, int64_t inflation_pay_factor, int64_t votepay_factor) {
+
+         double inflation = double(annual_rate)/double(10000);
+
+         BOOST_REQUIRE_EQUAL(success(), setinflation(
+            annual_rate,
+            inflation_pay_factor,
+            votepay_factor
+         ));
+
+         produce_block(fc::hours(24));
+         const asset   initial_supply  = get_token_supply();
+         const int64_t initial_savings = get_balance("eosio.saving"_n).get_amount();
+         for (uint32_t i = 0; i < 7 * 52; ++i) {
+            produce_block(fc::seconds(8 * 3600));
+            BOOST_REQUIRE_EQUAL(success(), push_action("defproducerc"_n, "claimrewards"_n, mvo()("owner", "defproducerc")));
+            produce_block(fc::seconds(8 * 3600));
+            BOOST_REQUIRE_EQUAL(success(), push_action("defproducerb"_n, "claimrewards"_n, mvo()("owner", "defproducerb")));
+            produce_block(fc::seconds(8 * 3600));
+            BOOST_REQUIRE_EQUAL(success(), push_action("defproducera"_n, "claimrewards"_n,
