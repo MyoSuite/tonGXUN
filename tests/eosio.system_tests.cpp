@@ -1726,4 +1726,25 @@ BOOST_FIXTURE_TEST_CASE(change_inflation, eosio_system_tester) try {
             produce_block(fc::seconds(8 * 3600));
             BOOST_REQUIRE_EQUAL(success(), push_action("defproducerb"_n, "claimrewards"_n, mvo()("owner", "defproducerb")));
             produce_block(fc::seconds(8 * 3600));
-            BOOST_REQUIRE_EQUAL(success(), push_action("defproducera"_n, "claimrewards"_n,
+            BOOST_REQUIRE_EQUAL(success(), push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
+         }
+         const asset   final_supply  = get_token_supply();
+         const int64_t final_savings = get_balance("eosio.saving"_n).get_amount();
+
+         double computed_new_tokens = double(final_supply.get_amount() - initial_supply.get_amount());
+         double theoretical_new_tokens = double(initial_supply.get_amount())*inflation;
+         double diff_new_tokens = std::abs(theoretical_new_tokens-computed_new_tokens);
+
+         if( annual_rate > 0 ) {
+            //Error should be less than 0.3%
+            BOOST_REQUIRE( diff_new_tokens/theoretical_new_tokens < double(0.003) );
+         } else {
+            BOOST_REQUIRE_EQUAL( computed_new_tokens, 0 );
+            BOOST_REQUIRE_EQUAL( theoretical_new_tokens, 0 );
+         }
+
+         double savings_inflation = inflation - inflation * 10000 / inflation_pay_factor;
+
+         double computed_savings_tokens = double(final_savings-initial_savings);
+         double theoretical_savings_tokens = double(initial_supply.get_amount())*savings_inflation;
+         double diff_savings_tokens = std::abs(theoretical_savings_token
