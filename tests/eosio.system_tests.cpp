@@ -1747,4 +1747,34 @@ BOOST_FIXTURE_TEST_CASE(change_inflation, eosio_system_tester) try {
 
          double computed_savings_tokens = double(final_savings-initial_savings);
          double theoretical_savings_tokens = double(initial_supply.get_amount())*savings_inflation;
-         double diff_savings_tokens = std::abs(theoretical_savings_token
+         double diff_savings_tokens = std::abs(theoretical_savings_tokens-computed_savings_tokens);
+
+         if( annual_rate > 0 ) {
+            //Error should be less than 0.3%
+            BOOST_REQUIRE( diff_savings_tokens/theoretical_savings_tokens < double(0.003) );
+         } else {
+            BOOST_REQUIRE_EQUAL( computed_savings_tokens, 0 );
+            BOOST_REQUIRE_EQUAL( theoretical_savings_tokens, 0 );
+         }
+      };
+
+      // 1% inflation for 1 year. 50% savings / 50% bp reward. 10000 / 50000 = 0.2 => 20% blockpay, 80% votepay
+      run_for_1year(100, 20000, 50000);
+
+      // 3% inflation for 1 year. 66.6% savings / 33.33% bp reward. 10000/13333 = 0.75 => 75% blockpay, 25% votepay
+      run_for_1year(300, 30000, 13333);
+
+      // 0% inflation for 1 year
+      run_for_1year(0, 30000, 50000);
+   }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(extreme_inflation) try {
+   eosio_system_tester t(eosio_system_tester::setup_level::minimal);
+   symbol core_symbol{CORE_SYM};
+   t.create_currency( "eosio.token"_n, config::system_account_name, asset((1ll << 62) - 1, core_symbol) );
+   t.issue( asset(10000000000000, core_symbol) );
+   t.deploy_contract();
+   t.produce_block();
+   t.
