@@ -1805,4 +1805,23 @@ BOOST_AUTO_TEST_CASE(extreme_inflation) try {
    t.produce_block(fc::hours(24));
    BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("overflow in calculating new tokens to be issued; inflation rate is too high"), t.push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
    BOOST_REQUIRE_EQUAL(t.success(), t.setinflation(500, 50000, 40000));
-   BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("quantity exceeds available supply"), t.push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "def
+   BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("quantity exceeds available supply"), t.push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::unit_test::tolerance(1e-10)) try {
+
+   const int64_t secs_per_year  = 52 * 7 * 24 * 3600;
+   const double  usecs_per_year = secs_per_year * 1000000;
+   const double  cont_rate      = std::log1p(double(0.05));
+
+   const asset net = core_sym::from_string("80.0000");
+   const asset cpu = core_sym::from_string("80.0000");
+   const std::vector<account_name> voters = { "producvotera"_n, "producvoterb"_n, "producvoterc"_n, "producvoterd"_n };
+   for (const auto& v: voters) {
+      create_account_with_resources( v, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu );
+      transfer( config::system_account_name, v, core_sym::from_string("100000000.0000"), config::system_account_name );
+      BOOST_REQUIRE_EQUAL(success(), stake(v, core_sym::from_string("30000000.0000"), core_sym::from_string("30000000.0000")) );
+   }
+
+   // create accounts {defproducera, defproducerb, ..., defproducerz, abcproducera, ..., defproducern} and register as producers
+   std:
