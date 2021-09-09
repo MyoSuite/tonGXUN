@@ -1777,4 +1777,17 @@ BOOST_AUTO_TEST_CASE(extreme_inflation) try {
    t.issue( asset(10000000000000, core_symbol) );
    t.deploy_contract();
    t.produce_block();
-   t.
+   t.create_account_with_resources("defproducera"_n, config::system_account_name, core_sym::from_string("1.0000"), false);
+   BOOST_REQUIRE_EQUAL(t.success(), t.regproducer("defproducera"_n));
+   t.transfer( config::system_account_name, "defproducera", core_sym::from_string("200000000.0000"), config::system_account_name);
+   BOOST_REQUIRE_EQUAL(t.success(), t.stake("defproducera", core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000")));
+   BOOST_REQUIRE_EQUAL(t.success(), t.vote( "defproducera"_n, { "defproducera"_n }));
+   t.produce_blocks(4);
+   t.produce_block(fc::hours(24));
+
+   BOOST_REQUIRE_EQUAL(t.success(), t.push_action("defproducera"_n, "claimrewards"_n, mvo()("owner", "defproducera")));
+   t.produce_block();
+   asset current_supply;
+   {
+      vector<char> data = t.get_row_by_account( "eosio.token"_n, name(core_symbol.to_symbol_code().value), "stat"_n, account_name(core_symbol.to_symbol_code().value) );
+      current_supply = t.token_abi_ser.binary_to_variant("currency_stats", data, abi_serializer::create_yield_function(eosio_system_tester::abi_serializer_max_time))["
