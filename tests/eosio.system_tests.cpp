@@ -1824,4 +1824,36 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
    }
 
    // create accounts {defproducera, defproducerb, ..., defproducerz, abcproducera, ..., defproducern} and register as producers
-   std:
+   std::vector<account_name> producer_names;
+   {
+      producer_names.reserve('z' - 'a' + 1);
+      {
+         const std::string root("defproducer");
+         for ( char c = 'a'; c <= 'z'; ++c ) {
+            producer_names.emplace_back(root + std::string(1, c));
+         }
+      }
+      {
+         const std::string root("abcproducer");
+         for ( char c = 'a'; c <= 'n'; ++c ) {
+            producer_names.emplace_back(root + std::string(1, c));
+         }
+      }
+      setup_producer_accounts(producer_names);
+      for (const auto& p: producer_names) {
+         BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
+         produce_blocks(1);
+         ilog( "------ get pro----------" );
+         wdump((p));
+         BOOST_TEST(0 == get_producer_info(p)["total_votes"].as<double>());
+      }
+   }
+
+   produce_block( fc::hours(24) );
+
+   // producvotera votes for defproducera ... defproducerj
+   // producvoterb votes for defproducera ... defproduceru
+   // producvoterc votes for defproducera ... defproducerz
+   // producvoterd votes for abcproducera ... abcproducern
+   {
+      BOOST_REQUIRE_EQUAL(success(), vote("producvotera"
