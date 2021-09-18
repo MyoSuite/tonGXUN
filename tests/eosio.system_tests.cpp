@@ -1856,4 +1856,22 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
    // producvoterc votes for defproducera ... defproducerz
    // producvoterd votes for abcproducera ... abcproducern
    {
-      BOOST_REQUIRE_EQUAL(success(), vote("producvotera"
+      BOOST_REQUIRE_EQUAL(success(), vote("producvotera"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+10)));
+      BOOST_REQUIRE_EQUAL(success(), vote("producvoterb"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+21)));
+      BOOST_REQUIRE_EQUAL(success(), vote("producvoterc"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+26)));
+      BOOST_REQUIRE_EQUAL(success(), vote("producvoterd"_n, vector<account_name>(producer_names.begin()+26, producer_names.end())));
+   }
+
+   {
+      auto proda = get_producer_info( "defproducera"_n );
+      auto prodj = get_producer_info( "defproducerj"_n );
+      auto prodk = get_producer_info( "defproducerk"_n );
+      auto produ = get_producer_info( "defproduceru"_n );
+      auto prodv = get_producer_info( "defproducerv"_n );
+      auto prodz = get_producer_info( "defproducerz"_n );
+
+      BOOST_REQUIRE (0 == proda["unpaid_blocks"].as<uint32_t>() && 0 == prodz["unpaid_blocks"].as<uint32_t>());
+
+      // check vote ratios
+      BOOST_REQUIRE ( 0 < proda["total_votes"].as<double>() && 0 < prodz["total_votes"].as<double>() );
+      BOOST_TEST( 
