@@ -1899,4 +1899,27 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
       BOOST_REQUIRE(all_21_produced && rest_didnt_produce);
    }
 
-   std::vector<double> vote_shares(producer_names.size()
+   std::vector<double> vote_shares(producer_names.size());
+   {
+      double total_votes = 0;
+      for (uint32_t i = 0; i < producer_names.size(); ++i) {
+         vote_shares[i] = get_producer_info(producer_names[i])["total_votes"].as<double>();
+         total_votes += vote_shares[i];
+      }
+      BOOST_TEST(total_votes == get_global_state()["total_producer_vote_weight"].as<double>());
+      std::for_each(vote_shares.begin(), vote_shares.end(), [total_votes](double& x) { x /= total_votes; });
+
+      BOOST_TEST(double(1) == std::accumulate(vote_shares.begin(), vote_shares.end(), double(0)));
+      BOOST_TEST(double(3./71.) == vote_shares.front());
+      BOOST_TEST(double(1./71.) == vote_shares.back());
+   }
+
+   {
+      const uint32_t prod_index = 2;
+      const auto prod_name = producer_names[prod_index];
+
+      const auto     initial_global_state      = get_global_state();
+      const uint64_t initial_claim_time        = microseconds_since_epoch_of_iso_string( initial_global_state["last_pervote_bucket_fill"] );
+      const int64_t  initial_pervote_bucket    = initial_global_state["pervote_bucket"].as<int64_t>();
+      const int64_t  initial_perblock_bucket   = initial_global_state["perblock_bucket"].as<int64_t>();
+      const int6
