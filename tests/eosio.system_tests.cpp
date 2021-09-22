@@ -1874,4 +1874,29 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
 
       // check vote ratios
       BOOST_REQUIRE ( 0 < proda["total_votes"].as<double>() && 0 < prodz["total_votes"].as<double>() );
-      BOOST_TEST( 
+      BOOST_TEST( proda["total_votes"].as<double>() == prodj["total_votes"].as<double>() );
+      BOOST_TEST( prodk["total_votes"].as<double>() == produ["total_votes"].as<double>() );
+      BOOST_TEST( prodv["total_votes"].as<double>() == prodz["total_votes"].as<double>() );
+      BOOST_TEST( 2 * proda["total_votes"].as<double>() == 3 * produ["total_votes"].as<double>() );
+      BOOST_TEST( proda["total_votes"].as<double>() ==  3 * prodz["total_votes"].as<double>() );
+   }
+
+   // give a chance for everyone to produce blocks
+   {
+      produce_blocks(23 * 12 + 20);
+      bool all_21_produced = true;
+      for (uint32_t i = 0; i < 21; ++i) {
+         if (0 == get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+            all_21_produced = false;
+         }
+      }
+      bool rest_didnt_produce = true;
+      for (uint32_t i = 21; i < producer_names.size(); ++i) {
+         if (0 < get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+            rest_didnt_produce = false;
+         }
+      }
+      BOOST_REQUIRE(all_21_produced && rest_didnt_produce);
+   }
+
+   std::vector<double> vote_shares(producer_names.size()
