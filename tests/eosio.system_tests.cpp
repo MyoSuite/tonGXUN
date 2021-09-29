@@ -1967,4 +1967,31 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
          BOOST_REQUIRE( within_one( from_perblock_bucket, balance.get_amount() - initial_balance.get_amount() ) );
          BOOST_REQUIRE( within_one( expected_pervote_bucket, pervote_bucket ) );
          BOOST_REQUIRE( within_one( expected_pervote_bucket, vpay_balance.get_amount() ) );
- 
+         BOOST_REQUIRE( within_one( perblock_bucket, bpay_balance.get_amount() ) );
+      }
+
+      produce_blocks(5);
+
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("already claimed rewards within past day"),
+                          push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name)));
+   }
+
+   {
+      const uint32_t prod_index = 23;
+      const auto prod_name = producer_names[prod_index];
+      BOOST_REQUIRE_EQUAL(success(),
+                          push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name)));
+      BOOST_REQUIRE_EQUAL(0, get_balance(prod_name).get_amount());
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("already claimed rewards within past day"),
+                          push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name)));
+   }
+
+   // Wait for 23 hours. By now, pervote_bucket has grown enough
+   // that a producer's share is more than 100 tokens.
+   produce_block(fc::seconds(23 * 3600));
+
+   {
+      const uint32_t prod_index = 15;
+      const auto prod_name = producer_names[prod_index];
+
+      const auto     initial_global_state      = get_global_state()
