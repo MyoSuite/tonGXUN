@@ -1994,4 +1994,19 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
       const uint32_t prod_index = 15;
       const auto prod_name = producer_names[prod_index];
 
-      const auto     initial_global_state      = get_global_state()
+      const auto     initial_global_state      = get_global_state();
+      const uint64_t initial_claim_time        = microseconds_since_epoch_of_iso_string( initial_global_state["last_pervote_bucket_fill"] );
+      const int64_t  initial_pervote_bucket    = initial_global_state["pervote_bucket"].as<int64_t>();
+      const int64_t  initial_perblock_bucket   = initial_global_state["perblock_bucket"].as<int64_t>();
+      const int64_t  initial_savings           = get_balance("eosio.saving"_n).get_amount();
+      const uint32_t initial_tot_unpaid_blocks = initial_global_state["total_unpaid_blocks"].as<uint32_t>();
+      const asset    initial_supply            = get_token_supply();
+      const asset    initial_bpay_balance      = get_balance("eosio.bpay"_n);
+      const asset    initial_vpay_balance      = get_balance("eosio.vpay"_n);
+      const asset    initial_balance           = get_balance(prod_name);
+      const uint32_t initial_unpaid_blocks     = get_producer_info(prod_name)["unpaid_blocks"].as<uint32_t>();
+
+      BOOST_REQUIRE_EQUAL(success(), push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name)));
+
+      const auto     global_state      = get_global_state();
+     
