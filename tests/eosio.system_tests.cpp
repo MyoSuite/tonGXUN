@@ -2055,4 +2055,23 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
       const uint32_t prod_index = 24;
       const auto prod_name = producer_names[prod_index];
       BOOST_REQUIRE_EQUAL(success(),
-                          
+                          push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name)));
+      BOOST_REQUIRE(100 * 10000 <= get_balance(prod_name).get_amount());
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("already claimed rewards within past day"),
+                          push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name)));
+   }
+
+   {
+      const uint32_t rmv_index = 5;
+      account_name prod_name = producer_names[rmv_index];
+
+      auto info = get_producer_info(prod_name);
+      BOOST_REQUIRE( info["is_active"].as<bool>() );
+      BOOST_REQUIRE( fc::crypto::public_key() != fc::crypto::public_key(info["producer_key"].as_string()) );
+
+      BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
+                           push_action(prod_name, "rmvproducer"_n, mvo()("producer", prod_name)));
+      BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
+                           push_action(producer_names[rmv_index + 2], "rmvproducer"_n, mvo()("producer", prod_name) ) );
+      BOOST_REQUIRE_EQUAL( success(),
+                           push_action(config::system_account_name, "rmvproducer"_n, mvo()("producer",
