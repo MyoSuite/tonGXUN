@@ -2074,4 +2074,27 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
       BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
                            push_action(producer_names[rmv_index + 2], "rmvproducer"_n, mvo()("producer", prod_name) ) );
       BOOST_REQUIRE_EQUAL( success(),
-                           push_action(config::system_account_name, "rmvproducer"_n, mvo()("producer",
+                           push_action(config::system_account_name, "rmvproducer"_n, mvo()("producer", prod_name) ) );
+      {
+         bool rest_didnt_produce = true;
+         for (uint32_t i = 21; i < producer_names.size(); ++i) {
+            if (0 < get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+               rest_didnt_produce = false;
+            }
+         }
+         BOOST_REQUIRE(rest_didnt_produce);
+      }
+
+      produce_blocks(3 * 21 * 12);
+      info = get_producer_info(prod_name);
+      const uint32_t init_unpaid_blocks = info["unpaid_blocks"].as<uint32_t>();
+      BOOST_REQUIRE( !info["is_active"].as<bool>() );
+      BOOST_REQUIRE( fc::crypto::public_key() == fc::crypto::public_key(info["producer_key"].as_string()) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("producer does not have an active key"),
+                           push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name) ) );
+      produce_blocks(3 * 21 * 12);
+      BOOST_REQUIRE_EQUAL( init_unpaid_blocks, get_producer_info(prod_name)["unpaid_blocks"].as<uint32_t>() );
+      {
+         bool prod_was_replaced = false;
+         for (uint32_t i = 21; i < producer_names.size(); ++i) {
+            if (0 < get_producer_info(producer_names[i])
