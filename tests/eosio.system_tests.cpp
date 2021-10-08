@@ -2097,4 +2097,32 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
       {
          bool prod_was_replaced = false;
          for (uint32_t i = 21; i < producer_names.size(); ++i) {
-            if (0 < get_producer_info(producer_names[i])
+            if (0 < get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+               prod_was_replaced = true;
+            }
+         }
+         BOOST_REQUIRE(prod_was_replaced);
+      }
+   }
+
+   {
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("producer not found"),
+                           push_action( config::system_account_name, "rmvproducer"_n, mvo()("producer", "nonexistingp") ) );
+   }
+
+   produce_block(fc::hours(24));
+
+   // switch to new producer pay metric
+   {
+      BOOST_REQUIRE_EQUAL( 0, get_global_state2()["revision"].as<uint8_t>() );
+      BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
+                           push_action(producer_names[1], "updtrevision"_n, mvo()("revision", 1) ) );
+      BOOST_REQUIRE_EQUAL( success(),
+                           push_action(config::system_account_name, "updtrevision"_n, mvo()("revision", 1) ) );
+      BOOST_REQUIRE_EQUAL( 1, get_global_state2()["revision"].as<uint8_t>() );
+
+      const uint32_t prod_index = 2;
+      const auto prod_name = producer_names[prod_index];
+
+      const auto     initial_prod_info         = get_producer_info(prod_name);
+     
