@@ -2125,4 +2125,14 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
       const auto prod_name = producer_names[prod_index];
 
       const auto     initial_prod_info         = get_producer_info(prod_name);
-     
+      const auto     initial_prod_info2        = get_producer_info2(prod_name);
+      const auto     initial_global_state      = get_global_state();
+      const double   initial_tot_votepay_share = get_global_state2()["total_producer_votepay_share"].as_double();
+      const double   initial_tot_vpay_rate     = get_global_state3()["total_vpay_share_change_rate"].as_double();
+      const uint64_t initial_vpay_state_update = microseconds_since_epoch_of_iso_string( get_global_state3()["last_vpay_state_update"] );
+      const uint64_t initial_bucket_fill_time  = microseconds_since_epoch_of_iso_string( initial_global_state["last_pervote_bucket_fill"] );
+      const int64_t  initial_pervote_bucket    = initial_global_state["pervote_bucket"].as<int64_t>();
+      const int64_t  initial_perblock_bucket   = initial_global_state["perblock_bucket"].as<int64_t>();
+      const uint32_t initial_tot_unpaid_blocks = initial_global_state["total_unpaid_blocks"].as<uint32_t>();
+      const asset    initial_supply            = get_token_supply();
+      const asset    initial_balance           = get_balance
