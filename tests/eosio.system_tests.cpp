@@ -2174,4 +2174,24 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_pay, eosio_system_tester, * boost::uni
       BOOST_REQUIRE_EQUAL( int64_t(expected_supply_growth), supply.get_amount() - initial_supply.get_amount() );
       BOOST_REQUIRE_EQUAL( claim_time, vpay_state_update );
       BOOST_REQUIRE( 100 * 10000 < from_pervote_bucket );
-      BOOST_CHECK_EQUAL( expected_pervote_bucket - fr
+      BOOST_CHECK_EQUAL( expected_pervote_bucket - from_pervote_bucket, pervote_bucket );
+      BOOST_CHECK_EQUAL( from_perblock_bucket + from_pervote_bucket, balance.get_amount() - initial_balance.get_amount() );
+      BOOST_TEST_REQUIRE( 0 == get_producer_info2(prod_name)["votepay_share"].as_double() );
+
+      produce_block(fc::hours(2));
+
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("already claimed rewards within past day"),
+                           push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name) ) );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE(multiple_producer_votepay_share, eosio_system_tester, * boost::unit_test::tolerance(1e-10)) try {
+
+   const asset net = core_sym::from_string("80.0000");
+   const asset cpu = core_sym::from_string("80.0000");
+   const std::vector<account_name> voters = { "producvotera"_n, "producvoterb"_n, "producvoterc"_n, "producvoterd"_n };
+   for (const auto& v: voters) {
+      create_account_with_resources( v, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu );
+      transfer( config::system_account_name, v, core_sym::from_string("100000000.0000"), config::system_account_n
