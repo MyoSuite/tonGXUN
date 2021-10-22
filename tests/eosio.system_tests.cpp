@@ -2241,3 +2241,15 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_votepay_share, eosio_system_tester, * 
       const auto& init_info2 = get_producer_info2(producer_names[0]);
       uint64_t init_update = microseconds_since_epoch_of_iso_string( init_info2["last_votepay_share_update"] );
       double   init_votes  = init_info["total_votes"].as_double();
+      BOOST_REQUIRE_EQUAL( success(), vote("producvoterb"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+21)) );
+      const auto& info  = get_producer_info(producer_names[0]);
+      const auto& info2 = get_producer_info2(producer_names[0]);
+      BOOST_TEST_REQUIRE( ((microseconds_since_epoch_of_iso_string( info2["last_votepay_share_update"] ) - init_update)/double(1E6)) * init_votes == info2["votepay_share"].as_double() );
+      BOOST_TEST_REQUIRE( info2["votepay_share"].as_double() * 10 == get_global_state2()["total_producer_votepay_share"].as_double() );
+
+      BOOST_TEST_REQUIRE( 0 == get_producer_info2(producer_names[11])["votepay_share"].as_double() );
+      produce_block( fc::hours(13) );
+      BOOST_REQUIRE_EQUAL( success(), vote("producvoterc"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+26)) );
+      BOOST_REQUIRE( 0 < get_producer_info2(producer_names[11])["votepay_share"].as_double() );
+      produce_block( fc::hours(1) );
+      BOOST_REQUIRE_EQUAL( success(), vote("producvoterd"_n, vector<account_na
