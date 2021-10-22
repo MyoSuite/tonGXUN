@@ -2194,4 +2194,31 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_votepay_share, eosio_system_tester, * 
    const std::vector<account_name> voters = { "producvotera"_n, "producvoterb"_n, "producvoterc"_n, "producvoterd"_n };
    for (const auto& v: voters) {
       create_account_with_resources( v, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu );
-      transfer( config::system_account_name, v, core_sym::from_string("100000000.0000"), config::system_account_n
+      transfer( config::system_account_name, v, core_sym::from_string("100000000.0000"), config::system_account_name );
+      BOOST_REQUIRE_EQUAL(success(), stake(v, core_sym::from_string("30000000.0000"), core_sym::from_string("30000000.0000")) );
+   }
+
+   // create accounts {defproducera, defproducerb, ..., defproducerz, abcproducera, ..., defproducern} and register as producers
+   std::vector<account_name> producer_names;
+   {
+      producer_names.reserve('z' - 'a' + 1);
+      {
+         const std::string root("defproducer");
+         for ( char c = 'a'; c <= 'z'; ++c ) {
+            producer_names.emplace_back(root + std::string(1, c));
+         }
+      }
+      {
+         const std::string root("abcproducer");
+         for ( char c = 'a'; c <= 'n'; ++c ) {
+            producer_names.emplace_back(root + std::string(1, c));
+         }
+      }
+      setup_producer_accounts(producer_names);
+      for (const auto& p: producer_names) {
+         BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
+         produce_blocks(1);
+         ilog( "------ get pro----------" );
+         wdump((p));
+         BOOST_TEST_REQUIRE(0 == get_producer_info(p)["total_votes"].as_double());
+         BOOST_TEST_REQUIRE(0 == get_produ
