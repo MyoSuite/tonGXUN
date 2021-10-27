@@ -2288,4 +2288,22 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_votepay_share, eosio_system_tester, * 
                            microseconds_since_epoch_of_iso_string( get_global_state3()["last_vpay_state_update"] ) );
 
       std::for_each( vote_shares.begin(), vote_shares.end(), [total_votes](double& x) { x /= total_votes; } );
-      BOOST_TEST_REQUIRE( double(1) == std::accumulate(vote_shares.begin(), vote_shares.e
+      BOOST_TEST_REQUIRE( double(1) == std::accumulate(vote_shares.begin(), vote_shares.end(), double(0)) );
+      BOOST_TEST_REQUIRE( double(3./71.) == vote_shares.front() );
+      BOOST_TEST_REQUIRE( double(1./71.) == vote_shares.back() );
+   }
+
+   std::vector<double> votepay_shares(producer_names.size());
+   {
+      const auto& gs3 = get_global_state3();
+      double total_votepay_shares          = 0;
+      double expected_total_votepay_shares = 0;
+      for (uint32_t i = 0; i < producer_names.size() ; ++i) {
+         const auto& info  = get_producer_info(producer_names[i]);
+         const auto& info2 = get_producer_info2(producer_names[i]);
+         votepay_shares[i] = info2["votepay_share"].as_double();
+         total_votepay_shares          += votepay_shares[i];
+         expected_total_votepay_shares += votepay_shares[i];
+         expected_total_votepay_shares += info["total_votes"].as_double()
+                                           * double( ( microseconds_since_epoch_of_iso_string( gs3["last_vpay_state_update"] )
+                                                        - microseconds_since_epoch_of_iso_string( info2["last_vote
