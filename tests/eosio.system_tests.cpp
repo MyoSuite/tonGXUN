@@ -2252,4 +2252,23 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_votepay_share, eosio_system_tester, * 
       BOOST_REQUIRE_EQUAL( success(), vote("producvoterc"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+26)) );
       BOOST_REQUIRE( 0 < get_producer_info2(producer_names[11])["votepay_share"].as_double() );
       produce_block( fc::hours(1) );
-      BOOST_REQUIRE_EQUAL( success(), vote("producvoterd"_n, vector<account_na
+      BOOST_REQUIRE_EQUAL( success(), vote("producvoterd"_n, vector<account_name>(producer_names.begin()+26, producer_names.end())) );
+      BOOST_TEST_REQUIRE( 0 == get_producer_info2(producer_names[26])["votepay_share"].as_double() );
+   }
+
+   {
+      auto proda = get_producer_info( "defproducera"_n );
+      auto prodj = get_producer_info( "defproducerj"_n );
+      auto prodk = get_producer_info( "defproducerk"_n );
+      auto produ = get_producer_info( "defproduceru"_n );
+      auto prodv = get_producer_info( "defproducerv"_n );
+      auto prodz = get_producer_info( "defproducerz"_n );
+
+      BOOST_REQUIRE (0 == proda["unpaid_blocks"].as<uint32_t>() && 0 == prodz["unpaid_blocks"].as<uint32_t>());
+
+      // check vote ratios
+      BOOST_REQUIRE ( 0 < proda["total_votes"].as_double() && 0 < prodz["total_votes"].as_double() );
+      BOOST_TEST_REQUIRE( proda["total_votes"].as_double() == prodj["total_votes"].as_double() );
+      BOOST_TEST_REQUIRE( prodk["total_votes"].as_double() == produ["total_votes"].as_double() );
+      BOOST_TEST_REQUIRE( prodv["total_votes"].as_double() == prodz["total_votes"].as_double() );
+      BOOST_TEST_REQUIRE( 2 * proda["total_vote
