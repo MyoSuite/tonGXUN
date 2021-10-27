@@ -2306,4 +2306,23 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_votepay_share, eosio_system_tester, * 
          expected_total_votepay_shares += votepay_shares[i];
          expected_total_votepay_shares += info["total_votes"].as_double()
                                            * double( ( microseconds_since_epoch_of_iso_string( gs3["last_vpay_state_update"] )
-                                                        - microseconds_since_epoch_of_iso_string( info2["last_vote
+                                                        - microseconds_since_epoch_of_iso_string( info2["last_votepay_share_update"] )
+                                                     ) / 1E6 );
+      }
+      BOOST_TEST( expected_total_votepay_shares > total_votepay_shares );
+      BOOST_TEST_REQUIRE( expected_total_votepay_shares == get_global_state2()["total_producer_votepay_share"].as_double() );
+   }
+
+   {
+      const uint32_t prod_index = 15;
+      const account_name prod_name = producer_names[prod_index];
+      const auto& init_info        = get_producer_info(prod_name);
+      const auto& init_info2       = get_producer_info2(prod_name);
+      BOOST_REQUIRE( 0 < init_info2["votepay_share"].as_double() );
+      BOOST_REQUIRE( 0 < microseconds_since_epoch_of_iso_string( init_info2["last_votepay_share_update"] ) );
+
+      BOOST_REQUIRE_EQUAL( success(), push_action(prod_name, "claimrewards"_n, mvo()("owner", prod_name)) );
+
+      BOOST_TEST_REQUIRE( 0 == get_producer_info2(prod_name)["votepay_share"].as_double() );
+      BOOST_REQUIRE_EQUAL( get_producer_info(prod_name)["last_claim_time"].as_string(),
+                           get_producer_info2(prod_name)["last_votepay_share_update"].as_string() );
