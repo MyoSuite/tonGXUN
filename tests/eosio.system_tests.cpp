@@ -2344,4 +2344,26 @@ BOOST_FIXTURE_TEST_CASE(multiple_producer_votepay_share, eosio_system_tester, * 
 
 } FC_LOG_AND_RETHROW()
 
-BOOS
+BOOST_FIXTURE_TEST_CASE(votepay_share_invariant, eosio_system_tester, * boost::unit_test::tolerance(1e-10)) try {
+
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   const asset net = core_sym::from_string("80.0000");
+   const asset cpu = core_sym::from_string("80.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n };
+   for (const auto& a: accounts) {
+      create_account_with_resources( a, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu );
+      transfer( config::system_account_name, a, core_sym::from_string("1000.0000"), config::system_account_name );
+   }
+   const auto vota  = accounts[0];
+   const auto votb  = accounts[1];
+   const auto proda = accounts[2];
+   const auto prodb = accounts[3];
+
+   BOOST_REQUIRE_EQUAL( success(), stake( vota, core_sym::from_string("100.0000"), core_sym::from_string("100.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), stake( votb, core_sym::from_string("100.0000"), core_sym::from_string("100.0000") ) );
+
+   BOOST_REQUIRE_EQUAL( success(), regproducer
