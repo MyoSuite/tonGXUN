@@ -2366,4 +2366,36 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_invariant, eosio_system_tester, * boost::u
    BOOST_REQUIRE_EQUAL( success(), stake( vota, core_sym::from_string("100.0000"), core_sym::from_string("100.0000") ) );
    BOOST_REQUIRE_EQUAL( success(), stake( votb, core_sym::from_string("100.0000"), core_sym::from_string("100.0000") ) );
 
-   BOOST_REQUIRE_EQUAL( success(), regproducer
+   BOOST_REQUIRE_EQUAL( success(), regproducer( proda ) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( prodb ) );
+
+   BOOST_REQUIRE_EQUAL( success(), vote( vota, { proda } ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( votb, { prodb } ) );
+
+   produce_block( fc::hours(25) );
+
+   BOOST_REQUIRE_EQUAL( success(), vote( vota, { proda } ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( votb, { prodb } ) );
+
+   produce_block( fc::hours(1) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_action(proda, "claimrewards"_n, mvo()("owner", proda)) );
+   BOOST_TEST_REQUIRE( 0 == get_producer_info2(proda)["votepay_share"].as_double() );
+
+   produce_block( fc::hours(24) );
+
+   BOOST_REQUIRE_EQUAL( success(), vote( vota, { proda } ) );
+
+   produce_block( fc::hours(24) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_action(prodb, "claimrewards"_n, mvo()("owner", prodb)) );
+   BOOST_TEST_REQUIRE( 0 == get_producer_info2(prodb)["votepay_share"].as_double() );
+
+   produce_block( fc::hours(10) );
+
+   BOOST_REQUIRE_EQUAL( success(), vote( votb, { prodb } ) );
+
+   produce_block( fc::hours(16) );
+
+   BOOST_REQUIRE_EQUAL( success(), vote( votb, { prodb } ) );
+   produce_block( fc::hours
