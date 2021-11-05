@@ -2398,4 +2398,30 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_invariant, eosio_system_tester, * boost::u
    produce_block( fc::hours(16) );
 
    BOOST_REQUIRE_EQUAL( success(), vote( votb, { prodb } ) );
-   produce_block( fc::hours
+   produce_block( fc::hours(2) );
+   BOOST_REQUIRE_EQUAL( success(), vote( vota, { proda } ) );
+
+   const auto& info  = get_producer_info(prodb);
+   const auto& info2 = get_producer_info2(prodb);
+   const auto& gs2   = get_global_state2();
+   const auto& gs3   = get_global_state3();
+
+   double expected_total_vpay_share = info2["votepay_share"].as_double()
+                                       + info["total_votes"].as_double()
+                                          * ( microseconds_since_epoch_of_iso_string( gs3["last_vpay_state_update"] )
+                                               - microseconds_since_epoch_of_iso_string( info2["last_votepay_share_update"] ) ) / 1E6;
+
+   BOOST_TEST_REQUIRE( expected_total_vpay_share == gs2["total_producer_votepay_share"].as_double() );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(votepay_share_proxy, eosio_system_tester, * boost::unit_test::tolerance(1e-5)) try {
+
+   // TELOS BEGIN
+   activate_network();
+   // cross_15_percent_threshold();
+   // TELOS END
+
+   const asset net = core_sym::from_string("80.0000");
+   const asset cpu = core_sym::from_string("80.0000");
+   const std::vector<account_name> accounts = { "alicea
