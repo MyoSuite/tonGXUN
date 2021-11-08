@@ -2444,4 +2444,21 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_proxy, eosio_system_tester, * boost::unit_
 
    // bob chooses alice as proxy
    BOOST_REQUIRE_EQUAL( success(), stake( bob, core_sym::from_string("100.0002"), core_sym::from_string("50.0001") ) );
-   BOOST_REQUIRE_EQUAL( success(), stake( alice, core_sym::from_string("150.0000"), core_sym::from_string("150.0000") ) )
+   BOOST_REQUIRE_EQUAL( success(), stake( alice, core_sym::from_string("150.0000"), core_sym::from_string("150.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( bob, { }, alice ) );
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("150.0003")) == get_voter_info(alice)["proxied_vote_weight"].as_double() );
+
+   // alice (proxy) votes for carol
+   BOOST_REQUIRE_EQUAL( success(), vote( alice, { carol } ) );
+   double total_votes = get_producer_info(carol)["total_votes"].as_double();
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("450.0003")) == total_votes );
+   BOOST_TEST_REQUIRE( 0 == get_producer_info2(carol)["votepay_share"].as_double() );
+   uint64_t last_update_time = microseconds_since_epoch_of_iso_string( get_producer_info2(carol)["last_votepay_share_update"] );
+
+   produce_block( fc::hours(15) );
+
+   // alice (proxy) votes again for carol
+   BOOST_REQUIRE_EQUAL( success(), vote( alice, { carol } ) );
+   auto cur_info2 = get_producer_info2(carol);
+   double expected_votepay_share = double( (microseconds_since_epoch_of_iso_string( cur_info2["last_votepay_share_update"] ) - last_update_time) / 1E6 ) * total_votes;
+   BOOST_TEST_REQUIRE( stake2votes(core_sym::from_string("450.0003")) == get_producer_info(caro
