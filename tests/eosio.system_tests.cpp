@@ -2424,4 +2424,24 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_proxy, eosio_system_tester, * boost::unit_
 
    const asset net = core_sym::from_string("80.0000");
    const asset cpu = core_sym::from_string("80.0000");
-   const std::vector<account_name> accounts = { "alicea
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n };
+   for (const auto& a: accounts) {
+      create_account_with_resources( a, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu );
+      transfer( config::system_account_name, a, core_sym::from_string("1000.0000"), config::system_account_name );
+   }
+   const auto alice = accounts[0];
+   const auto bob   = accounts[1];
+   const auto carol = accounts[2];
+   const auto emily = accounts[3];
+
+   // alice becomes a proxy
+   BOOST_REQUIRE_EQUAL( success(), push_action( alice, "regproxy"_n, mvo()("proxy", alice)("isproxy", true) ) );
+   REQUIRE_MATCHING_OBJECT( proxy( alice ), get_voter_info( alice ) );
+
+   // carol and emily become producers
+   BOOST_REQUIRE_EQUAL( success(), regproducer( carol, 1) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( emily, 1) );
+
+   // bob chooses alice as proxy
+   BOOST_REQUIRE_EQUAL( success(), stake( bob, core_sym::from_string("100.0002"), core_sym::from_string("50.0001") ) );
+   BOOST_REQUIRE_EQUAL( success(), stake( alice, core_sym::from_string("150.0000"), core_sym::from_string("150.0000") ) )
