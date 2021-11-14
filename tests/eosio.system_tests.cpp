@@ -2497,4 +2497,21 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_proxy, eosio_system_tester, * boost::unit_
 
    // bob votes for carol again
    // carol hasn't claimed rewards in over 3 days
-   total_votes = get_producer_info(carol)["total
+   total_votes = get_producer_info(carol)["total_votes"].as_double();
+   BOOST_REQUIRE_EQUAL( success(), vote( bob, { carol } ) );
+   BOOST_REQUIRE_EQUAL( get_producer_info2(carol)["last_votepay_share_update"].as_string(),
+                        get_global_state3()["last_vpay_state_update"].as_string() );
+   BOOST_TEST_REQUIRE( 0 == get_producer_info2(carol)["votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( 0 == get_global_state2()["total_producer_votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( 0 == get_global_state3()["total_vpay_share_change_rate"].as_double() );
+
+   produce_block( fc::hours(20) );
+
+   // bob votes for carol again
+   // carol still hasn't claimed rewards
+   BOOST_REQUIRE_EQUAL( success(), vote( bob, { carol } ) );
+   BOOST_REQUIRE_EQUAL(get_producer_info2(carol)["last_votepay_share_update"].as_string(),
+                       get_global_state3()["last_vpay_state_update"].as_string() );
+   BOOST_TEST_REQUIRE( 0 == get_producer_info2(carol)["votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( 0 == get_global_state2()["total_producer_votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( 0 == get_global_state3()["total_vpay_share_chan
