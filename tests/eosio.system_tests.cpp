@@ -2534,4 +2534,21 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_proxy, eosio_system_tester, * boost::unit_
    auto cur_info2_emily = get_producer_info2(emily);
 
    expected_votepay_share = double( (microseconds_since_epoch_of_iso_string( cur_info2["last_votepay_share_update"] ) - last_update_time) / 1E6 ) * total_votes;
-   BOOST_TEST_REQUIRE( expected_votepay_share == cur_info2["votep
+   BOOST_TEST_REQUIRE( expected_votepay_share == cur_info2["votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( 0                      == cur_info2_emily["votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( expected_votepay_share == get_global_state2()["total_producer_votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( get_producer_info(carol)["total_votes"].as_double() ==
+                       get_global_state3()["total_vpay_share_change_rate"].as_double() );
+   BOOST_REQUIRE_EQUAL( cur_info2["last_votepay_share_update"].as_string(),
+                        get_global_state3()["last_vpay_state_update"].as_string() );
+   BOOST_REQUIRE_EQUAL( cur_info2_emily["last_votepay_share_update"].as_string(),
+                        get_global_state3()["last_vpay_state_update"].as_string() );
+
+   produce_block( fc::hours(10) );
+
+   // bob chooses alice as proxy
+   // emily still hasn't claimed rewards
+   last_update_time = microseconds_since_epoch_of_iso_string( get_producer_info2(carol)["last_votepay_share_update"] );
+   BOOST_REQUIRE_EQUAL( success(), vote( bob, { }, alice ) );
+   cur_info2 = get_producer_info2(carol);
+   cur_info2_emily = get_producer_info2(
