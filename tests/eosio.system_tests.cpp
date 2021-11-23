@@ -2593,4 +2593,27 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_update_order, eosio_system_tester, * boost
    BOOST_REQUIRE_EQUAL( success(), stake( alice, core_sym::from_string("100.0000"), core_sym::from_string("100.0000") ) );
    BOOST_REQUIRE_EQUAL( success(), stake( bob,   core_sym::from_string("100.0000"), core_sym::from_string("100.0000") ) );
 
-   BOOST_
+   BOOST_REQUIRE_EQUAL( success(), vote( alice, { carol, emily } ) );
+
+
+   BOOST_REQUIRE_EQUAL( success(), push_action( carol, "claimrewards"_n, mvo()("owner", carol) ) );
+   produce_block( fc::hours(1) );
+   BOOST_REQUIRE_EQUAL( success(), push_action( emily, "claimrewards"_n, mvo()("owner", emily) ) );
+
+   produce_block( fc::hours(3 * 24 + 1) );
+
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      trx.actions.emplace_back( get_action( config::system_account_name, "claimrewards"_n, { {carol, config::active_name} },
+                                            mvo()("owner", carol) ) );
+
+      std::vector<account_name> prods = { carol, emily };
+      trx.actions.emplace_back( get_action( config::system_account_name, "voteproducer"_n, { {alice, config::active_name} },
+                                            mvo()("voter", alice)("proxy", name(0))("producers", prods) ) );
+
+      trx.actions.emplace_back( get_action( config::system_account_name, "claimrewards"_n, { {emily, config::active_name} },
+                                            mvo()("owner", emily) ) );
+
+      trx.sign( get_private_key( carol, "active
