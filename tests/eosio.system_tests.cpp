@@ -2616,4 +2616,22 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_update_order, eosio_system_tester, * boost
       trx.actions.emplace_back( get_action( config::system_account_name, "claimrewards"_n, { {emily, config::active_name} },
                                             mvo()("owner", emily) ) );
 
-      trx.sign( get_private_key( carol, "active
+      trx.sign( get_private_key( carol, "active" ), control->get_chain_id() );
+      trx.sign( get_private_key( alice, "active" ), control->get_chain_id() );
+      trx.sign( get_private_key( emily, "active" ), control->get_chain_id() );
+
+      push_transaction( trx );
+   }
+
+   const auto& carol_info  = get_producer_info(carol);
+   const auto& carol_info2 = get_producer_info2(carol);
+   const auto& emily_info  = get_producer_info(emily);
+   const auto& emily_info2 = get_producer_info2(emily);
+   const auto& gs3         = get_global_state3();
+   BOOST_REQUIRE_EQUAL( carol_info2["last_votepay_share_update"].as_string(), gs3["last_vpay_state_update"].as_string() );
+   BOOST_REQUIRE_EQUAL( emily_info2["last_votepay_share_update"].as_string(), gs3["last_vpay_state_update"].as_string() );
+   BOOST_TEST_REQUIRE( 0  == carol_info2["votepay_share"].as_double() );
+   BOOST_TEST_REQUIRE( 0  == emily_info2["votepay_share"].as_double() );
+   BOOST_REQUIRE( 0 < carol_info["total_votes"].as_double() );
+   BOOST_TEST_REQUIRE( carol_info["total_votes"].as_double() == emily_info["total_votes"].as_double() );
+   BOOST_TEST_REQUIRE( gs3["total_vpay_share_change_rate"].as_double() == 2 * carol_inf
