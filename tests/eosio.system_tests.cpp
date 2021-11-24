@@ -2634,4 +2634,26 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_update_order, eosio_system_tester, * boost
    BOOST_TEST_REQUIRE( 0  == emily_info2["votepay_share"].as_double() );
    BOOST_REQUIRE( 0 < carol_info["total_votes"].as_double() );
    BOOST_TEST_REQUIRE( carol_info["total_votes"].as_double() == emily_info["total_votes"].as_double() );
-   BOOST_TEST_REQUIRE( gs3["total_vpay_share_change_rate"].as_double() == 2 * carol_inf
+   BOOST_TEST_REQUIRE( gs3["total_vpay_share_change_rate"].as_double() == 2 * carol_info["total_votes"].as_double() );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(votepay_transition, eosio_system_tester, * boost::unit_test::tolerance(1e-10)) try {
+
+   const asset net = core_sym::from_string("80.0000");
+   const asset cpu = core_sym::from_string("80.0000");
+   const std::vector<account_name> voters = { "producvotera"_n, "producvoterb"_n, "producvoterc"_n, "producvoterd"_n };
+   for (const auto& v: voters) {
+      create_account_with_resources( v, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu );
+      transfer( config::system_account_name, v, core_sym::from_string("100000000.0000"), config::system_account_name );
+      BOOST_REQUIRE_EQUAL(success(), stake(v, core_sym::from_string("30000000.0000"), core_sym::from_string("30000000.0000")) );
+   }
+
+   // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
+   std::vector<account_name> producer_names;
+   {
+      producer_names.reserve('z' - 'a' + 1);
+      {
+         const std::string root("defproducer");
+         for ( char c = 'a'; c <= 'd'; ++c ) {
+            producer_names.emplace_ba
