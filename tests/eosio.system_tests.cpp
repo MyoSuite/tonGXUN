@@ -2656,4 +2656,25 @@ BOOST_FIXTURE_TEST_CASE(votepay_transition, eosio_system_tester, * boost::unit_t
       {
          const std::string root("defproducer");
          for ( char c = 'a'; c <= 'd'; ++c ) {
-            producer_names.emplace_ba
+            producer_names.emplace_back(root + std::string(1, c));
+         }
+      }
+      setup_producer_accounts(producer_names);
+      for (const auto& p: producer_names) {
+         BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
+         BOOST_TEST_REQUIRE(0 == get_producer_info(p)["total_votes"].as_double());
+         BOOST_TEST_REQUIRE(0 == get_producer_info2(p)["votepay_share"].as_double());
+         BOOST_REQUIRE(0 < microseconds_since_epoch_of_iso_string( get_producer_info2(p)["last_votepay_share_update"] ));
+      }
+   }
+
+   BOOST_REQUIRE_EQUAL( success(), vote("producvotera"_n, vector<account_name>(producer_names.begin(), producer_names.end())) );
+   auto* tbl = control->db().find<eosio::chain::table_id_object, eosio::chain::by_code_scope_table>(
+                  boost::make_tuple( config::system_account_name,
+                                     config::system_account_name,
+                                     "producers2"_n ) );
+   BOOST_REQUIRE( tbl );
+   BOOST_REQUIRE( 0 < microseconds_since_epoch_of_iso_string( get_producer_info2("defproducera")["last_votepay_share_update"] ) );
+
+   // const_cast hack for now
+   const_cast<chainbase::d
