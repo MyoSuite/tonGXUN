@@ -2693,4 +2693,24 @@ BOOST_FIXTURE_TEST_CASE(votepay_transition, eosio_system_tester, * boost::unit_t
    BOOST_REQUIRE_EQUAL( success(), regproducer("defproducera"_n) );
    BOOST_REQUIRE( microseconds_since_epoch_of_iso_string( get_producer_info("defproducera"_n)["last_claim_time"] ) < microseconds_since_epoch_of_iso_string( get_producer_info2("defproducera"_n)["last_votepay_share_update"] ) );
 
-   create_account_with_resources( "defproducer1"_n, co
+   create_account_with_resources( "defproducer1"_n, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu );
+   BOOST_REQUIRE_EQUAL( success(), regproducer("defproducer1"_n) );
+   BOOST_REQUIRE( 0 < microseconds_since_epoch_of_iso_string( get_producer_info("defproducer1"_n)["last_claim_time"] ) );
+   BOOST_REQUIRE_EQUAL( get_producer_info("defproducer1"_n)["last_claim_time"].as_string(),
+                        get_producer_info2("defproducer1"_n)["last_votepay_share_update"].as_string() );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_AUTO_TEST_CASE(votepay_transition2, * boost::unit_test::tolerance(1e-10)) try {
+   eosio_system_tester t(eosio_system_tester::setup_level::minimal);
+
+   std::string old_contract_core_symbol_name = "SYS"; // Set to core symbol used in contracts::util::system_wasm_old()
+   symbol old_contract_core_symbol{::eosio::chain::string_to_symbol_c( 4, old_contract_core_symbol_name.c_str() )};
+
+   auto old_core_from_string = [&]( const std::string& s ) {
+      return eosio::chain::asset::from_string(s + " " + old_contract_core_symbol_name);
+   };
+
+   t.create_core_token( old_contract_core_symbol );
+   t.set_abi(  config::system_account_name, contracts::util::syst
