@@ -2730,4 +2730,25 @@ BOOST_AUTO_TEST_CASE(votepay_transition2, * boost::unit_test::tolerance(1e-10)) 
    }
 
    // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
-   std::vector<account_name> p
+   std::vector<account_name> producer_names;
+   {
+      producer_names.reserve('z' - 'a' + 1);
+      {
+         const std::string root("defproducer");
+         for ( char c = 'a'; c <= 'd'; ++c ) {
+            producer_names.emplace_back(root + std::string(1, c));
+         }
+      }
+     t.setup_producer_accounts( producer_names, old_core_from_string("1.0000"),
+                     old_core_from_string("80.0000"), old_core_from_string("80.0000") );
+      for (const auto& p: producer_names) {
+         BOOST_REQUIRE_EQUAL( t.success(), t.regproducer(p) );
+         BOOST_TEST_REQUIRE(0 == t.get_producer_info(p)["total_votes"].as_double());
+      }
+   }
+
+   BOOST_REQUIRE_EQUAL( t.success(), t.vote("producvotera"_n, vector<account_name>(producer_names.begin(), producer_names.end())) );
+   t.produce_block( fc::hours(20) );
+   BOOST_REQUIRE_EQUAL( t.success(), t.vote("producvoterb"_n, vector<account_name>(producer_names.begin(), producer_names.end())) );
+   t.produce_block( fc::hours(30) );
+   BOOST_REQUIRE_EQUAL( t.success(), t.vote("producvoterc"_n, vector<account_name>(producer_names.begin(), producer
