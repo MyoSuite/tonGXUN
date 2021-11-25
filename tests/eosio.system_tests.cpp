@@ -2713,4 +2713,21 @@ BOOST_AUTO_TEST_CASE(votepay_transition2, * boost::unit_test::tolerance(1e-10)) 
    };
 
    t.create_core_token( old_contract_core_symbol );
-   t.set_abi(  config::system_account_name, contracts::util::syst
+   t.set_abi(  config::system_account_name, contracts::util::system_abi_old().data() );
+   {
+      const auto& accnt = t.control->db().get<account_object,by_name>( config::system_account_name );
+      abi_def abi;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+      t.abi_ser.set_abi(abi, abi_serializer::create_yield_function(eosio_system_tester::abi_serializer_max_time));
+   }
+   const asset net = old_core_from_string("80.0000");
+   const asset cpu = old_core_from_string("80.0000");
+   const std::vector<account_name> voters = { "producvotera"_n, "producvoterb"_n, "producvoterc"_n, "producvoterd"_n };
+   for (const auto& v: voters) {
+      t.create_account_with_resources( v, config::system_account_name, old_core_from_string("1.0000"), false, net, cpu );
+      t.transfer( config::system_account_name, v, old_core_from_string("100000000.0000"), config::system_account_name );
+      BOOST_REQUIRE_EQUAL(t.success(), t.stake(v, old_core_from_string("30000000.0000"), old_core_from_string("30000000.0000")) );
+   }
+
+   // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
+   std::vector<account_name> p
