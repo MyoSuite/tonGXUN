@@ -2845,4 +2845,26 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, eosio_system_tester) 
    }
 
    BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "propose"_n, mvo()
-                                                    ("proposer",   
+                                                    ("proposer",      "alice1111111")
+                                                    ("proposal_name", "upgrade1")
+                                                    ("trx",           trx)
+                                                    ("requested", prod_perms)
+                       )
+   );
+
+   // get 15 approvals
+   for ( size_t i = 0; i < 14; ++i ) {
+      BOOST_REQUIRE_EQUAL(success(), push_action_msig( name(producer_names[i]), "approve"_n, mvo()
+                                                       ("proposer",      "alice1111111")
+                                                       ("proposal_name", "upgrade1")
+                                                       ("level",         permission_level{ name(producer_names[i]), config::active_name })
+                          )
+      );
+   }
+
+   //should fail
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("transaction authorization failed"),
+                       push_action_msig( "alice1111111"_n, "exec"_n, mvo()
+                                         ("proposer",      "alice1111111")
+                                         ("proposal_name", "upgrade1")
+                         
