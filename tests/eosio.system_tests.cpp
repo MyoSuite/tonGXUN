@@ -2769,4 +2769,31 @@ BOOST_AUTO_TEST_CASE(votepay_transition2, * boost::unit_test::tolerance(1e-10)) 
 
    BOOST_REQUIRE_EQUAL( t.success(), t.push_action(producer_names[0], "claimrewards"_n, mvo()("owner", producer_names[0])) );
    BOOST_TEST_REQUIRE( 0 == t.get_global_state2()["total_producer_votepay_share"].as_double() );
-   BOOST_TEST_REQUIRE( t.get_producer_info(producer_names[0])["total_votes"].as_double() == t.get_global_state3
+   BOOST_TEST_REQUIRE( t.get_producer_info(producer_names[0])["total_votes"].as_double() == t.get_global_state3()["total_vpay_share_change_rate"].as_double() );
+
+   t.produce_block( fc::hours(5) );
+
+   BOOST_REQUIRE_EQUAL( t.success(), t.regproducer(producer_names[1]) );
+   BOOST_TEST_REQUIRE( t.get_producer_info(producer_names[0])["total_votes"].as_double() + t.get_producer_info(producer_names[1])["total_votes"].as_double() ==
+                       t.get_global_state3()["total_vpay_share_change_rate"].as_double() );
+
+} FC_LOG_AND_RETHROW()
+*/
+// TELOS END
+
+
+BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, eosio_system_tester) try {
+   //install multisig contract
+   abi_serializer msig_abi_ser = initialize_multisig();
+   auto producer_names = active_and_vote_producers();
+
+   //change `default_max_inline_action_size` to 512 KB
+   eosio::chain::chain_config params = control->get_global_properties().configuration;
+   params.max_inline_action_size = 512 * 1024;
+   base_tester::push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
+                              ("params", params) );
+
+   produce_blocks();
+
+   //helper function
+   auto push_action_msig = [&]( const a
