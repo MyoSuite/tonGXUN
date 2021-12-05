@@ -2796,4 +2796,28 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, eosio_system_tester) 
    produce_blocks();
 
    //helper function
-   auto push_action_msig = [&]( const a
+   auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
+         string action_type_name = msig_abi_ser.get_action_type(name);
+
+         action act;
+         act.account = "eosio.msig"_n;
+         act.name = name;
+         act.data = msig_abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+
+         return base_tester::push_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
+   };
+   // test begins
+   vector<permission_level> prod_perms;
+   for ( auto& x : producer_names ) {
+      prod_perms.push_back( { name(x), config::active_name } );
+   }
+
+   transaction trx;
+   {
+      //prepare system contract with different hash (contract differs in one byte)
+      auto code = contracts::system_wasm();
+      string msg = "producer votes must be unique and sorted";
+      auto it = std::search( code.begin(), code.end(), msg.begin(), msg.end() );
+      BOOST_REQUIRE( it != code.end() );
+      msg[0] = 'P';
+      std::copy( msg.begin(
