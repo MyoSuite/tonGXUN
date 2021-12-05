@@ -2820,4 +2820,29 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, eosio_system_tester) 
       auto it = std::search( code.begin(), code.end(), msg.begin(), msg.end() );
       BOOST_REQUIRE( it != code.end() );
       msg[0] = 'P';
-      std::copy( msg.begin(
+      std::copy( msg.begin(), msg.end(), it );
+
+      fc::variant pretty_trx = fc::mutable_variant_object()
+         ("expiration", "2020-01-01T00:30")
+         ("ref_block_num", 2)
+         ("ref_block_prefix", 3)
+         ("net_usage_words", 0)
+         ("max_cpu_usage_ms", 0)
+         ("delay_sec", 0)
+         ("actions", fc::variants({
+               fc::mutable_variant_object()
+                  ("account", name(config::system_account_name))
+                  ("name", "setcode")
+                  ("authorization", vector<permission_level>{ { config::system_account_name, config::active_name } })
+                  ("data", fc::mutable_variant_object() ("account", name(config::system_account_name))
+                   ("vmtype", 0)
+                   ("vmversion", "0")
+                   ("code", bytes( code.begin(), code.end() ))
+                  )
+                  })
+         );
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "propose"_n, mvo()
+                                                    ("proposer",   
