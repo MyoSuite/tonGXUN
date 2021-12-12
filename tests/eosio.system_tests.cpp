@@ -2867,4 +2867,29 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, eosio_system_tester) 
                        push_action_msig( "alice1111111"_n, "exec"_n, mvo()
                                          ("proposer",      "alice1111111")
                                          ("proposal_name", "upgrade1")
-                         
+                                         ("executer",      "alice1111111")
+                       )
+   );
+
+   // one more approval
+   BOOST_REQUIRE_EQUAL(success(), push_action_msig( name(producer_names[14]), "approve"_n, mvo()
+                                                    ("proposer",      "alice1111111")
+                                                    ("proposal_name", "upgrade1")
+                                                    ("level",         permission_level{ name(producer_names[14]), config::active_name })
+                          )
+   );
+
+   transaction_trace_ptr trace;
+   control->applied_transaction.connect(
+   [&]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> p ) {
+      trace = std::get<0>(p);
+   } );
+
+   BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "exec"_n, mvo()
+                                                    ("proposer",      "alice1111111")
+                                                    ("proposal_name", "upgrade1")
+                                                    ("executer",      "alice1111111")
+                       )
+   );
+
+   BOOST_REQUIRE( bool(trace) 
