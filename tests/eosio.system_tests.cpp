@@ -2892,4 +2892,24 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, eosio_system_tester) 
                        )
    );
 
-   BOOST_REQUIRE( bool(trace) 
+   BOOST_REQUIRE( bool(trace) );
+   BOOST_REQUIRE_EQUAL( 1, trace->action_traces.size() );
+   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+
+   produce_blocks( 250 );
+
+} FC_LOG_AND_RETHROW()
+
+// TELOS BEGIN: producer_onblock_check on telos.system_tests.cpp
+/*
+BOOST_FIXTURE_TEST_CASE(producer_onblock_check, eosio_system_tester) try {
+
+   const asset large_asset = core_sym::from_string("80.0000");
+   create_account_with_resources( "producvotera"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+   create_account_with_resources( "producvoterb"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+   create_account_with_resources( "producvoterc"_n, config::system_account_name, core_sym::from_string("1.0000"), false, large_asset, large_asset );
+
+   // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
+   std::vector<account_name> producer_names;
+   producer_names.reserve('z' - 'a' + 1);
+   const std::string root("defprodu
