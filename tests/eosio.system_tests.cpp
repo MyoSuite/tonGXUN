@@ -2912,4 +2912,25 @@ BOOST_FIXTURE_TEST_CASE(producer_onblock_check, eosio_system_tester) try {
    // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
    std::vector<account_name> producer_names;
    producer_names.reserve('z' - 'a' + 1);
-   const std::string root("defprodu
+   const std::string root("defproducer");
+   for ( char c = 'a'; c <= 'z'; ++c ) {
+      producer_names.emplace_back(root + std::string(1, c));
+   }
+   setup_producer_accounts(producer_names);
+
+   for (auto a:producer_names)
+      regproducer(a);
+
+   produce_block(fc::hours(24));
+
+   BOOST_REQUIRE_EQUAL(0, get_producer_info( producer_names.front() )["total_votes"].as<double>());
+   BOOST_REQUIRE_EQUAL(0, get_producer_info( producer_names.back() )["total_votes"].as<double>());
+
+
+   transfer(config::system_account_name, "producvotera", core_sym::from_string("200000000.0000"), config::system_account_name);
+   BOOST_REQUIRE_EQUAL(success(), stake("producvotera", core_sym::from_string("70000000.0000"), core_sym::from_string("70000000.0000") ));
+   BOOST_REQUIRE_EQUAL(success(), vote( "producvotera"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+10)));
+   BOOST_CHECK_EQUAL( wasm_assert_msg( "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)" ),
+                      unstake( "producvotera", core_sym::from_string("50.0000"), core_sym::from_string("50.0000") ) );
+
+   /
