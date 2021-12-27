@@ -2970,4 +2970,28 @@ BOOST_FIXTURE_TEST_CASE(producer_onblock_check, eosio_system_tester) try {
    BOOST_REQUIRE_EQUAL(success(), stake("producvoterc", core_sym::from_string("2000000.0000"), core_sym::from_string("2000000.0000")));
 
    BOOST_REQUIRE_EQUAL(success(), vote( "producvoterb"_n, vector<account_name>(producer_names.begin(), producer_names.begin()+21)));
-   BOOST_REQUIRE_EQUAL(success(), vote( "prod
+   BOOST_REQUIRE_EQUAL(success(), vote( "producvoterc"_n, vector<account_name>(producer_names.begin(), producer_names.end())));
+
+   // give a chance for everyone to produce blocks
+   {
+      produce_blocks(21 * 12);
+      bool all_21_produced = true;
+      for (uint32_t i = 0; i < 21; ++i) {
+         if (0 == get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+            all_21_produced= false;
+         }
+      }
+      bool rest_didnt_produce = true;
+      for (uint32_t i = 21; i < producer_names.size(); ++i) {
+         if (0 < get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+            rest_didnt_produce = false;
+         }
+      }
+      BOOST_REQUIRE_EQUAL(true, all_21_produced);
+      BOOST_REQUIRE_EQUAL(true, rest_didnt_produce);
+      BOOST_REQUIRE_EQUAL(success(),
+                          push_action(producer_names.front(), "claimrewards"_n, mvo()("owner", producer_names.front())));
+      BOOST_REQUIRE(0 < get_balance(producer_names.front()).get_amount());
+   }
+
+   BOOST_CHECK_EQUAL( success(), unstake( "producvotera", core_sym::from_string("50.00
