@@ -2994,4 +2994,27 @@ BOOST_FIXTURE_TEST_CASE(producer_onblock_check, eosio_system_tester) try {
       BOOST_REQUIRE(0 < get_balance(producer_names.front()).get_amount());
    }
 
-   BOOST_CHECK_EQUAL( success(), unstake( "producvotera", core_sym::from_string("50.00
+   BOOST_CHECK_EQUAL( success(), unstake( "producvotera", core_sym::from_string("50.0000"), core_sym::from_string("50.0000") ) );
+
+} FC_LOG_AND_RETHROW()
+*/
+// TELOS BEGIN: Disable proxy test
+/*
+BOOST_FIXTURE_TEST_CASE( voters_actions_affect_proxy_and_producers, eosio_system_tester, * boost::unit_test::tolerance(1e+6) ) try {
+   cross_15_percent_threshold();
+
+   create_accounts_with_resources( { "donald111111"_n, "defproducer1"_n, "defproducer2"_n, "defproducer3"_n } );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer1"_n, 1) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer2"_n, 2) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer3"_n, 3) );
+
+   //alice1111111 becomes a producer
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproxy"_n, mvo()
+                                                ("proxy",  "alice1111111")
+                                                ("isproxy", true)
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n ), get_voter_info( "alice1111111" ) );
+
+   //alice1111111 makes stake and votes
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_
