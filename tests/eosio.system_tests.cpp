@@ -3097,4 +3097,28 @@ BOOST_FIXTURE_TEST_CASE( vote_both_proxy_and_producers, eosio_system_tester ) tr
    issue_and_transfer( "bob111111111", core_sym::from_string("1000.0000"),  config::system_account_name );
    BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("100.0002"), core_sym::from_string("50.0001") ) );
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("cannot vote for producers and proxy at same time"),
-                        vote( "bob111111111"_n, { "carol1111111"_n }, "alic
+                        vote( "bob111111111"_n, { "carol1111111"_n }, "alice1111111" ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( select_invalid_proxy, eosio_system_tester ) try {
+   //accumulate proxied votes
+   issue_and_transfer( "bob111111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("100.0002"), core_sym::from_string("50.0001") ) );
+
+   //selecting account not registered as a proxy
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "invalid proxy specified" ),
+                        vote( "bob111111111"_n, vector<account_name>(), "alice1111111" ) );
+
+   //selecting not existing account as a proxy
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "invalid proxy specified" ),
+                        vote( "bob111111111"_n, vector<account_name>(), "notexist" ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( double_register_unregister_proxy_keeps_votes, eosio_system_tester ) try {
+   //alice1111111 becomes a proxy
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproxy"_n, mvo()
+                                                ("proxy", 
