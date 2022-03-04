@@ -3136,4 +3136,23 @@ BOOST_FIXTURE_TEST_CASE( double_register_unregister_proxy_keeps_votes, eosio_sys
    BOOST_REQUIRE_EQUAL( success(), vote( "bob111111111"_n, vector<account_name>(), "alice1111111" ) );
    REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )( "proxied_vote_weight", stake2votes( core_sym::from_string("150.0003") ))( "staked", 100000 ), get_voter_info( "alice1111111" ) );
 
-   //double regestering sho
+   //double regestering should fail without affecting total votes and stake
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "action has no effect" ),
+                        push_action( "alice1111111"_n, "regproxy"_n, mvo()
+                                     ("proxy",  "alice1111111")
+                                     ("isproxy",  1)
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( proxy( "alice1111111"_n )( "proxied_vote_weight", stake2votes(core_sym::from_string("150.0003")) )( "staked", 100000 ), get_voter_info( "alice1111111" ) );
+
+   //uregister
+   BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproxy"_n, mvo()
+                                                ("proxy",  "alice1111111")
+                                                ("isproxy",  0)
+                        )
+   );
+   REQUIRE_MATCHING_OBJECT( voter( "alice1111111" )( "proxied_vote_weight", stake2votes(core_sym::from_string("150.0003")) )( "staked", 100000 ), get_voter_info( "alice1111111" ) );
+
+   //double unregistering should not affect proxied_votes and stake
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "action has no effect" ),
+                        
