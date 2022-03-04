@@ -3179,4 +3179,17 @@ BOOST_FIXTURE_TEST_CASE( proxy_cannot_use_another_proxy, eosio_system_tester ) t
                         )
    );
 
-   //
+   //proxy should not be able to use a proxy
+   issue_and_transfer( "bob111111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("100.0002"), core_sym::from_string("50.0001") ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "account registered as a proxy is not allowed to use a proxy" ),
+                        vote( "bob111111111"_n, vector<account_name>(), "alice1111111" ) );
+
+   //voter that uses a proxy should not be allowed to become a proxy
+   issue_and_transfer( "carol1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), stake( "carol1111111", core_sym::from_string("100.0002"), core_sym::from_string("50.0001") ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( "carol1111111"_n, vector<account_name>(), "alice1111111" ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "account that uses a proxy is not allowed to become a proxy" ),
+                        push_action( "carol1111111"_n, "regproxy"_n, mvo()
+                                     ("proxy",  "carol1111111")
+                   
