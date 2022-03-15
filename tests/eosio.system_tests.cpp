@@ -3192,4 +3192,26 @@ BOOST_FIXTURE_TEST_CASE( proxy_cannot_use_another_proxy, eosio_system_tester ) t
    BOOST_REQUIRE_EQUAL( wasm_assert_msg( "account that uses a proxy is not allowed to become a proxy" ),
                         push_action( "carol1111111"_n, "regproxy"_n, mvo()
                                      ("proxy",  "carol1111111")
-                   
+                                     ("isproxy",  1)
+                        )
+   );
+
+   //proxy should not be able to use itself as a proxy
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "cannot proxy to self" ),
+                        vote( "bob111111111"_n, vector<account_name>(), "bob111111111" ) );
+
+} FC_LOG_AND_RETHROW()
+*/
+
+fc::mutable_variant_object config_to_variant( const eosio::chain::chain_config& config ) {
+   return mutable_variant_object()
+      ( "max_block_net_usage", config.max_block_net_usage )
+      ( "target_block_net_usage_pct", config.target_block_net_usage_pct )
+      ( "max_transaction_net_usage", config.max_transaction_net_usage )
+      ( "base_per_transaction_net_usage", config.base_per_transaction_net_usage )
+      ( "context_free_discount_net_usage_num", config.context_free_discount_net_usage_num )
+      ( "context_free_discount_net_usage_den", config.context_free_discount_net_usage_den )
+      ( "max_block_cpu_usage", config.max_block_cpu_usage )
+      ( "target_block_cpu_usage_pct", config.target_block_cpu_usage_pct )
+      ( "max_transaction_cpu_usage", config.max_transaction_cpu_usage )
+  
