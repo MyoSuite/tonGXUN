@@ -3214,4 +3214,21 @@ fc::mutable_variant_object config_to_variant( const eosio::chain::chain_config& 
       ( "max_block_cpu_usage", config.max_block_cpu_usage )
       ( "target_block_cpu_usage_pct", config.target_block_cpu_usage_pct )
       ( "max_transaction_cpu_usage", config.max_transaction_cpu_usage )
-  
+      ( "min_transaction_cpu_usage", config.min_transaction_cpu_usage )
+      ( "max_transaction_lifetime", config.max_transaction_lifetime )
+      ( "deferred_trx_expiration_window", config.deferred_trx_expiration_window )
+      ( "max_transaction_delay", config.max_transaction_delay )
+      ( "max_inline_action_size", config.max_inline_action_size )
+      ( "max_inline_action_depth", config.max_inline_action_depth )
+      ( "max_authority_depth", config.max_authority_depth );
+}
+
+BOOST_FIXTURE_TEST_CASE( elect_producers /*_and_parameters*/, eosio_system_tester ) try {
+   create_accounts_with_resources( {  "defproducer1"_n, "defproducer2"_n, "defproducer3"_n } );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer1"_n, 1) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer2"_n, 2) );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "defproducer3"_n, 3) );
+
+   //stake more than 15% of total EOS supply to activate chain
+   transfer( "eosio", "alice1111111", core_sym::from_string("600000000.0000"), "eosio" );
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "alice1111111", core_sym::from_string("3
