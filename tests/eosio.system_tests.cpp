@@ -3231,4 +3231,25 @@ BOOST_FIXTURE_TEST_CASE( elect_producers /*_and_parameters*/, eosio_system_teste
 
    //stake more than 15% of total EOS supply to activate chain
    transfer( "eosio", "alice1111111", core_sym::from_string("600000000.0000"), "eosio" );
-   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "alice1111111", core_sym::from_string("3
+   BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111", "alice1111111", core_sym::from_string("300000000.0000"), core_sym::from_string("300000000.0000") ) );
+   //vote for producers
+   BOOST_REQUIRE_EQUAL( success(), vote( "alice1111111"_n, { "defproducer1"_n } ) );
+   // TELOS BEGIN
+   activate_network();
+   // TELOS END
+   produce_blocks(250);
+   auto producer_keys = control->head_block_state()->active_schedule.producers;
+   BOOST_REQUIRE_EQUAL( 1, producer_keys.size() );
+   BOOST_REQUIRE_EQUAL( name("defproducer1"), producer_keys[0].producer_name );
+
+   //auto config = config_to_variant( control->get_global_properties().configuration );
+   //auto prod1_config = testing::filter_fields( config, producer_parameters_example( 1 ) );
+   //REQUIRE_EQUAL_OBJECTS(prod1_config, config);
+
+   // elect 2 producers
+   issue_and_transfer( "bob111111111", core_sym::from_string("80000.0000"),  config::system_account_name );
+   ilog("stake");
+   BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("40000.0000"), core_sym::from_string("40000.0000") ) );
+   ilog("start vote");
+   BOOST_REQUIRE_EQUAL( success(), vote( "bob111111111"_n, { "defproducer2"_n } ) );
+   ilo
