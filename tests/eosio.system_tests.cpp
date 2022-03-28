@@ -3252,4 +3252,22 @@ BOOST_FIXTURE_TEST_CASE( elect_producers /*_and_parameters*/, eosio_system_teste
    BOOST_REQUIRE_EQUAL( success(), stake( "bob111111111", core_sym::from_string("40000.0000"), core_sym::from_string("40000.0000") ) );
    ilog("start vote");
    BOOST_REQUIRE_EQUAL( success(), vote( "bob111111111"_n, { "defproducer2"_n } ) );
-   ilo
+   ilog(".");
+   produce_blocks(250);
+   producer_keys = control->head_block_state()->active_schedule.producers;
+   BOOST_REQUIRE_EQUAL( 2, producer_keys.size() );
+   BOOST_REQUIRE_EQUAL( name("defproducer1"), producer_keys[0].producer_name );
+   BOOST_REQUIRE_EQUAL( name("defproducer2"), producer_keys[1].producer_name );
+   //config = config_to_variant( control->get_global_properties().configuration );
+   //auto prod2_config = testing::filter_fields( config, producer_parameters_example( 2 ) );
+   //REQUIRE_EQUAL_OBJECTS(prod2_config, config);
+
+   // elect 3 producers
+   BOOST_REQUIRE_EQUAL( success(), vote( "bob111111111"_n, { "defproducer2"_n, "defproducer3"_n } ) );
+   produce_blocks(250);
+   producer_keys = control->head_block_state()->active_schedule.producers;
+   BOOST_REQUIRE_EQUAL( 3, producer_keys.size() );
+   BOOST_REQUIRE_EQUAL( name("defproducer1"), producer_keys[0].producer_name );
+   BOOST_REQUIRE_EQUAL( name("defproducer2"), producer_keys[1].producer_name );
+   BOOST_REQUIRE_EQUAL( name("defproducer3"), producer_keys[2].producer_name );
+   //config = config
