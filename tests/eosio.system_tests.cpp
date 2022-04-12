@@ -3295,4 +3295,21 @@ BOOST_FIXTURE_TEST_CASE( elect_producers /*_and_parameters*/, eosio_system_teste
 
 BOOST_FIXTURE_TEST_CASE( buyname, eosio_system_tester ) try {
    create_accounts_with_resources( { "dan"_n, "sam"_n } );
-   transfer( config::s
+   transfer( config::system_account_name, "dan", core_sym::from_string( "10000.0000" ) );
+   transfer( config::system_account_name, "sam", core_sym::from_string( "10000.0000" ) );
+   stake_with_transfer( config::system_account_name, "sam"_n, core_sym::from_string( "80000000.0000" ), core_sym::from_string( "80000000.0000" ) );
+   stake_with_transfer( config::system_account_name, "dan"_n, core_sym::from_string( "80000000.0000" ), core_sym::from_string( "80000000.0000" ) );
+
+   regproducer( config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), vote( "sam"_n, { config::system_account_name } ) );
+   // TELOS BEGIN
+   activate_network();
+   // TELOS END
+   // wait 14 days after min required amount has been staked
+   produce_block( fc::days(7) );
+   BOOST_REQUIRE_EQUAL( success(), vote( "dan"_n, { config::system_account_name } ) );
+   produce_block( fc::days(7) );
+   produce_block();
+
+   BOOST_REQUIRE_EXCEPTION( create_accounts_with_resources( { "fail"_n }, "dan"_n ), // dan shouldn't be able to create fail
+                            eosio_assert_message_exception, eosio
