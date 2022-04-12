@@ -3312,4 +3312,18 @@ BOOST_FIXTURE_TEST_CASE( buyname, eosio_system_tester ) try {
    produce_block();
 
    BOOST_REQUIRE_EXCEPTION( create_accounts_with_resources( { "fail"_n }, "dan"_n ), // dan shouldn't be able to create fail
-                            eosio_assert_message_exception, eosio
+                            eosio_assert_message_exception, eosio_assert_message_is( "no active bid for name" ) );
+   bidname( "dan", "nofail", core_sym::from_string( "1.0000" ) );
+   BOOST_REQUIRE_EQUAL( "assertion failure with message: must increase bid by 10%", bidname( "sam", "nofail", core_sym::from_string( "1.0000" ) )); // didn't increase bid by 10%
+   BOOST_REQUIRE_EQUAL( success(), bidname( "sam", "nofail", core_sym::from_string( "2.0000" ) )); // didn't increase bid by 10%
+   produce_block( fc::days(1) );
+   produce_block();
+
+   BOOST_REQUIRE_EXCEPTION( create_accounts_with_resources( { "nofail"_n }, "dan"_n ), // dan shoudn't be able to do this, sam won
+                            eosio_assert_message_exception, eosio_assert_message_is( "only highest bidder can claim" ) );
+   //wlog( "verify sam can create nofail" );
+   create_accounts_with_resources( { "nofail"_n }, "sam"_n ); // sam should be able to do this, he won the bid
+   //wlog( "verify nofail can create test.nofail" );
+   transfer( "eosio", "nofail", core_sym::from_string( "1000.0000" ) );
+   create_accounts_with_resources( { "test.nofail"_n }, "nofail"_n ); // only nofail can create test.nofail
+   //wlog( "verify dan ca
