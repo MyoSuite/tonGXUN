@@ -3326,4 +3326,23 @@ BOOST_FIXTURE_TEST_CASE( buyname, eosio_system_tester ) try {
    //wlog( "verify nofail can create test.nofail" );
    transfer( "eosio", "nofail", core_sym::from_string( "1000.0000" ) );
    create_accounts_with_resources( { "test.nofail"_n }, "nofail"_n ); // only nofail can create test.nofail
-   //wlog( "verify dan ca
+   //wlog( "verify dan cannot create test.fail" );
+   BOOST_REQUIRE_EXCEPTION( create_accounts_with_resources( { "test.fail"_n }, "dan"_n ), // dan shouldn't be able to do this
+                            eosio_assert_message_exception, eosio_assert_message_is( "only suffix may create this account" ) );
+
+   create_accounts_with_resources( { "goodgoodgood"_n }, "dan"_n ); /// 12 char names should succeed
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( bid_invalid_names, eosio_system_tester ) try {
+   create_accounts_with_resources( { "dan"_n } );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "you can only bid on top-level suffix" ),
+                        bidname( "dan", "abcdefg.12345", core_sym::from_string( "1.0000" ) ) );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "the empty name is not a valid account name to bid on" ),
+                        bidname( "dan", "", core_sym::from_string( "1.0000" ) ) );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "13 character names are not valid account names to bid on" ),
+                        bidname( "dan", "abcdefgh12345", core_sym::from_string( "1.0000" ) ) );
+
+   BOOST_REQU
