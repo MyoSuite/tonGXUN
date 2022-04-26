@@ -3366,4 +3366,21 @@ BOOST_FIXTURE_TEST_CASE( multiple_namebids, eosio_system_tester ) try {
    produce_block();
    // stake but but not enough to go live
    stake_with_transfer( config::system_account_name, "bob"_n,  core_sym::from_string( "35000000.0000" ), core_sym::from_string( "35000000.0000" ) );
-   stake_with_transfer( config::system_ac
+   stake_with_transfer( config::system_account_name, "carl"_n, core_sym::from_string( "35000000.0000" ), core_sym::from_string( "35000000.0000" ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( "bob"_n, { "producer"_n } ) );
+   BOOST_REQUIRE_EQUAL( success(), vote( "carl"_n, { "producer"_n } ) );
+
+   // start bids
+   bidname( "bob",  "prefa", core_sym::from_string("1.0003") );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string( "9998.9997" ), get_balance("bob") );
+   bidname( "bob",  "prefb", core_sym::from_string("1.0000") );
+   bidname( "bob",  "prefc", core_sym::from_string("1.0000") );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string( "9996.9997" ), get_balance("bob") );
+
+   bidname( "carl", "prefd", core_sym::from_string("1.0000") );
+   bidname( "carl", "prefe", core_sym::from_string("1.0000") );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string( "9998.0000" ), get_balance("carl") );
+
+   BOOST_REQUIRE_EQUAL( error("assertion failure with message: account is already highest bidder"),
+                        bidname( "bob", "prefb", core_sym::from_string("1.1001") ) );
+   BOOST_REQUIRE_EQUAL( error("assertion failure with m
