@@ -3345,4 +3345,25 @@ BOOST_FIXTURE_TEST_CASE( bid_invalid_names, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( wasm_assert_msg( "13 character names are not valid account names to bid on" ),
                         bidname( "dan", "abcdefgh12345", core_sym::from_string( "1.0000" ) ) );
 
-   BOOST_REQU
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "accounts with 12 character names and no dots can be created without bidding required" ),
+                        bidname( "dan", "abcdefg12345", core_sym::from_string( "1.0000" ) ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( multiple_namebids, eosio_system_tester ) try {
+
+   const std::string not_closed_message("auction for name is not closed yet");
+
+   std::vector<account_name> accounts = { "alice"_n, "bob"_n, "carl"_n, "david"_n, "eve"_n };
+   create_accounts_with_resources( accounts );
+   for ( const auto& a: accounts ) {
+      transfer( config::system_account_name, a, core_sym::from_string( "10000.0000" ) );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string( "10000.0000" ), get_balance(a) );
+   }
+   create_accounts_with_resources( { "producer"_n } );
+   BOOST_REQUIRE_EQUAL( success(), regproducer( "producer"_n ) );
+
+   produce_block();
+   // stake but but not enough to go live
+   stake_with_transfer( config::system_account_name, "bob"_n,  core_sym::from_string( "35000000.0000" ), core_sym::from_string( "35000000.0000" ) );
+   stake_with_transfer( config::system_ac
