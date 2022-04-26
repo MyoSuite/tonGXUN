@@ -3383,4 +3383,24 @@ BOOST_FIXTURE_TEST_CASE( multiple_namebids, eosio_system_tester ) try {
 
    BOOST_REQUIRE_EQUAL( error("assertion failure with message: account is already highest bidder"),
                         bidname( "bob", "prefb", core_sym::from_string("1.1001") ) );
-   BOOST_REQUIRE_EQUAL( error("assertion failure with m
+   BOOST_REQUIRE_EQUAL( error("assertion failure with message: must increase bid by 10%"),
+                        bidname( "alice", "prefb", core_sym::from_string("1.0999") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string( "9996.9997" ), get_balance("bob") );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string( "10000.0000" ), get_balance("alice") );
+
+   // alice outbids bob on prefb
+   {
+      const asset initial_names_balance = get_balance("eosio.names"_n);
+      BOOST_REQUIRE_EQUAL( success(),
+                           bidname( "alice", "prefb", core_sym::from_string("1.1001") ) );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string( "9997.9997" ), get_balance("bob") );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string( "9998.8999" ), get_balance("alice") );
+      BOOST_REQUIRE_EQUAL( initial_names_balance + core_sym::from_string("0.1001"), get_balance("eosio.names"_n) );
+   }
+
+   // david outbids carl on prefd
+   {
+      BOOST_REQUIRE_EQUAL( core_sym::from_string( "9998.0000" ), get_balance("carl") );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string( "10000.0000" ), get_balance("david") );
+      BOOST_REQUIRE_EQUAL( success(),
+                           bidname( "david", "prefd"
