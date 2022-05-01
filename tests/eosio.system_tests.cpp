@@ -3403,4 +3403,31 @@ BOOST_FIXTURE_TEST_CASE( multiple_namebids, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( core_sym::from_string( "9998.0000" ), get_balance("carl") );
       BOOST_REQUIRE_EQUAL( core_sym::from_string( "10000.0000" ), get_balance("david") );
       BOOST_REQUIRE_EQUAL( success(),
-                           bidname( "david", "prefd"
+                           bidname( "david", "prefd", core_sym::from_string("1.9900") ) );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string( "9999.0000" ), get_balance("carl") );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string( "9998.0100" ), get_balance("david") );
+   }
+
+   // eve outbids carl on prefe
+   {
+      BOOST_REQUIRE_EQUAL( success(),
+                           bidname( "eve", "prefe", core_sym::from_string("1.7200") ) );
+   }
+
+   produce_block( fc::days(14) );
+   produce_block();
+
+   // highest bid is from david for prefd but no bids can be closed yet
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefd"_n, "david"_n ),
+                            fc::exception, fc_assert_exception_message_is( not_closed_message ) );
+
+   // stake enough to go above the 15% threshold
+   stake_with_transfer( config::system_account_name, "alice"_n, core_sym::from_string( "10000000.0000" ), core_sym::from_string( "10000000.0000" ) );
+   BOOST_REQUIRE_EQUAL(0, get_producer_info("producer")["unpaid_blocks"].as<uint32_t>());
+   BOOST_REQUIRE_EQUAL( success(), vote( "alice"_n, { "producer"_n } ) );
+
+   // TELOS BEGIN
+   activate_network();
+   // TELOS END
+
+   // ne
