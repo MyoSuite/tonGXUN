@@ -3430,4 +3430,22 @@ BOOST_FIXTURE_TEST_CASE( multiple_namebids, eosio_system_tester ) try {
    activate_network();
    // TELOS END
 
-   // ne
+   // need to wait for 14 days after going live
+   produce_blocks(10);
+   produce_block( fc::days(2) );
+   produce_blocks( 10 );
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefd"_n, "david"_n ),
+                            fc::exception, fc_assert_exception_message_is( not_closed_message ) );
+   // it's been 14 days, auction for prefd has been closed
+   produce_block( fc::days(12) );
+   create_account_with_resources( "prefd"_n, "david"_n );
+   produce_blocks(2);
+   produce_block( fc::hours(23) );
+   // auctions for prefa, prefb, prefc, prefe haven't been closed
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefa"_n, "bob"_n ),
+                            fc::exception, fc_assert_exception_message_is( not_closed_message ) );
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefb"_n, "alice"_n ),
+                            fc::exception, fc_assert_exception_message_is( not_closed_message ) );
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefc"_n, "bob"_n ),
+                            fc::exception, fc_assert_exception_message_is( not_closed_message ) );
+ 
