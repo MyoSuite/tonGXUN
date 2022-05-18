@@ -3465,4 +3465,22 @@ BOOST_FIXTURE_TEST_CASE( multiple_namebids, eosio_system_tester ) try {
    // but changing a bid that is not the highest does not push closing time
    BOOST_REQUIRE_EQUAL( success(),
                         bidname( "carl", "prefe", core_sym::from_string("2.0980") ) );
-   produce_block( fc::h
+   produce_block( fc::hours(2) );
+   produce_blocks(2);
+   // bid for prefb has closed, only highest bidder can claim
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefb"_n, "alice"_n ),
+                            eosio_assert_message_exception, eosio_assert_message_is( "only highest bidder can claim" ) );
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefb"_n, "carl"_n ),
+                            eosio_assert_message_exception, eosio_assert_message_is( "only highest bidder can claim" ) );
+   create_account_with_resources( "prefb"_n, "eve"_n );
+
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefe"_n, "carl"_n ),
+                            fc::exception, fc_assert_exception_message_is( not_closed_message ) );
+   produce_block();
+   produce_block( fc::hours(24) );
+   // by now bid for prefe has closed
+   create_account_with_resources( "prefe"_n, "carl"_n );
+   // prefe can now create *.prefe
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "xyz.prefe"_n, "carl"_n ),
+                            fc::exception, fc_assert_exception_message_is("only suffix may create this account") );
+   transfer( config::system_account_name, "prefe"_n, core_sym::from_string("
