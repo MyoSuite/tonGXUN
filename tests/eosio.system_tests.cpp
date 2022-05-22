@@ -3506,4 +3506,29 @@ BOOST_FIXTURE_TEST_CASE( namebid_pending_winner, eosio_system_tester ) try {
    produce_block( fc::hours(100) ); //should close "perfa"
    produce_block( fc::hours(100) ); //should close "perfb"
 
-   
+   //despite "perfa" account hasn't been created, we should be able to create "perfb" account
+   create_account_with_resources( "prefb"_n, "bob111111111"_n );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( vote_producers_in_and_out, eosio_system_tester ) try {
+   // TELOS ADDITION
+   activate_network();
+
+   const asset net = core_sym::from_string("80.0000");
+   const asset cpu = core_sym::from_string("80.0000");
+   std::vector<account_name> voters = { "producvotera"_n, "producvoterb"_n, "producvoterc"_n, "producvoterd"_n };
+   for (const auto& v: voters) {
+      create_account_with_resources(v, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu);
+   }
+
+   // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
+   std::vector<account_name> producer_names;
+   {
+      producer_names.reserve('z' - 'a' + 1);
+      const std::string root("defproducer");
+      for ( char c = 'a'; c <= 'z'; ++c ) {
+         producer_names.emplace_back(root + std::string(1, c));
+      }
+      setup_producer_accounts(producer_names);
+      for (const auto& p: producer_names) {
+         BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
