@@ -3483,4 +3483,27 @@ BOOST_FIXTURE_TEST_CASE( multiple_namebids, eosio_system_tester ) try {
    // prefe can now create *.prefe
    BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "xyz.prefe"_n, "carl"_n ),
                             fc::exception, fc_assert_exception_message_is("only suffix may create this account") );
-   transfer( config::system_account_name, "prefe"_n, core_sym::from_string("
+   transfer( config::system_account_name, "prefe"_n, core_sym::from_string("10000.0000") );
+   create_account_with_resources( "xyz.prefe"_n, "prefe"_n );
+
+   // other auctions haven't closed
+   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "prefa"_n, "bob"_n ),
+                            fc::exception, fc_assert_exception_message_is( not_closed_message ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( namebid_pending_winner, eosio_system_tester ) try {
+   // TELOS BEGIN
+   active_and_vote_producers2();
+   // cross_15_percent_threshold();
+   // TELOS END
+   produce_block( fc::hours(14*24) );    //wait 14 day for name auction activation
+   transfer( config::system_account_name, "alice1111111"_n, core_sym::from_string("10000.0000") );
+   transfer( config::system_account_name, "bob111111111"_n, core_sym::from_string("10000.0000") );
+
+   BOOST_REQUIRE_EQUAL( success(), bidname( "alice1111111", "prefa", core_sym::from_string( "50.0000" ) ));
+   BOOST_REQUIRE_EQUAL( success(), bidname( "bob111111111", "prefb", core_sym::from_string( "30.0000" ) ));
+   produce_block( fc::hours(100) ); //should close "perfa"
+   produce_block( fc::hours(100) ); //should close "perfb"
+
+   
