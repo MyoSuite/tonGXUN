@@ -3557,3 +3557,28 @@ BOOST_FIXTURE_TEST_CASE( vote_producers_in_and_out, eosio_system_tester ) try {
       produce_blocks(51 * 24 + 20);
 
       bool all_21_produced = true;
+      for (uint32_t i = 0; i < 21; ++i) {
+         if (0 == get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+            all_21_produced = false;
+         }
+      }
+      bool rest_didnt_produce = true;
+      for (uint32_t i = 21; i < producer_names.size(); ++i) {
+         if (0 < get_producer_info(producer_names[i])["unpaid_blocks"].as<uint32_t>()) {
+            rest_didnt_produce = false;
+         }
+      }
+      BOOST_REQUIRE(all_21_produced && rest_didnt_produce);
+   }
+
+   {
+      // BEGIN TELOS REPLACEMENT
+      /*
+      produce_block(fc::hours(7));
+      const uint32_t voted_out_index = 20;
+      const uint32_t new_prod_index  = 23;
+      BOOST_REQUIRE_EQUAL(success(), stake("producvoterd", core_sym::from_string("40000000.0000"), core_sym::from_string("40000000.0000")));
+      BOOST_REQUIRE_EQUAL(success(), vote("producvoterd"_n, { producer_names[new_prod_index] }));
+      BOOST_REQUIRE_EQUAL(0, get_producer_info(producer_names[new_prod_index])["unpaid_blocks"].as<uint32_t>());
+      produce_blocks(4 * 12 * 21);
+      BOOST_REQUIRE(0 < get_producer_info(producer_names[new_prod_
