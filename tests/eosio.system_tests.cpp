@@ -3581,4 +3581,19 @@ BOOST_FIXTURE_TEST_CASE( vote_producers_in_and_out, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL(success(), vote("producvoterd"_n, { producer_names[new_prod_index] }));
       BOOST_REQUIRE_EQUAL(0, get_producer_info(producer_names[new_prod_index])["unpaid_blocks"].as<uint32_t>());
       produce_blocks(4 * 12 * 21);
-      BOOST_REQUIRE(0 < get_producer_info(producer_names[new_prod_
+      BOOST_REQUIRE(0 < get_producer_info(producer_names[new_prod_index])["unpaid_blocks"].as<uint32_t>());
+      const uint32_t initial_unpaid_blocks = get_producer_info(producer_names[voted_out_index])["unpaid_blocks"].as<uint32_t>();
+      produce_blocks(2 * 12 * 21);
+      BOOST_REQUIRE_EQUAL(initial_unpaid_blocks, get_producer_info(producer_names[voted_out_index])["unpaid_blocks"].as<uint32_t>());
+      produce_block(fc::hours(24));
+      BOOST_REQUIRE_EQUAL(success(), vote("producvoterd"_n, { producer_names[voted_out_index] }));
+      produce_blocks(2 * 12 * 21);
+      BOOST_REQUIRE(fc::crypto::public_key() != fc::crypto::public_key(get_producer_info(producer_names[voted_out_index])["producer_key"].as_string()));
+      BOOST_REQUIRE_EQUAL(success(), push_action(producer_names[voted_out_index], "claimrewards"_n, mvo()("owner", producer_names[voted_out_index])));
+      */
+      produce_block(fc::hours(3));
+      const uint32_t voted_out_index = 20;
+      const uint32_t new_prod_index  = 23;
+      // the new weight calculation gives bigger weight for more voted producers
+      vector<account_name> v = vector<account_name>(producer_names.begin(), producer_names.begin()+(voted_out_index-1));
+  
