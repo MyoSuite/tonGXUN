@@ -3636,4 +3636,33 @@ BOOST_FIXTURE_TEST_CASE( setparams, eosio_system_tester ) try {
 
    // test begins
    vector<permission_level> prod_perms;
-   for ( aut
+   for ( auto& x : producer_names ) {
+      prod_perms.push_back( { name(x), config::active_name } );
+   }
+
+   eosio::chain::chain_config params;
+   params = control->get_global_properties().configuration;
+   //change some values
+   params.max_block_net_usage += 10;
+   params.max_transaction_lifetime += 1;
+
+   transaction trx;
+   {
+      fc::variant pretty_trx = fc::mutable_variant_object()
+         ("expiration", "2020-01-01T00:30")
+         ("ref_block_num", 2)
+         ("ref_block_prefix", 3)
+         ("net_usage_words", 0)
+         ("max_cpu_usage_ms", 0)
+         ("delay_sec", 0)
+         ("actions", fc::variants({
+               fc::mutable_variant_object()
+                  ("account", name(config::system_account_name))
+                  ("name", "setparams")
+                  ("authorization", vector<permission_level>{ { config::system_account_name, config::active_name } })
+                  ("data", fc::mutable_variant_object()
+                   ("params", params)
+                  )
+                  })
+         );
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_funct
