@@ -3688,4 +3688,30 @@ BOOST_FIXTURE_TEST_CASE( setparams, eosio_system_tester ) try {
 
    transaction_trace_ptr trace;
    control->applied_transaction.connect(
-   [&]( std::tuple<const transaction_trace_ptr&, const packed_tra
+   [&]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> p ) {
+      trace = std::get<0>(p);
+   } );
+
+   BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "exec"_n, mvo()
+                                                    ("proposer",      "alice1111111")
+                                                    ("proposal_name", "setparams1")
+                                                    ("executer",      "alice1111111")
+                       )
+   );
+
+   BOOST_REQUIRE( bool(trace) );
+   BOOST_REQUIRE_EQUAL( 1, trace->action_traces.size() );
+   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+
+   produce_blocks( 250 );
+
+   // make sure that changed parameters were applied
+   auto active_params = control->get_global_properties().configuration;
+   BOOST_REQUIRE_EQUAL( params.max_block_net_usage, active_params.max_block_net_usage );
+   BOOST_REQUIRE_EQUAL( params.max_transaction_lifetime, active_params.max_transaction_lifetime );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( wasmcfg, eosio_system_tester ) try {
+   //instal
