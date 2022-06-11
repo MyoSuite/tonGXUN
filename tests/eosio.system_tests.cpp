@@ -3762,4 +3762,29 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, eosio_system_tester ) try {
                                                     ("proposer",      "alice1111111")
                                                     ("proposal_name", "setparams1")
                                                     ("trx",           trx)
-                                                  
+                                                    ("requested", prod_perms)
+                       )
+   );
+
+   // get 16 approvals
+   for ( size_t i = 0; i < 15; ++i ) {
+      BOOST_REQUIRE_EQUAL(success(), push_action_msig( name(producer_names[i]), "approve"_n, mvo()
+                                                       ("proposer",      "alice1111111")
+                                                       ("proposal_name", "setparams1")
+                                                       ("level",         permission_level{ name(producer_names[i]), config::active_name })
+                          )
+      );
+   }
+
+   transaction_trace_ptr trace;
+   control->applied_transaction.connect(
+   [&]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> p ) {
+      trace = std::get<0>(p);
+   } );
+
+   BOOST_REQUIRE_EQUAL(success(), push_action_msig( "alice1111111"_n, "exec"_n, mvo()
+                                                    ("proposer",      "alice1111111")
+                                                    ("proposal_name", "setparams1")
+                                                    ("executer",      "alice1111111")
+                       )
+ 
