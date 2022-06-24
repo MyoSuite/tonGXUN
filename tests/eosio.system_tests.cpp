@@ -3813,4 +3813,20 @@ BOOST_FIXTURE_TEST_CASE( setram_effect, eosio_system_tester ) try {
       const auto name_a = accounts[0];
       transfer( config::system_account_name, name_a, core_sym::from_string("1000.0000") );
       BOOST_REQUIRE_EQUAL( core_sym::from_string("1000.0000"), get_balance(name_a) );
-      const uint64_t init_bytes_a = get_total_stake(name_a)["ram_byt
+      const uint64_t init_bytes_a = get_total_stake(name_a)["ram_bytes"].as_uint64();
+      BOOST_REQUIRE_EQUAL( success(), buyram( name_a, name_a, core_sym::from_string("300.0000") ) );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("700.0000"), get_balance(name_a) );
+      const uint64_t bought_bytes_a = get_total_stake(name_a)["ram_bytes"].as_uint64() - init_bytes_a;
+
+      // after buying and selling balance should be 700 + 300 * 0.995 * 0.995 = 997.0075 (actually 997.0074 due to rounding fees up)
+      BOOST_REQUIRE_EQUAL( success(), sellram(name_a, bought_bytes_a ) );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("997.0074"), get_balance(name_a) );
+   }
+
+   {
+      const auto name_b = accounts[1];
+      transfer( config::system_account_name, name_b, core_sym::from_string("1000.0000") );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("1000.0000"), get_balance(name_b) );
+      const uint64_t init_bytes_b = get_total_stake(name_b)["ram_bytes"].as_uint64();
+      // name_b buys ram at current price
+      BOOST_REQUIRE_EQUAL( success(), buyram( name_b, name_b, core_sym::from_string("300.0000"
