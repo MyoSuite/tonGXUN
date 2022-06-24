@@ -3787,4 +3787,30 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, eosio_system_tester ) try {
                                                     ("proposal_name", "setparams1")
                                                     ("executer",      "alice1111111")
                        )
- 
+   );
+
+   BOOST_REQUIRE( bool(trace) );
+   BOOST_REQUIRE_EQUAL( 1, trace->action_traces.size() );
+   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+
+   produce_blocks( 250 );
+
+   // make sure that changed parameters were applied
+   auto active_params = control->get_global_properties().wasm_configuration;
+   BOOST_REQUIRE_EQUAL( active_params.max_table_elements, 8192 );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setram_effect, eosio_system_tester ) try {
+
+   const asset net = core_sym::from_string("8.0000");
+   const asset cpu = core_sym::from_string("8.0000");
+   std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   for (const auto& a: accounts) {
+      create_account_with_resources(a, config::system_account_name, core_sym::from_string("1.0000"), false, net, cpu);
+   }
+
+   {
+      const auto name_a = accounts[0];
+      transfer( config::system_account_name, name_a, core_sym::from_string("1000.0000") );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("1000.0000"), get_balance(name_a) );
+      const uint64_t init_bytes_a = get_total_stake(name_a)["ram_byt
