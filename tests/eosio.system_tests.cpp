@@ -3829,4 +3829,25 @@ BOOST_FIXTURE_TEST_CASE( setram_effect, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( core_sym::from_string("1000.0000"), get_balance(name_b) );
       const uint64_t init_bytes_b = get_total_stake(name_b)["ram_bytes"].as_uint64();
       // name_b buys ram at current price
-      BOOST_REQUIRE_EQUAL( success(), buyram( name_b, name_b, core_sym::from_string("300.0000"
+      BOOST_REQUIRE_EQUAL( success(), buyram( name_b, name_b, core_sym::from_string("300.0000") ) );
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("700.0000"), get_balance(name_b) );
+      const uint64_t bought_bytes_b = get_total_stake(name_b)["ram_bytes"].as_uint64() - init_bytes_b;
+
+      // increase max_ram_size, ram bought by name_b loses part of its value
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("ram may only be increased"),
+                           push_action(config::system_account_name, "setram"_n, mvo()("max_ram_size", 12ll*1024 * 1024 * 1024)) );
+      BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
+                           push_action(name_b, "setram"_n, mvo()("max_ram_size", 16ll*1024 * 1024 * 1024)) );
+      BOOST_REQUIRE_EQUAL( success(),
+                           push_action(config::system_account_name, "setram"_n, mvo()("max_ram_size", 16ll*1024 * 1024 * 1024)) );
+
+      BOOST_REQUIRE_EQUAL( success(), sellram(name_b, bought_bytes_b ) );
+      BOOST_REQUIRE( core_sym::from_string("900.0000") < get_balance(name_b) );
+      BOOST_REQUIRE( core_sym::from_string("950.0000") > get_balance(name_b) );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+// TELOS BEGIN
+/*
+BOOST_FIXTURE_TEST_CASE( ra
