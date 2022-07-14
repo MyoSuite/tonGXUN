@@ -3903,4 +3903,23 @@ BOOST_FIXTURE_TEST_CASE( ram_inflation, eosio_system_tester ) try {
 BOOST_FIXTURE_TEST_CASE( eosioram_ramusage, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( "alice1111111" ) );
    transfer( "eosio", "alice1111111", core_sym::from_string("1000.0000"), "eosio" );
-   BOOST_REQUIRE_EQUAL
+   BOOST_REQUIRE_EQUAL( success(), stake( "eosio", "alice1111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+
+   const asset initial_ram_balance = get_balance("eosio.ram"_n);
+   const asset initial_ramfee_balance = get_balance("eosio.ramfee"_n);
+   BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("1000.0000") ) );
+
+   BOOST_REQUIRE_EQUAL( false, get_row_by_account( "eosio.token"_n, "alice1111111"_n, "accounts"_n, account_name(symbol{CORE_SYM}.to_symbol_code()) ).empty() );
+
+   //remove row
+   base_tester::push_action( "eosio.token"_n, "close"_n, "alice1111111"_n, mvo()
+                             ( "owner", "alice1111111" )
+                             ( "symbol", symbol{CORE_SYM} )
+   );
+   BOOST_REQUIRE_EQUAL( true, get_row_by_account( "eosio.token"_n, "alice1111111"_n, "accounts"_n, account_name(symbol{CORE_SYM}.to_symbol_code()) ).empty() );
+
+   auto rlm = control->get_resource_limits_manager();
+   auto eosioram_ram_usage = rlm.get_account_ram_usage("eosio.ram"_n);
+   auto alice_ram_usage = rlm.get_account_ram_usage("alice1111111"_n);
+
+   BOOST_REQUIRE_EQUAL( success(), sellram( "alic
