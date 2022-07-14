@@ -3881,4 +3881,26 @@ BOOST_FIXTURE_TEST_CASE( ram_inflation, eosio_system_tester ) try {
    cur_ram_size = get_global_state()["max_ram_size"].as_uint64();
    produce_blocks();
    BOOST_REQUIRE_EQUAL( success(), buyrambytes( "alice1111111", "alice1111111", 100 ) );
-   BOOST_REQUIRE_EQUAL( cur_ram_size + 2 * rate, get_global_state()["max_ram_size
+   BOOST_REQUIRE_EQUAL( cur_ram_size + 2 * rate, get_global_state()["max_ram_size"].as_uint64() );
+
+   BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
+                        push_action( "alice1111111"_n, "setramrate"_n, mvo()("bytes_per_block", rate) ) );
+
+   cur_ram_size = get_global_state()["max_ram_size"].as_uint64();
+   produce_blocks(10);
+   uint16_t old_rate = rate;
+   rate = 5000;
+   BOOST_REQUIRE_EQUAL( success(), push_action( config::system_account_name, "setramrate"_n, mvo()("bytes_per_block", rate) ) );
+   BOOST_REQUIRE_EQUAL( cur_ram_size + 11 * old_rate, get_global_state()["max_ram_size"].as_uint64() );
+   produce_blocks(5);
+   BOOST_REQUIRE_EQUAL( success(), buyrambytes( "alice1111111", "alice1111111", 100 ) );
+   BOOST_REQUIRE_EQUAL( cur_ram_size + 11 * old_rate + 6 * rate, get_global_state()["max_ram_size"].as_uint64() );
+
+} FC_LOG_AND_RETHROW()
+*/
+// TELOS END
+
+BOOST_FIXTURE_TEST_CASE( eosioram_ramusage, eosio_system_tester ) try {
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( "alice1111111" ) );
+   transfer( "eosio", "alice1111111", core_sym::from_string("1000.0000"), "eosio" );
+   BOOST_REQUIRE_EQUAL
