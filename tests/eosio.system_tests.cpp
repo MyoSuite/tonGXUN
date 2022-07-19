@@ -3948,4 +3948,22 @@ BOOST_FIXTURE_TEST_CASE( ram_gift, eosio_system_tester ) try {
                         ram_usage_exceeded );
    */
 
-   //
+   //check that stake/unstake keeps the gift
+   transfer( "eosio", "alice1111111", core_sym::from_string("1000.0000"), "eosio" );
+   BOOST_REQUIRE_EQUAL( success(), stake( "eosio", "alice1111111", core_sym::from_string("200.0000"), core_sym::from_string("100.0000") ) );
+   int64_t ram_bytes_after_stake;
+   rlm.get_account_limits( "alice1111111"_n, ram_bytes_after_stake, net_weight, cpu_weight );
+   BOOST_REQUIRE_EQUAL( ram_bytes_orig, ram_bytes_after_stake );
+
+   BOOST_REQUIRE_EQUAL( success(), unstake( "eosio", "alice1111111", core_sym::from_string("20.0000"), core_sym::from_string("10.0000") ) );
+   int64_t ram_bytes_after_unstake;
+   rlm.get_account_limits( "alice1111111"_n, ram_bytes_after_unstake, net_weight, cpu_weight );
+   BOOST_REQUIRE_EQUAL( ram_bytes_orig, ram_bytes_after_unstake );
+
+   uint64_t ram_gift = 1400;
+
+   int64_t ram_bytes;
+   BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("1000.0000") ) );
+   rlm.get_account_limits( "alice1111111"_n, ram_bytes, net_weight, cpu_weight );
+   auto userres = get_total_stake( "alice1111111"_n );
+   BOOST_REQUIRE_EQUAL( userres["ram_bytes"].as_uin
