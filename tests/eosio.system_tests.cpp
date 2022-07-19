@@ -3922,4 +3922,30 @@ BOOST_FIXTURE_TEST_CASE( eosioram_ramusage, eosio_system_tester ) try {
    auto eosioram_ram_usage = rlm.get_account_ram_usage("eosio.ram"_n);
    auto alice_ram_usage = rlm.get_account_ram_usage("alice1111111"_n);
 
-   BOOST_REQUIRE_EQUAL( success(), sellram( "alic
+   BOOST_REQUIRE_EQUAL( success(), sellram( "alice1111111", 2048 ) );
+
+   //make sure that ram was billed to alice, not to eosio.ram
+   BOOST_REQUIRE_EQUAL( true, alice_ram_usage < rlm.get_account_ram_usage("alice1111111"_n) );
+   BOOST_REQUIRE_EQUAL( eosioram_ram_usage, rlm.get_account_ram_usage("eosio.ram"_n) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( ram_gift, eosio_system_tester ) try {
+   active_and_vote_producers();
+
+   auto rlm = control->get_resource_limits_manager();
+   int64_t ram_bytes_orig, net_weight, cpu_weight;
+   rlm.get_account_limits( "alice1111111"_n, ram_bytes_orig, net_weight, cpu_weight );
+
+   /*
+    * It seems impossible to write this test, because buyrambytes action doesn't give you exact amount of bytes requested
+    *
+   //check that it's possible to create account bying required_bytes(2724) + userres table(112) + userres row(160) - ram_gift_bytes(1400)
+   create_account_with_resources( "abcdefghklmn"_n, "alice1111111"_n, 2724 + 112 + 160 - 1400 );
+
+   //check that one byte less is not enough
+   BOOST_REQUIRE_THROW( create_account_with_resources( "abcdefghklmn"_n, "alice1111111"_n, 2724 + 112 + 160 - 1400 - 1 ),
+                        ram_usage_exceeded );
+   */
+
+   //
