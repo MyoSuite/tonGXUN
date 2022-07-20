@@ -3966,4 +3966,24 @@ BOOST_FIXTURE_TEST_CASE( ram_gift, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), buyram( "alice1111111", "alice1111111", core_sym::from_string("1000.0000") ) );
    rlm.get_account_limits( "alice1111111"_n, ram_bytes, net_weight, cpu_weight );
    auto userres = get_total_stake( "alice1111111"_n );
-   BOOST_REQUIRE_EQUAL( userres["ram_bytes"].as_uin
+   BOOST_REQUIRE_EQUAL( userres["ram_bytes"].as_uint64() + ram_gift, ram_bytes );
+
+   BOOST_REQUIRE_EQUAL( success(), sellram( "alice1111111", 1024 ) );
+   rlm.get_account_limits( "alice1111111"_n, ram_bytes, net_weight, cpu_weight );
+   userres = get_total_stake( "alice1111111"_n );
+   BOOST_REQUIRE_EQUAL( userres["ram_bytes"].as_uint64() + ram_gift, ram_bytes );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( rex_rounding_issue, eosio_system_tester ) try {
+   const std::vector<name> whales { "whale1"_n, "whale2"_n, "whale3"_n, "whale4"_n , "whale5"_n  };
+   const name bob{ "bob"_n }, alice{ "alice"_n };
+   const std::vector<name> accounts = {bob, alice};
+   const std::vector<name> rexborrowers = {"rex1"_n, "rex2"_n, "rex3"_n, "rex4"_n};
+    const asset one_eos      = core_sym::from_string("1.0000");
+   const asset one_rex      = asset::from_string("1.0000 REX");
+   const asset init_balance = core_sym::from_string("1000.0000");
+   const asset whale_balance = core_sym::from_string("1000000.0000");
+
+   setup_rex_accounts( accounts, init_balance );
+   // create_accounts_with_resources({ bob, wha
