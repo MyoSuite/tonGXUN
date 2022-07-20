@@ -3986,4 +3986,22 @@ BOOST_FIXTURE_TEST_CASE( rex_rounding_issue, eosio_system_tester ) try {
    const asset whale_balance = core_sym::from_string("1000000.0000");
 
    setup_rex_accounts( accounts, init_balance );
-   // create_accounts_with_resources({ bob, wha
+   // create_accounts_with_resources({ bob, whale });
+   for (auto& w : whales) {
+      create_accounts_with_resources({ w });
+      stake_with_transfer(config::system_account_name, w, core_sym::from_string("1000.0000"), core_sym::from_string("1000.0000"));
+      issue_and_transfer(w, core_sym::from_string("100000000.0000"));
+      // BOOST_REQUIRE_EQUAL( success(), vote( w, { }, "proxyaccount"_n ) );
+      BOOST_REQUIRE_EQUAL( success(), push_action( w, "deposit"_n, mvo()("owner", w)("amount", core_sym::from_string("1000000.0000")) ) );
+      BOOST_REQUIRE_EQUAL( success(), push_action( w, "buyrex"_n, mvo()("from", w)("amount", core_sym::from_string("1000000.0000")) ) );
+   }
+
+   issue_and_transfer(bob, init_balance);
+
+
+   for(auto& rb : rexborrowers) {
+      create_accounts_with_resources({ rb });
+      buyram(config::system_account_name, rb, core_sym::from_string("10.0000"));
+      issue_and_transfer(rb, core_sym::from_string("1000000.0000"));
+      stake_with_transfer(config::system_account_name, rb, core_sym::from_string("1000.0000"), core_sym::from_string("1000.0000"));
+      // BOOST_REQUIRE_EQUAL( success(), vote( rb, { }, "proxyaccount"_n
