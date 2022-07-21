@@ -4004,4 +4004,23 @@ BOOST_FIXTURE_TEST_CASE( rex_rounding_issue, eosio_system_tester ) try {
       buyram(config::system_account_name, rb, core_sym::from_string("10.0000"));
       issue_and_transfer(rb, core_sym::from_string("1000000.0000"));
       stake_with_transfer(config::system_account_name, rb, core_sym::from_string("1000.0000"), core_sym::from_string("1000.0000"));
-      // BOOST_REQUIRE_EQUAL( success(), vote( rb, { }, "proxyaccount"_n
+      // BOOST_REQUIRE_EQUAL( success(), vote( rb, { }, "proxyaccount"_n ) );
+      BOOST_REQUIRE_EQUAL( success(), push_action( rb, "deposit"_n, mvo()("owner", rb)("amount", core_sym::from_string("1000000.0000")) ) );
+   }
+   // get accounts into rex
+   for(auto& acct : accounts){
+      stake_with_transfer(config::system_account_name, acct, core_sym::from_string("1000.0000"), core_sym::from_string("1000.0000"));
+      issue_and_transfer(acct, core_sym::from_string("100.1239"));
+      // BOOST_REQUIRE_EQUAL( success(), vote( acct, { }, "proxyaccount"_n ) );
+      BOOST_REQUIRE_EQUAL( success(), push_action( acct, "deposit"_n, mvo()("owner", acct)("amount", core_sym::from_string("100.1239")) ) );
+      BOOST_REQUIRE_EQUAL( success(), push_action( acct, "buyrex"_n, mvo()("from", acct)("amount", core_sym::from_string("100.1239")) ) );
+   }
+
+   auto rent_and_go = [&] (int cnt) {
+      for(auto& rb : rexborrowers) {
+         BOOST_REQUIRE_EQUAL( success(),
+                        push_action( rb, "rentcpu"_n, 
+                        mvo()
+                        ("from", rb)
+                        ("receiver", rb)
+                        ("loan_p
