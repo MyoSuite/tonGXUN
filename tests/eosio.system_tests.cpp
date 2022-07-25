@@ -4023,4 +4023,23 @@ BOOST_FIXTURE_TEST_CASE( rex_rounding_issue, eosio_system_tester ) try {
                         mvo()
                         ("from", rb)
                         ("receiver", rb)
-                        ("loan_p
+                        ("loan_payment", core_sym::from_string("100.0000"))
+                        ("loan_fund", core_sym::from_string("0.0000")) ) );
+      }
+      // exec and update
+      for(auto& acct : accounts) {
+         if(cnt % 10 == 0) {
+            BOOST_REQUIRE_EQUAL( success(), push_action( acct, "rexexec"_n, mvo()("user", acct)("max", 2) ) );
+            BOOST_REQUIRE_EQUAL( success(), push_action( acct, "updaterex"_n, mvo()("owner", acct) ) );
+         }
+         BOOST_REQUIRE_EQUAL( success(), push_action( acct, "sellrex"_n, mvo()("from", acct)("rex",one_rex) ) );
+         BOOST_REQUIRE_EQUAL( success(),
+                            push_action( acct, "unstaketorex"_n, mvo()("owner", acct)("receiver", acct)("from_net", one_eos)("from_cpu", one_eos) ) );
+      }
+
+      produce_block( fc::days(1) );
+   };
+   // BOOST_REQUIRE_EQUAL( get_rex_vote_stake( alice ),                init_rex_stake - core_sym::from_string("0.0006") );
+   auto check_tables = [&] (const name& acct, bool is_error=false) {
+      auto rex_stake = get_rex_vote_stake(acct);
+      auto vote_staked = ge
