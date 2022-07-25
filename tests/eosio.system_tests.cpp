@@ -4042,4 +4042,34 @@ BOOST_FIXTURE_TEST_CASE( rex_rounding_issue, eosio_system_tester ) try {
    // BOOST_REQUIRE_EQUAL( get_rex_vote_stake( alice ),                init_rex_stake - core_sym::from_string("0.0006") );
    auto check_tables = [&] (const name& acct, bool is_error=false) {
       auto rex_stake = get_rex_vote_stake(acct);
-      auto vote_staked = ge
+      auto vote_staked = get_voter_info(acct)["staked"];
+      auto delband = get_dbw_obj(acct, acct);
+      auto cpu_stake = delband["cpu_weight"].as<asset>();
+      auto net_stake = delband["net_weight"].as<asset>();
+      ilog( "voter:\t${voter}", ("voter", vote_staked));
+      ilog( "calc_vote:\t${calc_vote}", ("calc_vote", (rex_stake + cpu_stake + net_stake).get_amount()));
+      if(is_error){
+         BOOST_REQUIRE_EQUAL( vote_staked - (rex_stake + cpu_stake + net_stake).get_amount(), 1 );
+      }
+      else{
+         BOOST_REQUIRE_EQUAL( (rex_stake + cpu_stake + net_stake).get_amount(), vote_staked );
+      }
+   };
+   // move ahead 5 days to unlock rex
+   produce_block(fc::days(5));
+   for(int i = 0; i < 159; ++i){
+      rent_and_go(i);
+      if(i % 10 == 0)
+         for(auto& acct : accounts) {
+            ilog("${i}", ("i",i));
+            check_tables(acct);
+         }
+   }
+   // day 160 there was a divergence of voter.staked and (rex_bal + delband.cpu + delband.net)
+   rent_and_go(160);
+   for(auto& acct : accounts) {
+      check_tables(acct, false);
+   }
+   // update vote
+   std::vector<name> delegates = {};
+   for(auto& ac
