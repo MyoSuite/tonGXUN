@@ -4072,4 +4072,28 @@ BOOST_FIXTURE_TEST_CASE( rex_rounding_issue, eosio_system_tester ) try {
    }
    // update vote
    std::vector<name> delegates = {};
-   for(auto& ac
+   for(auto& acct : accounts) {
+      BOOST_REQUIRE_EQUAL( success(),
+                            push_action( acct, "voteupdate"_n, mvo()("voter_name", acct) ) );
+   }
+   // check that values are equal
+   for(auto& acct : accounts) {
+      check_tables(acct, false);
+   }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( rex_auth, eosio_system_tester ) try {
+
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   const account_name alice = accounts[0], bob = accounts[1];
+   const asset init_balance = core_sym::from_string("1000.0000");
+   const asset one_eos      = core_sym::from_string("1.0000");
+   const asset one_rex      = asset::from_string("1.0000 REX");
+   setup_rex_accounts( accounts, init_balance );
+
+   const std::string error_msg("missing authority of aliceaccount");
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "deposit"_n, mvo()("owner", alice)("amount", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "withdraw"_n, mvo()("owner", alice)("amount", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "buyrex"_n, mvo()("from", alice)("amount", one_eos) ) );
+   BOOST
