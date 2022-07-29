@@ -4096,4 +4096,14 @@ BOOST_FIXTURE_TEST_CASE( rex_auth, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "deposit"_n, mvo()("owner", alice)("amount", one_eos) ) );
    BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "withdraw"_n, mvo()("owner", alice)("amount", one_eos) ) );
    BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "buyrex"_n, mvo()("from", alice)("amount", one_eos) ) );
-   BOOST
+   BOOST_REQUIRE_EQUAL( error(error_msg),
+                        push_action( bob, "unstaketorex"_n, mvo()("owner", alice)("receiver", alice)("from_net", one_eos)("from_cpu", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "sellrex"_n, mvo()("from", alice)("rex", one_rex) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "cnclrexorder"_n, mvo()("owner", alice) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg),
+                        push_action( bob, "rentcpu"_n, mvo()("from", alice)("receiver", alice)("loan_payment", one_eos)("loan_fund", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg),
+                        push_action( bob, "rentnet"_n, mvo()("from", alice)("receiver", alice)("loan_payment", one_eos)("loan_fund", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "fundcpuloan"_n, mvo()("from", alice)("loan_num", 1)("payment", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "fundnetloan"_n, mvo()("from", alice)("loan_num", 1)("payment", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "defcpuloan"_n, mvo()("from", alice)("loan_num", 1
