@@ -4106,4 +4106,22 @@ BOOST_FIXTURE_TEST_CASE( rex_auth, eosio_system_tester ) try {
                         push_action( bob, "rentnet"_n, mvo()("from", alice)("receiver", alice)("loan_payment", one_eos)("loan_fund", one_eos) ) );
    BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "fundcpuloan"_n, mvo()("from", alice)("loan_num", 1)("payment", one_eos) ) );
    BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "fundnetloan"_n, mvo()("from", alice)("loan_num", 1)("payment", one_eos) ) );
-   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "defcpuloan"_n, mvo()("from", alice)("loan_num", 1
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "defcpuloan"_n, mvo()("from", alice)("loan_num", 1)("amount", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "defnetloan"_n, mvo()("from", alice)("loan_num", 1)("amount", one_eos) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "updaterex"_n, mvo()("owner", alice) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "rexexec"_n, mvo()("user", alice)("max", 1) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "consolidate"_n, mvo()("owner", alice) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "mvtosavings"_n, mvo()("owner", alice)("rex", one_rex) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "mvfrsavings"_n, mvo()("owner", alice)("rex", one_rex) ) );
+   BOOST_REQUIRE_EQUAL( error(error_msg), push_action( bob, "closerex"_n, mvo()("owner", alice) ) );
+
+   BOOST_REQUIRE_EQUAL( error("missing authority of eosio"), push_action( alice, "setrex"_n, mvo()("balance", one_eos) ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( buy_sell_rex, eosio_system_tester ) try {
+
+   const int64_t ratio        = 10000;
+   const asset   init_rent    = core_sym::from_string("20000.0000");
+   const asset   init_balance = core_
