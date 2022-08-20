@@ -4124,4 +4124,18 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_rex, eosio_system_tester ) try {
 
    const int64_t ratio        = 10000;
    const asset   init_rent    = core_sym::from_string("20000.0000");
-   const asset   init_balance = core_
+   const asset   init_balance = core_sym::from_string("1000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n, "frankaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3], frank = accounts[4];
+   setup_rex_accounts( accounts, init_balance );
+
+   const asset one_unit = core_sym::from_string("0.0001");
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient funds"), buyrex( alice, init_balance + one_unit ) );
+   BOOST_REQUIRE_EQUAL( asset::from_string("25000.0000 REX"),  get_buyrex_result( alice, core_sym::from_string("2.5000") ) );
+   produce_blocks(2);
+   produce_block(fc::days(5));
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("2.5000"),     get_sellrex_result( alice, asset::from_string("25000.0000 REX") ) );
+
+   BOOST_REQUIRE_EQUAL( success(),                           buyrex( alice, core_sym::from_string("13.0000") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("13.0000"),    get_rex_vote_stake( alice ) );
+   BOOST_REQUIRE_EQUAL( success(),                           buyr
