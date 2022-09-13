@@ -4183,4 +4183,23 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_rex, eosio_system_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 
-BOOST_FIXTURE_TEST_CASE( 
+BOOST_FIXTURE_TEST_CASE( buy_sell_small_rex, eosio_system_tester ) try {
+
+   const int64_t ratio        = 10000;
+   const asset   init_balance = core_sym::from_string("50000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2];
+   setup_rex_accounts( accounts, init_balance );
+
+   const asset payment = core_sym::from_string("40000.0000");
+   BOOST_REQUIRE_EQUAL( ratio * payment.get_amount(),               get_buyrex_result( alice, payment ).get_amount() );
+
+   produce_blocks(2);
+   produce_block( fc::days(5) );
+   produce_blocks(2);
+
+   asset init_rex_stake = get_rex_vote_stake( alice );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("proceeds are negligible"), sellrex( alice, asset::from_string("0.0001 REX") ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("proceeds are negligible"), sellrex( alice, asset::from_string("0.9999 REX") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0001"),            get_sellrex_result( alice, asset::from_string("1.0000 REX") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0001"),            get_sellrex_result( alice,
