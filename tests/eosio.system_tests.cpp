@@ -4219,4 +4219,29 @@ BOOST_FIXTURE_TEST_CASE( unstake_buy_rex, eosio_system_tester, * boost::unit_tes
    const int64_t ratio        = 10000;
    const asset   zero_asset   = core_sym::from_string("0.0000");
    const asset   neg_asset    = core_sym::from_string("-0.0001");
-   const asset   one_token    = core_sym::from_string("1.00
+   const asset   one_token    = core_sym::from_string("1.0000");
+   const asset   init_balance = core_sym::from_string("10000.0000");
+   const asset   init_net     = core_sym::from_string("70.0000");
+   const asset   init_cpu     = core_sym::from_string("90.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n, "frankaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3], frank = accounts[4];
+   setup_rex_accounts( accounts, init_balance, init_net, init_cpu, false );
+
+   // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
+   std::vector<account_name> producer_names;
+   {
+      // BEGIN TELOS REPLACEMENT
+      /*
+      producer_names.reserve('z' - 'a' + 1);
+      const std::string root("defproducer");
+      for ( char c = 'a'; c <= 'z'; ++c ) {
+         producer_names.emplace_back(root + std::string(1, c));
+      }
+      */
+      producer_names.reserve(30);
+      const std::string root("tprod");
+      for(uint8_t i = 0; i < 30; i++) {
+         name p = name(root + toBase31(i));
+         producer_names.emplace_back(p);
+      }
+  
