@@ -4244,4 +4244,26 @@ BOOST_FIXTURE_TEST_CASE( unstake_buy_rex, eosio_system_tester, * boost::unit_tes
          name p = name(root + toBase31(i));
          producer_names.emplace_back(p);
       }
-  
+      // END TELOS REPLACEMENT
+
+      setup_producer_accounts(producer_names);
+      for ( const auto& p: producer_names ) {
+         BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
+         BOOST_TEST_REQUIRE( 0 == get_producer_info(p)["total_votes"].as<double>() );
+      }
+      // TELOS ADDITION
+      std::sort(producer_names.begin(), producer_names.end());
+   }
+
+   const int64_t init_cpu_limit = get_cpu_limit( alice );
+   const int64_t init_net_limit = get_net_limit( alice );
+
+   {
+      const asset net_stake = core_sym::from_string("25.5000");
+      const asset cpu_stake = core_sym::from_string("12.4000");
+      const asset tot_stake = net_stake + cpu_stake;
+      BOOST_REQUIRE_EQUAL( init_balance,                            get_balance( alice ) );
+      BOOST_REQUIRE_EQUAL( success(),                               stake( alice, alice, net_stake, cpu_stake ) );
+      BOOST_REQUIRE_EQUAL( get_cpu_limit( alice ),                  init_cpu_limit + cpu_stake.get_amount() );
+      BOOST_REQUIRE_EQUAL( get_net_limit( alice ),                  init_net_limit + net_stake.get_amount() );
+   
