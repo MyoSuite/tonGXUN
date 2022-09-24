@@ -4266,4 +4266,18 @@ BOOST_FIXTURE_TEST_CASE( unstake_buy_rex, eosio_system_tester, * boost::unit_tes
       BOOST_REQUIRE_EQUAL( success(),                               stake( alice, alice, net_stake, cpu_stake ) );
       BOOST_REQUIRE_EQUAL( get_cpu_limit( alice ),                  init_cpu_limit + cpu_stake.get_amount() );
       BOOST_REQUIRE_EQUAL( get_net_limit( alice ),                  init_net_limit + net_stake.get_amount() );
-   
+      // TELOS BEGIN
+      // BOOST_REQUIRE_EQUAL( success(),
+      //                      vote( alice, std::vector<account_name>(producer_names.begin(), producer_names.begin() + 20) ) );
+      // BOOST_REQUIRE_EQUAL( wasm_assert_msg("must vote for at least 21 producers or for a proxy before buying REX"),
+      //                      unstaketorex( alice, alice, net_stake, cpu_stake ) );
+      // TELOS END
+      BOOST_REQUIRE_EQUAL( success(),
+                           vote( alice, std::vector<account_name>(producer_names.begin(), producer_names.begin() + 30) ) );  // TELOS
+      const asset init_eosio_stake_balance = get_balance( "eosio.stake"_n );
+      const auto init_voter_info = get_voter_info( alice );
+      const auto init_prod_info  = get_producer_info( producer_names[0] );
+      BOOST_TEST_REQUIRE( init_prod_info["total_votes"].as_double() ==
+                          stake2votes( asset( init_voter_info["staked"].as<int64_t>(), symbol{CORE_SYM} ) ) );
+      produce_block( fc::days(4) );
+      BOOST_REQUIRE_EQUAL( ratio * tot_stake.get_amount(),          get_unstaketorex_result( alice
