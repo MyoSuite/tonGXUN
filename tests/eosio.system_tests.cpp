@@ -4292,4 +4292,20 @@ BOOST_FIXTURE_TEST_CASE( unstake_buy_rex, eosio_system_tester, * boost::unit_tes
       BOOST_REQUIRE_EQUAL( init_voter_info["staked"].as<int64_t>(), current_voter_info["staked"].as<int64_t>() );
       BOOST_TEST_REQUIRE( current_prod_info["total_votes"].as_double() ==
                           stake2votes( asset( current_voter_info["staked"].as<int64_t>(), symbol{CORE_SYM} ) ) );
-      BOOST_TEST_REQUIRE( init_prod_info["total_votes"
+      BOOST_TEST_REQUIRE( init_prod_info["total_votes"].as_double() <= /*TELOS*/ current_prod_info["total_votes"].as_double() );
+   }
+
+   {
+      const asset net_stake = core_sym::from_string("200.5000");
+      const asset cpu_stake = core_sym::from_string("120.0000");
+      const asset tot_stake = net_stake + cpu_stake;
+      BOOST_REQUIRE_EQUAL( success(),                               stake( bob, carol, net_stake, cpu_stake ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("amount exceeds tokens staked for net"),
+                           unstaketorex( bob, carol, net_stake + one_token, zero_asset ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("amount exceeds tokens staked for cpu"),
+                           unstaketorex( bob, carol, zero_asset, cpu_stake + one_token ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("delegated bandwidth record does not exist"),
+                           unstaketorex( bob, emily, zero_asset, one_token ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("must unstake a positive amount to buy rex"),
+                           unstaketorex( bob, carol, zero_asset, zero_asset ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("must unstake a posit
