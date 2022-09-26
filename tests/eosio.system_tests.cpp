@@ -4280,4 +4280,16 @@ BOOST_FIXTURE_TEST_CASE( unstake_buy_rex, eosio_system_tester, * boost::unit_tes
       BOOST_TEST_REQUIRE( init_prod_info["total_votes"].as_double() ==
                           stake2votes( asset( init_voter_info["staked"].as<int64_t>(), symbol{CORE_SYM} ) ) );
       produce_block( fc::days(4) );
-      BOOST_REQUIRE_EQUAL( ratio * tot_stake.get_amount(),          get_unstaketorex_result( alice
+      BOOST_REQUIRE_EQUAL( ratio * tot_stake.get_amount(),          get_unstaketorex_result( alice, alice, net_stake, cpu_stake ).get_amount() );
+      BOOST_REQUIRE_EQUAL( get_cpu_limit( alice ),                  init_cpu_limit );
+      BOOST_REQUIRE_EQUAL( get_net_limit( alice ),                  init_net_limit );
+      BOOST_REQUIRE_EQUAL( ratio * tot_stake.get_amount(),          get_rex_balance( alice ).get_amount() );
+      BOOST_REQUIRE_EQUAL( tot_stake,                               get_rex_balance_obj( alice )["vote_stake"].as<asset>() );
+      BOOST_REQUIRE_EQUAL( tot_stake,                               get_balance( "eosio.rex"_n ) );
+      BOOST_REQUIRE_EQUAL( tot_stake,                               init_eosio_stake_balance - get_balance( "eosio.stake"_n ) );
+      auto current_voter_info = get_voter_info( alice );
+      auto current_prod_info  = get_producer_info( producer_names[0] );
+      BOOST_REQUIRE_EQUAL( init_voter_info["staked"].as<int64_t>(), current_voter_info["staked"].as<int64_t>() );
+      BOOST_TEST_REQUIRE( current_prod_info["total_votes"].as_double() ==
+                          stake2votes( asset( current_voter_info["staked"].as<int64_t>(), symbol{CORE_SYM} ) ) );
+      BOOST_TEST_REQUIRE( init_prod_info["total_votes"
