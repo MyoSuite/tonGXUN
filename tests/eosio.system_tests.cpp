@@ -4319,4 +4319,20 @@ BOOST_FIXTURE_TEST_CASE( unstake_buy_rex, eosio_system_tester, * boost::unit_tes
       BOOST_REQUIRE_EQUAL( false,                                   get_dbw_obj( bob, carol ).is_null() );
       BOOST_REQUIRE_EQUAL( success(),                               unstaketorex( bob, carol, zero_asset, cpu_stake ) );
       BOOST_REQUIRE_EQUAL( true,                                    get_dbw_obj( bob, carol ).is_null() );
-      BOOST_REQUIRE_EQUAL( 0,                                       get_rex_balance( 
+      BOOST_REQUIRE_EQUAL( 0,                                       get_rex_balance( carol ).get_amount() );
+      BOOST_REQUIRE_EQUAL( ratio * tot_stake.get_amount(),          get_rex_balance( bob ).get_amount() );
+      BOOST_REQUIRE_EQUAL( init_cpu_limit,                          get_cpu_limit( bob ) );
+      BOOST_REQUIRE_EQUAL( init_net_limit,                          get_net_limit( bob ) );
+      BOOST_REQUIRE_EQUAL( init_cpu_limit,                          get_cpu_limit( carol ) );
+      BOOST_REQUIRE_EQUAL( init_net_limit,                          get_net_limit( carol ) );
+   }
+
+   {
+      const asset net_stake = core_sym::from_string("130.5000");
+      const asset cpu_stake = core_sym::from_string("220.0800");
+      const asset tot_stake = net_stake + cpu_stake;
+      BOOST_REQUIRE_EQUAL( success(),                               stake_with_transfer( emily, frank, net_stake, cpu_stake ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("delegated bandwidth record does not exist"),
+                           unstaketorex( emily, frank, net_stake, cpu_stake ) );
+      BOOST_REQUIRE_EQUAL( success(),                               unstaketorex( frank, frank, net_stake, cpu_stake ) );
+     
