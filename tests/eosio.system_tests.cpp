@@ -4335,4 +4335,27 @@ BOOST_FIXTURE_TEST_CASE( unstake_buy_rex, eosio_system_tester, * boost::unit_tes
       BOOST_REQUIRE_EQUAL( wasm_assert_msg("delegated bandwidth record does not exist"),
                            unstaketorex( emily, frank, net_stake, cpu_stake ) );
       BOOST_REQUIRE_EQUAL( success(),                               unstaketorex( frank, frank, net_stake, cpu_stake ) );
-     
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( frank, asset::from_string("1.0000 REX") ) );
+      produce_block( fc::days(5) );
+      BOOST_REQUIRE_EQUAL( success(),                               sellrex( frank, asset::from_string("1.0000 REX") ) );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( buy_rent_rex, eosio_system_tester ) try {
+
+   const int64_t ratio        = 10000;
+   const asset   init_balance = core_sym::from_string("60000.0000");
+   const asset   init_net     = core_sym::from_string("70.0000");
+   const asset   init_cpu     = core_sym::from_string("90.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n, "frankaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3], frank = accounts[4];
+   setup_rex_accounts( accounts, init_balance, init_net, init_cpu );
+
+   const int64_t init_cpu_limit = get_cpu_limit( alice );
+   const int64_t init_net_limit = get_net_limit( alice );
+
+   // bob tries to rent rex
+   BOOST_REQUIRE_EQUAL( wasm_asser
