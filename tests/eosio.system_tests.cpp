@@ -4358,4 +4358,21 @@ BOOST_FIXTURE_TEST_CASE( buy_rent_rex, eosio_system_tester ) try {
    const int64_t init_net_limit = get_net_limit( alice );
 
    // bob tries to rent rex
-   BOOST_REQUIRE_EQUAL( wasm_asser
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("rex system not initialized yet"), rentcpu( bob, carol, core_sym::from_string("5.0000") ) );
+   // alice lends rex
+   BOOST_REQUIRE_EQUAL( success(), buyrex( alice, core_sym::from_string("50265.0000") ) );
+   BOOST_REQUIRE_EQUAL( init_balance - core_sym::from_string("50265.0000"), get_rex_fund(alice) );
+   auto rex_pool = get_rex_pool();
+   const asset   init_tot_unlent   = rex_pool["total_unlent"].as<asset>();
+   const asset   init_tot_lendable = rex_pool["total_lendable"].as<asset>();
+   const asset   init_tot_rent     = rex_pool["total_rent"].as<asset>();
+   const int64_t init_stake        = get_voter_info(alice)["staked"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"),        rex_pool["total_lent"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( ratio * init_tot_lendable.get_amount(), rex_pool["total_rex"].as<asset>().get_amount() );
+   BOOST_REQUIRE_EQUAL( rex_pool["total_rex"].as<asset>(),      get_rex_balance(alice) );
+
+   BOOST_REQUIRE( get_rex_return_pool().is_null() );
+
+   {
+      // bob rents cpu for carol
+      const asset fee = core_sym::from_string("1
