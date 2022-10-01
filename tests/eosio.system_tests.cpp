@@ -4392,4 +4392,21 @@ BOOST_FIXTURE_TEST_CASE( buy_rent_rex, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( 0,                   rex_return_pool["current_rate_of_increase"].as<int64_t>() );
 
       // test that carol's resource limits have been updated properly
-      BOOST_REQUIRE_EQU
+      BOOST_REQUIRE_EQUAL( expected_total_lent, get_cpu_limit( carol ) - init_cpu_limit );
+      BOOST_REQUIRE_EQUAL( 0,                   get_net_limit( carol ) - init_net_limit );
+
+      // alice tries to sellrex, order gets scheduled then she cancels order
+      BOOST_REQUIRE_EQUAL( cancelrexorder( alice ),           wasm_assert_msg("no sellrex order is scheduled") );
+      produce_block( fc::days(6) );
+      BOOST_REQUIRE_EQUAL( success(),                         sellrex( alice, get_rex_balance(alice) ) );
+      BOOST_REQUIRE_EQUAL( success(),                         cancelrexorder( alice ) );
+      BOOST_REQUIRE_EQUAL( rex_pool["total_rex"].as<asset>(), get_rex_balance(alice) );
+
+      produce_block( fc::days(20) );
+      BOOST_REQUIRE_EQUAL( success(), sellrex( alice, get_rex_balance(alice) ) );
+      BOOST_REQUIRE_EQUAL( success(), cancelrexorder( alice ) );
+
+      rex_return_pool = get_rex_return_pool();
+      BOOST_REQUIRE( !rex_return_pool.is_null() );
+      int64_t rate = fee.get_amount() / (30 * 144);
+      BOOST_REQUIRE_EQUAL( rate,               rex_return_pool["current_rate_of
