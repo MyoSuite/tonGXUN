@@ -4375,4 +4375,21 @@ BOOST_FIXTURE_TEST_CASE( buy_rent_rex, eosio_system_tester ) try {
 
    {
       // bob rents cpu for carol
-      const asset fee = core_sym::from_string("1
+      const asset fee = core_sym::from_string("17.0000");
+      BOOST_REQUIRE_EQUAL( success(),          rentcpu( bob, carol, fee ) );
+      BOOST_REQUIRE_EQUAL( init_balance - fee, get_rex_fund(bob) );
+      rex_pool = get_rex_pool();
+      BOOST_REQUIRE_EQUAL( init_tot_lendable,       rex_pool["total_lendable"].as<asset>() ); // 65
+      BOOST_REQUIRE_EQUAL( init_tot_rent + fee,     rex_pool["total_rent"].as<asset>() );     // 100 + 17
+      int64_t expected_total_lent = bancor_convert( init_tot_rent.get_amount(), init_tot_unlent.get_amount(), fee.get_amount() );
+      BOOST_REQUIRE_EQUAL( expected_total_lent,
+                           rex_pool["total_lent"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL( rex_pool["total_lent"].as<asset>() + rex_pool["total_unlent"].as<asset>(),
+                           rex_pool["total_lendable"].as<asset>() );
+
+      auto rex_return_pool = get_rex_return_pool();
+      BOOST_REQUIRE( !rex_return_pool.is_null() );
+      BOOST_REQUIRE_EQUAL( 0,                   rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+
+      // test that carol's resource limits have been updated properly
+      BOOST_REQUIRE_EQU
