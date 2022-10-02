@@ -4409,4 +4409,24 @@ BOOST_FIXTURE_TEST_CASE( buy_rent_rex, eosio_system_tester ) try {
       rex_return_pool = get_rex_return_pool();
       BOOST_REQUIRE( !rex_return_pool.is_null() );
       int64_t rate = fee.get_amount() / (30 * 144);
-      BOOST_REQUIRE_EQUAL( rate,               rex_return_pool["current_rate_of
+      BOOST_REQUIRE_EQUAL( rate,               rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+
+      produce_block( fc::days(10) );
+      // alice is finally able to sellrex, she gains the fee paid by bob
+      BOOST_REQUIRE_EQUAL( success(),          sellrex( alice, get_rex_balance(alice) ) );
+      BOOST_REQUIRE_EQUAL( 0,                  get_rex_balance(alice).get_amount() );
+      auto expected_rex_fund = (init_balance + fee).get_amount();
+      auto actual_rex_fund   = get_rex_fund(alice).get_amount();
+      BOOST_REQUIRE_EQUAL( expected_rex_fund,  actual_rex_fund );
+      // test that carol's resource limits have been updated properly when loan expires
+      BOOST_REQUIRE_EQUAL( init_cpu_limit,     get_cpu_limit( carol ) );
+      BOOST_REQUIRE_EQUAL( init_net_limit,     get_net_limit( carol ) );
+
+      rex_pool = get_rex_pool();
+      BOOST_REQUIRE_EQUAL( 0, rex_pool["total_lendable"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL( 0, rex_pool["total_unlent"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL( 0, rex_pool["total_rex"].as<asset>().get_amount() );
+   }
+
+   {
+      const int64_t init_net_limit = get_net_limit( emily )
