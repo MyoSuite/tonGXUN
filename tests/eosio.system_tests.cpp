@@ -4429,4 +4429,25 @@ BOOST_FIXTURE_TEST_CASE( buy_rent_rex, eosio_system_tester ) try {
    }
 
    {
-      const int64_t init_net_limit = get_net_limit( emily )
+      const int64_t init_net_limit = get_net_limit( emily );
+      BOOST_REQUIRE_EQUAL( 0,         get_rex_balance(alice).get_amount() );
+      BOOST_REQUIRE_EQUAL( success(), buyrex( alice, core_sym::from_string("20050.0000") ) );
+      rex_pool = get_rex_pool();
+      const asset fee = core_sym::from_string("0.4560");
+      int64_t expected_net = bancor_convert( rex_pool["total_rent"].as<asset>().get_amount(),
+                                             rex_pool["total_unlent"].as<asset>().get_amount(),
+                                             fee.get_amount() );
+      BOOST_REQUIRE_EQUAL( success(),    rentnet( emily, emily, fee ) );
+      BOOST_REQUIRE_EQUAL( expected_net, get_net_limit( emily ) - init_net_limit );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( buy_sell_sell_rex, eosio_system_tester ) try {
+
+   const int64_t ratio        = 10000;
+   const asset   init_balance = core_sym::from_string("40000.0000");
+   const asset   init_net     = core_sym::from_string("70.0000");
+   const asset   init_cpu     = core_sym::from_string("90.0000");
+   const std::vector<account_name> accounts = { "aliceaccoun
