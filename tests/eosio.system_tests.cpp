@@ -4484,4 +4484,24 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_sell_rex, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(),                                           sellrex( alice, get_rex_balance(alice) - rex_tok ) );
    BOOST_REQUIRE_EQUAL( false,                                               get_rex_order_obj( alice ).is_null() );
    BOOST_REQUIRE_EQUAL( success(),                                           sellrex( alice, rex_tok ) );
-   BOOST_REQUIRE_EQUAL( sellrex( alice, rex_tok ),     
+   BOOST_REQUIRE_EQUAL( sellrex( alice, rex_tok ),                           wasm_assert_msg("insufficient funds for current and scheduled orders") );
+   BOOST_REQUIRE_EQUAL( ratio * payment.get_amount() - rex_tok.get_amount(), get_rex_order( alice )["rex_requested"].as<asset>().get_amount() );
+   BOOST_REQUIRE_EQUAL( success(),                                           consolidate( alice ) );
+   BOOST_REQUIRE_EQUAL( 0,                                                   get_rex_balance_obj( alice )["rex_maturities"].get_array().size() );
+
+   produce_block( fc::days(26) );
+   produce_blocks(2);
+
+   BOOST_REQUIRE_EQUAL( success(),  rexexec( alice, 2 ) );
+   BOOST_REQUIRE_EQUAL( 0,          get_rex_balance( alice ).get_amount() );
+   BOOST_REQUIRE_EQUAL( 0,          get_rex_balance_obj( alice )["matured_rex"].as<int64_t>() );
+   const asset init_fund = get_rex_fund( alice );
+   BOOST_REQUIRE_EQUAL( success(),  updaterex( alice ) );
+   BOOST_REQUIRE_EQUAL( 0,          get_rex_balance( alice ).get_amount() );
+   BOOST_REQUIRE_EQUAL( 0,          get_rex_balance_obj( alice )["matured_rex"].as<int64_t>() );
+   BOOST_REQUIRE      ( init_fund < get_rex_fund( alice ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CA
