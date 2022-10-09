@@ -4504,4 +4504,22 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_sell_rex, eosio_system_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 
-BOOST_FIXTURE_TEST_CA
+BOOST_FIXTURE_TEST_CASE( buy_sell_claim_rex, eosio_system_tester ) try {
+
+   const asset init_balance = core_sym::from_string("3000000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n, "frankaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3], frank = accounts[4];
+   setup_rex_accounts( accounts, init_balance );
+
+   const auto purchase1  = core_sym::from_string("50000.0000");
+   const auto purchase2  = core_sym::from_string("105500.0000");
+   const auto purchase3  = core_sym::from_string("104500.0000");
+   const auto init_stake = get_voter_info(alice)["staked"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( success(), buyrex( alice, purchase1) );
+   BOOST_REQUIRE_EQUAL( success(), buyrex( bob,   purchase2) );
+   BOOST_REQUIRE_EQUAL( success(), buyrex( carol, purchase3) );
+
+   BOOST_REQUIRE_EQUAL( init_balance - purchase1, get_rex_fund(alice) );
+   BOOST_REQUIRE_EQUAL( purchase1.get_amount(),   get_voter_info(alice)["staked"].as<int64_t>() - init_stake );
+
+   BOOST_REQU
