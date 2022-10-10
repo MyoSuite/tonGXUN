@@ -4522,4 +4522,29 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_claim_rex, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( init_balance - purchase1, get_rex_fund(alice) );
    BOOST_REQUIRE_EQUAL( purchase1.get_amount(),   get_voter_info(alice)["staked"].as<int64_t>() - init_stake );
 
-   BOOST_REQU
+   BOOST_REQUIRE_EQUAL( init_balance - purchase2, get_rex_fund(bob) );
+   BOOST_REQUIRE_EQUAL( init_balance - purchase3, get_rex_fund(carol) );
+
+   auto init_alice_rex = get_rex_balance(alice);
+   auto init_bob_rex   = get_rex_balance(bob);
+   auto init_carol_rex = get_rex_balance(carol);
+
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("20000.0000"), get_rex_pool()["total_rent"].as<asset>() );
+
+   for (uint8_t i = 0; i < 4; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), rentcpu( emily, emily, core_sym::from_string("12000.0000") ) );
+   }
+
+   produce_block( fc::days(25) );
+
+   const asset rent_payment = core_sym::from_string("46000.0000");
+   BOOST_REQUIRE_EQUAL( success(), rentcpu( frank, frank, rent_payment, rent_payment ) );
+
+   produce_block( fc::days(4) );
+
+   BOOST_REQUIRE_EQUAL( success(), rexexec( alice, 1 ) );
+
+   const auto    init_rex_pool        = get_rex_pool();
+   const int64_t total_lendable       = init_rex_pool["total_lendable"].as<asset>().get_amount();
+   const int64_t total_rex            = init_rex_pool["total_rex"].as<asset>().get_amount();
+   const int64_t init_alice_rex_stake = ( eosio:
