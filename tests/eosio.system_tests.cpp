@@ -4547,4 +4547,22 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_claim_rex, eosio_system_tester ) try {
    const auto    init_rex_pool        = get_rex_pool();
    const int64_t total_lendable       = init_rex_pool["total_lendable"].as<asset>().get_amount();
    const int64_t total_rex            = init_rex_pool["total_rex"].as<asset>().get_amount();
-   const int64_t init_alice_rex_stake = ( eosio:
+   const int64_t init_alice_rex_stake = ( eosio::chain::uint128_t(init_alice_rex.get_amount()) * total_lendable ) / total_rex;
+
+   BOOST_REQUIRE_EQUAL( success(), sellrex( alice, asset( 3 * get_rex_balance(alice).get_amount() / 4, symbol{SY(4,REX)} ) ) );
+
+   BOOST_TEST_REQUIRE( within_one( init_alice_rex.get_amount() / 4, get_rex_balance(alice).get_amount() ) );
+
+   init_alice_rex = get_rex_balance(alice);
+   BOOST_REQUIRE_EQUAL( success(), sellrex( bob,   get_rex_balance(bob) ) );
+   BOOST_REQUIRE_EQUAL( success(), sellrex( carol, get_rex_balance(carol) ) );
+   BOOST_REQUIRE_EQUAL( success(), sellrex( alice, get_rex_balance(alice) ) );
+
+   BOOST_REQUIRE_EQUAL( init_bob_rex,   get_rex_balance(bob) );
+   BOOST_REQUIRE_EQUAL( init_carol_rex, get_rex_balance(carol) );
+   BOOST_REQUIRE_EQUAL( init_alice_rex, get_rex_balance(alice) );
+
+   // now bob's, carol's and alice's sellrex orders have been queued
+   BOOST_REQUIRE_EQUAL( true,           get_rex_order(alice)["is_open"].as<bool>() );
+   BOOST_REQUIRE_EQUAL( init_alice_rex, get_rex_order(alice)["rex_requested"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( 0,              get_rex_order(alice)["proceeds"].a
