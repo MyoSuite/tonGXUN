@@ -4580,4 +4580,23 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_claim_rex, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( true,           get_rex_order(bob)["is_open"].as<bool>() );
    BOOST_REQUIRE_EQUAL( true,           get_rex_order(carol)["is_open"].as<bool>() );
 
-   // wait for 2 more hours, by now frank's loan has expired and there is enough balan
+   // wait for 2 more hours, by now frank's loan has expired and there is enough balance in
+   // total_unlent to close some sellrex orders. only two are processed, bob's and carol's.
+   // alices's order is still open.
+   // an action is needed to trigger queue processing
+   produce_block( fc::hours(2) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("rex loans are currently not available"),
+                        rentcpu( frank, frank, core_sym::from_string("0.0001") ) );
+   {
+      auto trace = base_tester::push_action( config::system_account_name, "rexexec"_n, frank,
+                                             mvo()("user", frank)("max", 2) );
+      auto output = get_rexorder_result( trace );
+      BOOST_REQUIRE_EQUAL( output.size(),    1 );
+      BOOST_REQUIRE_EQUAL( output[0].first,  bob );
+      BOOST_REQUIRE_EQUAL( output[0].second, get_rex_order(bob)["proceeds"].as<asset>() );
+   }
+
+   {
+      BOOST_REQUIRE_EQUAL( false,          get_rex_order(bob)["is_open"].as<bool>() );
+      BOOST_REQUIRE_EQUAL( init_bob_rex,   get_rex_order(bob)["rex_requested"].as<asset>() );
+      BOOST_TEST_REQUIRE ( 0 <             get_rex_order(bob)["procee
