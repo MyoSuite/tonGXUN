@@ -4621,4 +4621,20 @@ BOOST_FIXTURE_TEST_CASE( buy_sell_claim_rex, eosio_system_tester ) try {
 
    {
       auto trace1 = base_tester::push_action( config::system_account_name, "updaterex"_n, bob, mvo()("owner", bob) );
-      auto trace2 = base_tester::push_action( config::system_account_name, "updaterex"_n, ca
+      auto trace2 = base_tester::push_action( config::system_account_name, "updaterex"_n, carol, mvo()("owner", carol) );
+      BOOST_REQUIRE_EQUAL( 0,              get_rex_vote_stake( bob ).get_amount() );
+      BOOST_REQUIRE_EQUAL( init_stake,     get_voter_info( bob )["staked"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( 0,              get_rex_vote_stake( carol ).get_amount() );
+      BOOST_REQUIRE_EQUAL( init_stake,     get_voter_info( carol )["staked"].as<int64_t>() );
+      auto output1 = get_rexorder_result( trace1 );
+      auto output2 = get_rexorder_result( trace2 );
+      BOOST_REQUIRE_EQUAL( 2,              output1.size() + output2.size() );
+
+      BOOST_REQUIRE_EQUAL( false,          get_rex_order_obj(alice).is_null() );
+      BOOST_REQUIRE_EQUAL( true,           get_rex_order_obj(bob).is_null() );
+      BOOST_REQUIRE_EQUAL( true,           get_rex_order_obj(carol).is_null() );
+      BOOST_REQUIRE_EQUAL( false,          get_rex_order(alice)["is_open"].as<bool>() );
+
+      const auto& rex_pool = get_rex_pool();
+      BOOST_REQUIRE_EQUAL( 0,              rex_pool["total_lendable"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL
