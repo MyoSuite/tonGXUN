@@ -4657,4 +4657,23 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
    const asset   init_balance = core_sym::from_string("40000.0000");
    const asset   one_unit     = core_sym::from_string("0.0001");
    const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n, "frankaccount"_n };
-   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3], frank = account
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3], frank = accounts[4];
+   setup_rex_accounts( accounts, init_balance  );
+
+   BOOST_REQUIRE_EQUAL( success(), buyrex( alice, core_sym::from_string("25000.0000") ) );
+
+   auto rex_pool            = get_rex_pool();
+   const asset payment      = core_sym::from_string("30.0000");
+   const asset zero_asset   = core_sym::from_string("0.0000");
+   const asset neg_asset    = core_sym::from_string("-1.0000");
+   BOOST_TEST_REQUIRE( 0 > neg_asset.get_amount() );
+   asset cur_frank_balance  = get_rex_fund( frank );
+   int64_t expected_stake   = bancor_convert( rex_pool["total_rent"].as<asset>().get_amount(),
+                                              rex_pool["total_unlent"].as<asset>().get_amount(),
+                                              payment.get_amount() );
+   const int64_t init_stake = get_cpu_limit( frank );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must use core token"),
+                        rentcpu( frank, bob, asset::from_string("10.0000 RND") ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must use core token"),
+                        rentcpu( frank, bob, payment, asset::from_str
