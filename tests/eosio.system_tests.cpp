@@ -4694,4 +4694,19 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
       const auto& pool = get_rex_pool();
       const int64_t r  = bancor_convert( pool["total_rent"].as<asset>().get_amount(),
                                          pool["total_unlent"].as<asset>().get_amount(),
-                
+                                         payment.get_amount() );
+      expected_rented_net = asset{ r, symbol{CORE_SYM} };
+   }
+   BOOST_REQUIRE_EQUAL( expected_rented_net, get_rentnet_result( alice, emily, payment ) ); // loan_num = 3
+   BOOST_REQUIRE_EQUAL( success(),           rentnet( alice, alice, payment ) );            // loan_num = 4
+   BOOST_REQUIRE_EQUAL( success(),           rentnet( alice, frank, payment ) );            // loan_num = 5
+   BOOST_REQUIRE_EQUAL( 5,                   get_last_net_loan()["loan_num"].as_uint64() );
+
+   auto loan_info         = get_cpu_loan(1);
+   auto old_frank_balance = cur_frank_balance;
+   cur_frank_balance      = get_rex_fund( frank );
+   BOOST_REQUIRE_EQUAL( old_frank_balance,           payment + cur_frank_balance );
+   BOOST_REQUIRE_EQUAL( 1,                           loan_info["loan_num"].as_uint64() );
+   BOOST_REQUIRE_EQUAL( payment,                     loan_info["payment"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( 0,                           loan_info["balance"].as<asset>().get_amount() );
+   BOOST_REQUIRE_EQUAL( expected_stake,              loan_info["total_staked"].as<asset>()
