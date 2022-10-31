@@ -4676,4 +4676,22 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("must use core token"),
                         rentcpu( frank, bob, asset::from_string("10.0000 RND") ) );
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("must use core token"),
-                        rentcpu( frank, bob, payment, asset::from_str
+                        rentcpu( frank, bob, payment, asset::from_string("10.0000 RND") ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must use positive asset amount"),
+                        rentcpu( frank, bob, zero_asset ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must use positive asset amount"),
+                        rentcpu( frank, bob, payment, neg_asset ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must use positive asset amount"),
+                        rentcpu( frank, bob, neg_asset, payment ) );
+   // create 2 cpu and 3 net loans
+   const asset rented_tokens{ expected_stake, symbol{CORE_SYM} };
+   BOOST_REQUIRE_EQUAL( rented_tokens,  get_rentcpu_result( frank, bob, payment ) ); // loan_num = 1
+   BOOST_REQUIRE_EQUAL( success(),      rentcpu( alice, emily, payment ) );          // loan_num = 2
+   BOOST_REQUIRE_EQUAL( 2,              get_last_cpu_loan()["loan_num"].as_uint64() );
+
+   asset expected_rented_net;
+   {
+      const auto& pool = get_rex_pool();
+      const int64_t r  = bancor_convert( pool["total_rent"].as<asset>().get_amount(),
+                                         pool["total_unlent"].as<asset>().get_amount(),
+                
