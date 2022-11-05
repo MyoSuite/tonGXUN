@@ -4728,4 +4728,16 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
    // in the meantime, defund then fund the same amount and test the balances
    {
       const asset amount = core_sym::from_string("7.5000");
-      BOOST_REQU
+      BOOST_REQUIRE_EQUAL( defundnetloan( frank, 1, fund ),                             wasm_assert_msg("loan not found") );
+      BOOST_REQUIRE_EQUAL( defundcpuloan( alice, 1, fund ),                             wasm_assert_msg("user must be loan creator") );
+      BOOST_REQUIRE_EQUAL( defundcpuloan( frank, 1, core_sym::from_string("75.0000") ), wasm_assert_msg("insufficent loan balance") );
+      old_frank_balance = cur_frank_balance;
+      asset old_loan_balance = get_cpu_loan(1)["balance"].as<asset>();
+      BOOST_REQUIRE_EQUAL( defundcpuloan( frank, 1, amount ), success() );
+      BOOST_REQUIRE_EQUAL( old_loan_balance,                  get_cpu_loan(1)["balance"].as<asset>() + amount );
+      cur_frank_balance = get_rex_fund( frank );
+      old_loan_balance  = get_cpu_loan(1)["balance"].as<asset>();
+      BOOST_REQUIRE_EQUAL( old_frank_balance + amount,        cur_frank_balance );
+      old_frank_balance = cur_frank_balance;
+      BOOST_REQUIRE_EQUAL( fundcpuloan( frank, 1, amount ),   success() );
+      BOOST_REQUIRE_EQUAL( old_loan_balance + amount,  
