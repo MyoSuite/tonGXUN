@@ -4740,4 +4740,27 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( old_frank_balance + amount,        cur_frank_balance );
       old_frank_balance = cur_frank_balance;
       BOOST_REQUIRE_EQUAL( fundcpuloan( frank, 1, amount ),   success() );
-      BOOST_REQUIRE_EQUAL( old_loan_balance + amount,  
+      BOOST_REQUIRE_EQUAL( old_loan_balance + amount,         get_cpu_loan(1)["balance"].as<asset>() );
+      cur_frank_balance = get_rex_fund( frank );
+      BOOST_REQUIRE_EQUAL( old_frank_balance - amount,        cur_frank_balance );
+   }
+
+   // wait for 30 days, frank's loan will be renewed at the current price
+   produce_block( fc::minutes(30*24*60 - 1) );
+   BOOST_REQUIRE_EQUAL( success(), updaterex( alice ) );
+   rex_pool = get_rex_pool();
+   {
+      int64_t unlent_tokens = bancor_convert( rex_pool["total_unlent"].as<asset>().get_amount(),
+                                              rex_pool["total_rent"].as<asset>().get_amount(),
+                                              expected_stake );
+
+      expected_stake = bancor_convert( rex_pool["total_rent"].as<asset>().get_amount() - unlent_tokens,
+                                       rex_pool["total_unlent"].as<asset>().get_amount() + expected_stake,
+                                       payment.get_amount() );
+   }
+
+   produce_block( fc::minutes(2) );
+
+   BOOST_REQUIRE_EQUAL( success(), sellrex( alice, asset::from_string("1.0000 REX") ) );
+
+   loan_info = g
