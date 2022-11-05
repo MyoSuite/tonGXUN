@@ -4709,4 +4709,23 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( 1,                           loan_info["loan_num"].as_uint64() );
    BOOST_REQUIRE_EQUAL( payment,                     loan_info["payment"].as<asset>() );
    BOOST_REQUIRE_EQUAL( 0,                           loan_info["balance"].as<asset>().get_amount() );
-   BOOST_REQUIRE_EQUAL( expected_stake,              loan_info["total_staked"].as<asset>()
+   BOOST_REQUIRE_EQUAL( expected_stake,              loan_info["total_staked"].as<asset>().get_amount() );
+   BOOST_REQUIRE_EQUAL( expected_stake + init_stake, get_cpu_limit( bob ) );
+
+   // frank funds his loan enough to be renewed once
+   const asset fund = core_sym::from_string("35.0000");
+   BOOST_REQUIRE_EQUAL( fundcpuloan( frank, 1, cur_frank_balance + one_unit), wasm_assert_msg("insufficient funds") );
+   BOOST_REQUIRE_EQUAL( fundnetloan( frank, 1, fund ), wasm_assert_msg("loan not found") );
+   BOOST_REQUIRE_EQUAL( fundcpuloan( alice, 1, fund ), wasm_assert_msg("user must be loan creator") );
+   BOOST_REQUIRE_EQUAL( success(),                     fundcpuloan( frank, 1, fund ) );
+   old_frank_balance = cur_frank_balance;
+   cur_frank_balance = get_rex_fund( frank );
+   loan_info         = get_cpu_loan(1);
+   BOOST_REQUIRE_EQUAL( old_frank_balance, fund + cur_frank_balance );
+   BOOST_REQUIRE_EQUAL( fund,              loan_info["balance"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( payment,           loan_info["payment"].as<asset>() );
+
+   // in the meantime, defund then fund the same amount and test the balances
+   {
+      const asset amount = core_sym::from_string("7.5000");
+      BOOST_REQU
