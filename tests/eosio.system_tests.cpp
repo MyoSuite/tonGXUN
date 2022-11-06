@@ -4763,4 +4763,22 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
 
    BOOST_REQUIRE_EQUAL( success(), sellrex( alice, asset::from_string("1.0000 REX") ) );
 
-   loan_info = g
+   loan_info = get_cpu_loan(1);
+   BOOST_REQUIRE_EQUAL( payment,                     loan_info["payment"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( fund - payment,              loan_info["balance"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( expected_stake,              loan_info["total_staked"].as<asset>().get_amount() );
+   BOOST_REQUIRE_EQUAL( expected_stake + init_stake, get_cpu_limit( bob ) );
+
+   // check that loans have been processed in order
+   BOOST_REQUIRE_EQUAL( false, get_cpu_loan(1).is_null() );
+   BOOST_REQUIRE_EQUAL( true,  get_cpu_loan(2).is_null() );
+   BOOST_REQUIRE_EQUAL( true,  get_net_loan(3).is_null() );
+   BOOST_REQUIRE_EQUAL( true,  get_net_loan(4).is_null() );
+   BOOST_REQUIRE_EQUAL( false, get_net_loan(5).is_null() );
+   BOOST_REQUIRE_EQUAL( 1,     get_last_cpu_loan()["loan_num"].as_uint64() );
+   BOOST_REQUIRE_EQUAL( 5,     get_last_net_loan()["loan_num"].as_uint64() );
+
+   // wait for another month, frank's loan doesn't have enough funds and will be closed
+   produce_block( fc::hours(30*24) );
+   BOOST_REQUIRE_EQUAL( success(),  buyrex( alice, core_sym::from_string("10.0000") ) );
+   BO
