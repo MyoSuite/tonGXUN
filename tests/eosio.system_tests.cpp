@@ -4826,4 +4826,16 @@ BOOST_FIXTURE_TEST_CASE( ramfee_namebid_to_rex, eosio_system_tester ) try {
 
    const int64_t ratio        = 10000;
    const asset   init_balance = core_sym::from_string("10000.0000");
-   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobb
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n, "frankaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3], frank = accounts[4];
+   setup_rex_accounts( accounts, init_balance, core_sym::from_string("80.0000"), core_sym::from_string("80.0000"), false );
+
+   asset cur_ramfee_balance = get_balance( "eosio.ramfee"_n );
+   BOOST_REQUIRE_EQUAL( success(),                      buyram( alice, alice, core_sym::from_string("20.0000") ) );
+   BOOST_REQUIRE_EQUAL( get_balance( "eosio.ramfee"_n ), core_sym::from_string("0.1000") + cur_ramfee_balance );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must deposit to REX fund first"),
+                        buyrex( alice, core_sym::from_string("350.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(),                      deposit( alice, core_sym::from_string("350.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(),                      buyrex( alice, core_sym::from_string("350.0000") ) );
+   cur_ramfee_balance = get_balance( "eosio.ramfee"_n );
+   asset cur_rex_balance = get_balance( "eosio.rex"_n );
