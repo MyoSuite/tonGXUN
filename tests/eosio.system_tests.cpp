@@ -4781,4 +4781,27 @@ BOOST_FIXTURE_TEST_CASE( rex_loans, eosio_system_tester ) try {
    // wait for another month, frank's loan doesn't have enough funds and will be closed
    produce_block( fc::hours(30*24) );
    BOOST_REQUIRE_EQUAL( success(),  buyrex( alice, core_sym::from_string("10.0000") ) );
-   BO
+   BOOST_REQUIRE_EQUAL( true,       get_cpu_loan(1).is_null() );
+   BOOST_REQUIRE_EQUAL( init_stake, get_cpu_limit( bob ) );
+   old_frank_balance = cur_frank_balance;
+   cur_frank_balance = get_rex_fund( frank );
+   BOOST_REQUIRE_EQUAL( fund - payment,     cur_frank_balance - old_frank_balance );
+   BOOST_REQUIRE      ( old_frank_balance < cur_frank_balance );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( rex_loan_checks, eosio_system_tester ) try {
+
+   const int64_t ratio        = 10000;
+   const asset   init_balance = core_sym::from_string("40000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1];
+   setup_rex_accounts( accounts, init_balance );
+
+   const asset payment1 = core_sym::from_string("20000.0000");
+   const asset payment2 = core_sym::from_string("4.0000");
+   const asset fee      = core_sym::from_string("1.0000");
+   BOOST_REQUIRE_EQUAL( success(), buyrex( alice, payment1 ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("loan price does not favor renting"),
+                        rentcpu( bob, bob, fee ) )
