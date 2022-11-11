@@ -4804,4 +4804,26 @@ BOOST_FIXTURE_TEST_CASE( rex_loan_checks, eosio_system_tester ) try {
    const asset fee      = core_sym::from_string("1.0000");
    BOOST_REQUIRE_EQUAL( success(), buyrex( alice, payment1 ) );
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("loan price does not favor renting"),
-                        rentcpu( bob, bob, fee ) )
+                        rentcpu( bob, bob, fee ) );
+   BOOST_REQUIRE_EQUAL( success(),            buyrex( alice, payment2 ) );
+   BOOST_REQUIRE_EQUAL( success(),            rentcpu( bob, bob, fee, fee + fee + fee ) );
+   BOOST_REQUIRE_EQUAL( true,                 !get_cpu_loan(1).is_null() );
+   BOOST_REQUIRE_EQUAL( 3 * fee.get_amount(), get_last_cpu_loan()["balance"].as<asset>().get_amount() );
+
+   produce_block( fc::days(31) );
+   BOOST_REQUIRE_EQUAL( success(),            rexexec( alice, 3) );
+   BOOST_REQUIRE_EQUAL( 2 * fee.get_amount(), get_last_cpu_loan()["balance"].as<asset>().get_amount() );
+
+   BOOST_REQUIRE_EQUAL( success(),            sellrex( alice, asset::from_string("1000000.0000 REX") ) );
+   produce_block( fc::days(31) );
+   BOOST_REQUIRE_EQUAL( success(),            rexexec( alice, 3) );
+   BOOST_REQUIRE_EQUAL( true,                 get_cpu_loan(1).is_null() );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( ramfee_namebid_to_rex, eosio_system_tester ) try {
+
+   const int64_t ratio        = 10000;
+   const asset   init_balance = core_sym::from_string("10000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobb
