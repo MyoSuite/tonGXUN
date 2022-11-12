@@ -4839,3 +4839,21 @@ BOOST_FIXTURE_TEST_CASE( ramfee_namebid_to_rex, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(),                      buyrex( alice, core_sym::from_string("350.0000") ) );
    cur_ramfee_balance = get_balance( "eosio.ramfee"_n );
    asset cur_rex_balance = get_balance( "eosio.rex"_n );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("350.0000"), cur_rex_balance );
+   BOOST_REQUIRE_EQUAL( success(),                         buyram( bob, carol, core_sym::from_string("70.0000") ) );
+   BOOST_REQUIRE_EQUAL( cur_ramfee_balance,                get_balance( "eosio.ramfee"_n ) );
+   BOOST_REQUIRE_EQUAL( get_balance( "eosio.rex"_n ),       cur_rex_balance + core_sym::from_string("0.3500") );
+
+   cur_rex_balance = get_balance( "eosio.rex"_n );
+
+   produce_blocks( 1 );
+   produce_block( fc::hours(30*24 + 12) );
+   produce_blocks( 1 );
+
+   BOOST_REQUIRE_EQUAL( success(),       rexexec( alice, 1 ) );
+   auto cur_rex_pool = get_rex_pool();
+
+   BOOST_TEST_REQUIRE(  within_one( cur_rex_balance.get_amount(), cur_rex_pool["total_unlent"].as<asset>().get_amount() ) );
+   BOOST_TEST_REQUIRE(  cur_rex_balance >=                        cur_rex_pool["total_unlent"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( 0,                                        cur_rex_pool["total_lent"].as<asset>().get_amount() );
+   BOOST_TEST_REQUIRE(  within_one( cur_rex_balance.get_amount(), cur_rex_pool["total_lendable"].as<asset>().
