@@ -4856,4 +4856,24 @@ BOOST_FIXTURE_TEST_CASE( ramfee_namebid_to_rex, eosio_system_tester ) try {
    BOOST_TEST_REQUIRE(  within_one( cur_rex_balance.get_amount(), cur_rex_pool["total_unlent"].as<asset>().get_amount() ) );
    BOOST_TEST_REQUIRE(  cur_rex_balance >=                        cur_rex_pool["total_unlent"].as<asset>() );
    BOOST_REQUIRE_EQUAL( 0,                                        cur_rex_pool["total_lent"].as<asset>().get_amount() );
-   BOOST_TEST_REQUIRE(  within_one( cur_rex_balance.get_amount(), cur_rex_pool["total_lendable"].as<asset>().
+   BOOST_TEST_REQUIRE(  within_one( cur_rex_balance.get_amount(), cur_rex_pool["total_lendable"].as<asset>().get_amount() ) );
+   BOOST_TEST_REQUIRE(  cur_rex_balance >=                        cur_rex_pool["total_lendable"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( 0,                                        cur_rex_pool["namebid_proceeds"].as<asset>().get_amount() );
+
+   // required for closing namebids
+   // TELOS SPECIFIC
+   // cross_15_percent_threshold();
+   active_and_vote_producers2();
+   vote("proxyaccount"_n, { "tprodaaaaaaa"_n });
+   produce_block( fc::days(14) );
+
+   cur_rex_balance = get_balance( "eosio.rex"_n );
+   BOOST_REQUIRE_EQUAL( success(),                        bidname( carol, "rndmbid"_n, core_sym::from_string("23.7000") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("23.7000"), get_balance( "eosio.names"_n ) );
+   BOOST_REQUIRE_EQUAL( success(),                        bidname( alice, "rndmbid"_n, core_sym::from_string("29.3500") ) );
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("29.3500"), get_balance( "eosio.names"_n ));
+
+   produce_block( fc::hours(24) );
+   produce_blocks( 1000 );  // TELOS SPECIFIC
+
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("29.3500"), get_rex_pool()["namebid_proceeds"].as<asset>()
