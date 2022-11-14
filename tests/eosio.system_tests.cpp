@@ -4876,4 +4876,25 @@ BOOST_FIXTURE_TEST_CASE( ramfee_namebid_to_rex, eosio_system_tester ) try {
    produce_block( fc::hours(24) );
    produce_blocks( 1000 );  // TELOS SPECIFIC
 
-   BOOST_REQUIRE_EQUAL( core_sym::from_string("29.3500"), get_rex_pool()["namebid_proceeds"].as<asset>()
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("29.3500"), get_rex_pool()["namebid_proceeds"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( success(),                        deposit( frank, core_sym::from_string("5.0000") ) );
+   BOOST_REQUIRE_EQUAL( success(),                        buyrex( frank, core_sym::from_string("5.0000") ) );
+   BOOST_REQUIRE_EQUAL( get_balance( "eosio.rex"_n ),      cur_rex_balance + core_sym::from_string("34.3500") );
+   BOOST_REQUIRE_EQUAL( 0,                                get_balance( "eosio.names"_n ).get_amount() );
+
+   cur_rex_balance = get_balance( "eosio.rex"_n );
+   produce_block( fc::hours(30*24 + 13) );
+   produce_blocks( 1 );
+
+   BOOST_REQUIRE_EQUAL( success(),                        rexexec( alice, 1 ) );
+   BOOST_REQUIRE_EQUAL( cur_rex_balance,                  get_rex_pool()["total_lendable"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( get_rex_pool()["total_lendable"].as<asset>(),
+                        get_rex_pool()["total_unlent"].as<asset>() );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( rex_maturity, eosio_system_tester ) try {
+
+   const asset init_balance = core_sym::from_string("1000000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobby
