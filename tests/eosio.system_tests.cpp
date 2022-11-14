@@ -4897,4 +4897,26 @@ BOOST_FIXTURE_TEST_CASE( ramfee_namebid_to_rex, eosio_system_tester ) try {
 BOOST_FIXTURE_TEST_CASE( rex_maturity, eosio_system_tester ) try {
 
    const asset init_balance = core_sym::from_string("1000000.0000");
-   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobby
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1];
+   setup_rex_accounts( accounts, init_balance );
+
+   const int64_t rex_ratio = 10000;
+   const symbol  rex_sym( SY(4, REX) );
+
+   {
+      BOOST_REQUIRE_EQUAL( success(), buyrex( alice, core_sym::from_string("11.5000") ) );
+      produce_block( fc::hours(3) );
+      BOOST_REQUIRE_EQUAL( success(), buyrex( alice, core_sym::from_string("18.5000") ) );
+      produce_block( fc::hours(25) );
+      BOOST_REQUIRE_EQUAL( success(), buyrex( alice, core_sym::from_string("25.0000") ) );
+
+      auto rex_balance = get_rex_balance_obj( alice );
+      BOOST_REQUIRE_EQUAL( 550000 * rex_ratio, rex_balance["rex_balance"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL( 0,                  rex_balance["matured_rex"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( 2,                  rex_balance["rex_maturities"].get_array().size() );
+
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( alice, asset::from_string("115000.0000 REX") ) );
+      produce_block( fc::hours( 3*24 + 20) );
+      BOOST_REQUIRE_EQUAL( 
