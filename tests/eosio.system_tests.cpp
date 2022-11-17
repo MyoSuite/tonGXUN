@@ -4933,4 +4933,26 @@ BOOST_FIXTURE_TEST_CASE( rex_maturity, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( 1200000000,         rex_balance["rex_balance"].as<asset>().get_amount() );
       BOOST_REQUIRE_EQUAL( 1200000000,         rex_balance["matured_rex"].as<int64_t>() );
       BOOST_REQUIRE_EQUAL( 0,                  rex_balance["rex_maturities"].get_array().size() );
-      BOOST_REQUIRE_EQUAL( wasm_assert_msg("
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( alice, asset::from_string("130000.0000 REX") ) );
+      BOOST_REQUIRE_EQUAL( success(),          sellrex( alice, asset::from_string("120000.0000 REX") ) );
+      rex_balance = get_rex_balance_obj( alice );
+      BOOST_REQUIRE_EQUAL( 0,                  rex_balance["rex_balance"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL( 0,                  rex_balance["matured_rex"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( 0,                  rex_balance["rex_maturities"].get_array().size() );
+   }
+
+   {
+      const asset payment1 = core_sym::from_string("14.8000");
+      const asset payment2 = core_sym::from_string("15.2000");
+      const asset payment  = payment1 + payment2;
+      const asset rex_bucket( rex_ratio * payment.get_amount(), rex_sym );
+      for ( uint8_t i = 0; i < 8; ++i ) {
+         BOOST_REQUIRE_EQUAL( success(), buyrex( bob, payment1 ) );
+         produce_block( fc::hours(2) );
+         BOOST_REQUIRE_EQUAL( success(), buyrex( bob, payment2 ) );
+         produce_block( fc::hours(24) );
+      }
+
+      auto rex_balance = get_rex_balance_obj( bob );
+  
