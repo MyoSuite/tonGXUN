@@ -5006,4 +5006,21 @@ BOOST_FIXTURE_TEST_CASE( rex_maturity, eosio_system_tester ) try {
    }
 
    {
-      const asset payment1 = core_sym::from_strin
+      const asset payment1 = core_sym::from_string("250000.0000");
+      const asset payment2 = core_sym::from_string("10000.0000");
+      const asset rex_bucket1( rex_ratio * payment1.get_amount(), rex_sym );
+      const asset rex_bucket2( rex_ratio * payment2.get_amount(), rex_sym );
+      const asset tot_rex = rex_bucket1 + rex_bucket2;
+
+      BOOST_REQUIRE_EQUAL( success(), buyrex( bob, payment1 ) );
+      produce_block( fc::days(3) );
+      BOOST_REQUIRE_EQUAL( success(), buyrex( bob, payment2 ) );
+      produce_block( fc::days(2) );
+      BOOST_REQUIRE_EQUAL( success(), updaterex( bob ) );
+
+      auto rex_balance = get_rex_balance_obj( bob );
+      BOOST_REQUIRE_EQUAL( tot_rex,                  rex_balance["rex_balance"].as<asset>() );
+      BOOST_REQUIRE_EQUAL( rex_bucket1.get_amount(), rex_balance["matured_rex"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( success(),                rentcpu( alice, alice, core_sym::from_string("8000.0000") ) );
+      BOOST_REQUIRE_EQUAL( success(),                sellrex( bob, asset( rex_bucket1.get_amount() - 20, rex_sym ) ) );
+      rex_balance = get_rex_balance_obj( bo
