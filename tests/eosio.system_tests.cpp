@@ -5080,4 +5080,22 @@ BOOST_FIXTURE_TEST_CASE( rex_savings, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
                            sellrex( alice, asset::from_string( "1.0000 REX" ) ) );
       produce_blocks( 2 );
-      produce_block( fc::days(
+      produce_block( fc::days(2) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( alice, asset::from_string( "10.0001 REX" ) ) );
+      BOOST_REQUIRE_EQUAL( success(),                   sellrex( alice, asset::from_string( "10.0000 REX" ) ) );
+      rex_balance = get_rex_balance_obj( alice );
+      BOOST_REQUIRE_EQUAL( 1,                           rex_balance["rex_maturities"].get_array().size() );
+      produce_block( fc::days(100) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( alice, asset::from_string( "0.0001 REX" ) ) );
+      BOOST_REQUIRE_EQUAL( success(),                   mvfrsavings( alice, get_rex_balance( alice ) ) );
+      produce_block( fc::days(5) );
+      BOOST_REQUIRE_EQUAL( success(),                   sellrex( alice, get_rex_balance( alice ) ) );
+   }
+
+   {
+      const asset payment = core_sym::from_string("20.0000");
+      const asset rex_bucket( rex_ratio * payment.get_amount(), rex_sym );
+      for ( uint8_t i = 0; i < 5; ++i ) {
+   
