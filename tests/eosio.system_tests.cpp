@@ -5098,4 +5098,20 @@ BOOST_FIXTURE_TEST_CASE( rex_savings, eosio_system_tester ) try {
       const asset payment = core_sym::from_string("20.0000");
       const asset rex_bucket( rex_ratio * payment.get_amount(), rex_sym );
       for ( uint8_t i = 0; i < 5; ++i ) {
-   
+         produce_block( fc::hours(24) );
+         BOOST_REQUIRE_EQUAL( success(), buyrex( bob, payment ) );
+      }
+
+      auto rex_balance = get_rex_balance_obj( bob );
+      BOOST_REQUIRE_EQUAL( 5 * rex_bucket.get_amount(), rex_balance["rex_balance"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL( 5,                           rex_balance["rex_maturities"].get_array().size() );
+      BOOST_REQUIRE_EQUAL( 0,                           rex_balance["matured_rex"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( success(),                   mvtosavings( bob, asset( rex_bucket.get_amount() / 2, rex_sym ) ) );
+      rex_balance = get_rex_balance_obj( bob );
+      BOOST_REQUIRE_EQUAL( 6,                           rex_balance["rex_maturities"].get_array().size() );
+
+      BOOST_REQUIRE_EQUAL( success(),                   mvtosavings( bob, asset( rex_bucket.get_amount() / 2, rex_sym ) ) );
+      rex_balance = get_rex_balance_obj( bob );
+      BOOST_REQUIRE_EQUAL( 5,                           rex_balance["rex_maturities"].get_array().size() );
+      produce_block( fc::days(1) );
+      BOOST_REQUIRE_EQUAL( s
