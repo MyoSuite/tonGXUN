@@ -5064,4 +5064,20 @@ BOOST_FIXTURE_TEST_CASE( rex_savings, eosio_system_tester ) try {
       auto rex_balance = get_rex_balance_obj( alice );
       BOOST_REQUIRE_EQUAL( 8 * rex_bucket.get_amount(), rex_balance["rex_balance"].as<asset>().get_amount() );
       BOOST_REQUIRE_EQUAL( 5,                           rex_balance["rex_maturities"].get_array().size() );
-      BOOST_REQUIRE_EQUAL( 4 * rex_bucket.get_amount(), rex_balanc
+      BOOST_REQUIRE_EQUAL( 4 * rex_bucket.get_amount(), rex_balance["matured_rex"].as<int64_t>() );
+
+      BOOST_REQUIRE_EQUAL( success(),                   mvtosavings( alice, asset( 8 * rex_bucket.get_amount(), rex_sym ) ) );
+      rex_balance = get_rex_balance_obj( alice );
+      BOOST_REQUIRE_EQUAL( 1,                           rex_balance["rex_maturities"].get_array().size() );
+      BOOST_REQUIRE_EQUAL( 0,                           rex_balance["matured_rex"].as<int64_t>() );
+      produce_block( fc::days(1000) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( alice, asset::from_string( "1.0000 REX" ) ) );
+      BOOST_REQUIRE_EQUAL( success(),                   mvfrsavings( alice, asset::from_string( "10.0000 REX" ) ) );
+      rex_balance = get_rex_balance_obj( alice );
+      BOOST_REQUIRE_EQUAL( 2,                           rex_balance["rex_maturities"].get_array().size() );
+      produce_block( fc::days(3) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( alice, asset::from_string( "1.0000 REX" ) ) );
+      produce_blocks( 2 );
+      produce_block( fc::days(
