@@ -5146,4 +5146,19 @@ BOOST_FIXTURE_TEST_CASE( rex_savings, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
                            sellrex( bob, rex_bucket ) );
       BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient REX in savings"),
-                           mvfrsavings( bob, asset( 3 * r
+                           mvfrsavings( bob, asset( 3 * rex_bucket.get_amount(), rex_sym ) ) );
+      BOOST_REQUIRE_EQUAL( success(),                   mvfrsavings( bob, rex_bucket ) );
+      BOOST_REQUIRE_EQUAL( 2,                           get_rex_balance_obj( bob )["rex_maturities"].get_array().size() );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient REX balance"),
+                           mvtosavings( bob, asset( 3 * rex_bucket.get_amount() / 2, rex_sym ) ) );
+      produce_block( fc::days(1) );
+      BOOST_REQUIRE_EQUAL( success(),                   mvfrsavings( bob, rex_bucket ) );
+      BOOST_REQUIRE_EQUAL( 3,                           get_rex_balance_obj( bob )["rex_maturities"].get_array().size() );
+      produce_block( fc::days(4) );
+      BOOST_REQUIRE_EQUAL( success(),                   sellrex( bob, rex_bucket ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient available rex"),
+                           sellrex( bob, rex_bucket ) );
+      produce_block( fc::days(1) );
+      BOOST_REQUIRE_EQUAL( success(),                   sellrex( bob, rex_bucket ) );
+      rex_balance = get_rex_balance_obj( bob );
+      BOOST_
