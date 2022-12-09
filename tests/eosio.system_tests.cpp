@@ -5243,4 +5243,22 @@ BOOST_FIXTURE_TEST_CASE( rex_savings, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( wasm_assert_msg("asset must be a positive amount of (REX, 4)"),
                            mvfrsavings( carol, asset::from_string("1.0000 RND") ) );
       BOOST_REQUIRE_EQUAL( success(),                   mvfrsavings( carol, half_rex_bucket ) );
-   
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient REX in savings"),
+                           mvfrsavings( carol, asset::from_string("0.0001 REX") ) );
+      rex_balance = get_rex_balance_obj( carol );
+      BOOST_REQUIRE_EQUAL( 1,                           rex_balance["rex_maturities"].get_array().size() );
+      BOOST_REQUIRE_EQUAL( 5 * half_rex_bucket_amount,  rex_balance["rex_balance"].as<asset>().get_amount() );
+      BOOST_REQUIRE_EQUAL( 2 * rex_bucket_amount,       rex_balance["matured_rex"].as<int64_t>() );
+      produce_block( fc::days(5) );
+      BOOST_REQUIRE_EQUAL( success(),                   sellrex( carol, get_rex_balance( carol) ) );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( update_rex, eosio_system_tester, * boost::unit_test::tolerance(1e-10) ) try {
+
+   const asset init_balance = core_sym::from_string("30000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3];
+   setup
