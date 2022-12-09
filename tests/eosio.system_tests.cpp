@@ -5226,4 +5226,21 @@ BOOST_FIXTURE_TEST_CASE( rex_savings, eosio_system_tester ) try {
       produce_block( fc::days(1) );
       BOOST_REQUIRE_EQUAL( success(),                   buyrex( carol, payment ) );
       rex_balance = get_rex_balance_obj( carol );
-      BOOST_REQUIRE_EQUAL( 2,                           rex_balance["
+      BOOST_REQUIRE_EQUAL( 2,                           rex_balance["rex_maturities"].get_array().size() );
+      BOOST_REQUIRE_EQUAL( 0,                           rex_balance["matured_rex"].as<int64_t>() );
+
+      BOOST_REQUIRE_EQUAL( success(),                   mvtosavings( carol, half_rex_bucket ) );
+      rex_balance = get_rex_balance_obj( carol );
+      BOOST_REQUIRE_EQUAL( 3,                           rex_balance["rex_maturities"].get_array().size() );
+
+      BOOST_REQUIRE_EQUAL( success(),                   buyrex( carol, half_payment ) );
+      rex_balance = get_rex_balance_obj( carol );
+      BOOST_REQUIRE_EQUAL( 3,                           rex_balance["rex_maturities"].get_array().size() );
+
+      produce_block( fc::days(5) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("asset must be a positive amount of (REX, 4)"),
+                           mvfrsavings( carol, asset::from_string("0.0000 REX") ) );
+      BOOST_REQUIRE_EQUAL( wasm_assert_msg("asset must be a positive amount of (REX, 4)"),
+                           mvfrsavings( carol, asset::from_string("1.0000 RND") ) );
+      BOOST_REQUIRE_EQUAL( success(),                   mvfrsavings( carol, half_rex_bucket ) );
+   
