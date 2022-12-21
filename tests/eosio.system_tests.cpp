@@ -5327,4 +5327,22 @@ BOOST_FIXTURE_TEST_CASE( update_rex, eosio_system_tester, * boost::unit_test::to
    produce_block( fc::days(20) );
 
    //NOTE: TELOS doesn't have "vote decay", this test has been rewritten to reflect telos voting logic. 
-   BOOST_TEST_REQUIRE( get_producer_info(producer_names[20])["total_votes"].as<double
+   BOOST_TEST_REQUIRE( get_producer_info(producer_names[20])["total_votes"].as<double>()
+                       == stake2votes( asset( get_voter_info( alice )["staked"].as<int64_t>(), symbol{CORE_SYM} ) ) );
+   // END TELOS REPLACEMENT
+
+   BOOST_REQUIRE_EQUAL( success(), updaterex( alice ) );
+   BOOST_TEST_REQUIRE( stake2votes( asset( get_voter_info( alice )["staked"].as<int64_t>(), symbol{CORE_SYM} ) )
+                       == get_producer_info(producer_names[20])["total_votes"].as<double>() );
+
+   // BEGIN TELOS DELETION
+   /*
+   produce_block( fc::hours(19 * 24 + 23) );
+   BOOST_REQUIRE_EQUAL( success(),                                       rexexec( alice, 1 ) );
+   */
+   const asset   init_rex             = get_rex_balance( alice );
+   const auto    current_rex_pool     = get_rex_pool();
+   const int64_t total_lendable       = current_rex_pool["total_lendable"].as<asset>().get_amount();
+   const int64_t total_rex            = current_rex_pool["total_rex"].as<asset>().get_amount();
+   const int64_t init_alice_rex_stake = ( eosio::chain::uint128_t(init_rex.get_amount()) * total_lendable ) / total_rex;
+   const asset rex_sell_amount( get_rex_balance(alice).get_amount() / 4, symbol( SY(4,REX)
