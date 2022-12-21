@@ -5279,4 +5279,35 @@ BOOST_FIXTURE_TEST_CASE( update_rex, eosio_system_tester, * boost::unit_test::to
    BOOST_REQUIRE_EQUAL( get_rex_vote_stake(alice).get_amount(), get_voter_info( alice )["staked"].as<int64_t>() - init_stake );
 
    // create accounts {tprodaaaaaaa, tprodaaaaaab, ..., tprodaaaaaaz} and register as producers
-   std::vector<account_name> producer_n
+   std::vector<account_name> producer_names;
+   {
+      // BEGIN TELOS REPLACEMENT
+      /*
+      producer_names.reserve('z' - 'a' + 1);
+      const std::string root("defproducer");
+      for ( char c = 'a'; c <= 'z'; ++c ) {
+         producer_names.emplace_back(root + std::string(1, c));
+      }
+      */
+      producer_names.reserve(30);
+      const std::string root("tprod");
+      for(uint8_t i = 0; i < 30; i++) {
+         name p = name(root + toBase31(i));
+         producer_names.emplace_back(p);
+      }
+      // END TELOS REPLACEMENT
+
+      setup_producer_accounts(producer_names);
+      for ( const auto& p: producer_names ) {
+         BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
+         BOOST_TEST_REQUIRE( 0 == get_producer_info(p)["total_votes"].as<double>() );
+      }
+      // TELOS ADDITION
+      std::sort(producer_names.begin(), producer_names.end());
+   }
+
+   // TELOS DELETION
+   // BOOST_REQUIRE_EQUAL( wasm_assert_msg("voter holding REX tokens must vote for at least 21 producers or for a proxy"),
+   //                      vote( alice, std::vector<account_name>(producer_names.begin(), producer_names.begin() + 20) ) );
+   BOOST_REQUIRE_EQUAL( success(),
+      
