@@ -5310,4 +5310,21 @@ BOOST_FIXTURE_TEST_CASE( update_rex, eosio_system_tester, * boost::unit_test::to
    // BOOST_REQUIRE_EQUAL( wasm_assert_msg("voter holding REX tokens must vote for at least 21 producers or for a proxy"),
    //                      vote( alice, std::vector<account_name>(producer_names.begin(), producer_names.begin() + 20) ) );
    BOOST_REQUIRE_EQUAL( success(),
-      
+                        vote( alice, std::vector<account_name>(producer_names.begin(), producer_names.begin() + 30) ) );  // TELOS SPECIFIC
+
+   BOOST_TEST_REQUIRE( stake2votes( asset( get_voter_info( alice )["staked"].as<int64_t>(), symbol{CORE_SYM} ) )
+                       == get_producer_info(producer_names[0])["total_votes"].as<double>() );
+   BOOST_TEST_REQUIRE( stake2votes( asset( get_voter_info( alice )["staked"].as<int64_t>(), symbol{CORE_SYM} ) )
+                       == get_producer_info(producer_names[20])["total_votes"].as<double>() );
+
+   BOOST_REQUIRE_EQUAL( success(), updaterex( alice ) );
+   // BEGIN TELOS REPLACEMENT
+   /*
+   produce_block( fc::days(10) );
+   BOOST_TEST_REQUIRE( get_producer_info(producer_names[20])["total_votes"].as<double>()
+                       < stake2votes( asset( get_voter_info( alice )["staked"].as<int64_t>(), symbol{CORE_SYM} ) ) );
+   */
+   produce_block( fc::days(20) );
+
+   //NOTE: TELOS doesn't have "vote decay", this test has been rewritten to reflect telos voting logic. 
+   BOOST_TEST_REQUIRE( get_producer_info(producer_names[20])["total_votes"].as<double
