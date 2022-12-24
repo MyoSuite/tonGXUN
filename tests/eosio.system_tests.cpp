@@ -5345,4 +5345,16 @@ BOOST_FIXTURE_TEST_CASE( update_rex, eosio_system_tester, * boost::unit_test::to
    const int64_t total_lendable       = current_rex_pool["total_lendable"].as<asset>().get_amount();
    const int64_t total_rex            = current_rex_pool["total_rex"].as<asset>().get_amount();
    const int64_t init_alice_rex_stake = ( eosio::chain::uint128_t(init_rex.get_amount()) * total_lendable ) / total_rex;
-   const asset rex_sell_amount( get_rex_balance(alice).get_amount() / 4, symbol( SY(4,REX)
+   const asset rex_sell_amount( get_rex_balance(alice).get_amount() / 4, symbol( SY(4,REX) ) );
+   BOOST_REQUIRE_EQUAL( success(),                                       sellrex( alice, rex_sell_amount ) );
+   BOOST_REQUIRE_EQUAL( init_rex,                                        get_rex_balance(alice) + rex_sell_amount );
+   BOOST_REQUIRE_EQUAL( 3 * init_alice_rex_stake,                         4 * get_rex_vote_stake(alice).get_amount() );
+   BOOST_REQUIRE_EQUAL( get_voter_info( alice )["staked"].as<int64_t>(), init_stake + get_rex_vote_stake(alice).get_amount() );
+   BOOST_TEST_REQUIRE( stake2votes( asset( get_voter_info( alice )["staked"].as<int64_t>(), symbol{CORE_SYM} ) )
+                       == get_producer_info(producer_names[0])["total_votes"].as<double>() );
+   produce_block( fc::days(31) );
+   BOOST_REQUIRE_EQUAL( success(), sellrex( alice, get_rex_balance( alice ) ) );
+   BOOST_REQUIRE_EQUAL( 0,         get_rex_balance( alice ).get_amount() );
+   BOOST_REQUIRE_EQUAL( success(), vote( alice, { producer_names[0], producer_names[4] } ) );
+   // TELOS DELETION
+   // BOOST_REQUIRE_EQUAL( wasm_assert_msg("must vote for at least 21 producers or for a proxy before buying REX")
