@@ -5420,4 +5420,18 @@ BOOST_FIXTURE_TEST_CASE( update_rex_vote, eosio_system_tester, * boost::unit_tes
    BOOST_TEST_REQUIRE ( stake2votes(purchase + rent + init_stake) ==
                         get_producer_info(producer_names[0])["total_votes"].as_double() );
    BOOST_TEST_REQUIRE ( stake2votes(purchase + rent + init_stake) ==
-                    
+                        get_producer_info(producer_names[20])["total_votes"].as_double() );
+
+   const asset to_net_stake = core_sym::from_string("60.0000");
+   const asset to_cpu_stake = core_sym::from_string("40.0000");
+   transfer( config::system_account_name, alice, to_net_stake + to_cpu_stake, config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(),                              rentcpu( emily, bob, rent ) );
+   produce_block( fc::hours(30 * 24 + 13) );
+   BOOST_REQUIRE_EQUAL( success(),                              rexexec( alice, 1 ) );
+   BOOST_REQUIRE_EQUAL( success(),                              stake( alice, alice, to_net_stake, to_cpu_stake ) );
+   BOOST_REQUIRE_EQUAL( purchase + rent + rent,                 get_rex_vote_stake(alice) );
+   BOOST_TEST_REQUIRE ( stake2votes(init_stake + purchase + rent + rent + to_net_stake + to_cpu_stake) ==
+                        get_producer_info(producer_names[0])["total_votes"].as_double() );
+   BOOST_REQUIRE_EQUAL( success(),                              rentcpu( emily, bob, rent ) );
+   produce_block( fc::hours(30 * 24 + 13) );
+   BOOST_REQUIRE_EQUAL( success(),                         
