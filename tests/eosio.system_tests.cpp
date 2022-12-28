@@ -5434,4 +5434,24 @@ BOOST_FIXTURE_TEST_CASE( update_rex_vote, eosio_system_tester, * boost::unit_tes
                         get_producer_info(producer_names[0])["total_votes"].as_double() );
    BOOST_REQUIRE_EQUAL( success(),                              rentcpu( emily, bob, rent ) );
    produce_block( fc::hours(30 * 24 + 13) );
-   BOOST_REQUIRE_EQUAL( success(),                         
+   BOOST_REQUIRE_EQUAL( success(),                              rexexec( alice, 1 ) );
+   BOOST_REQUIRE_EQUAL( success(),                              unstake( alice, alice, to_net_stake, to_cpu_stake ) );
+   BOOST_REQUIRE_EQUAL( purchase + rent + rent + rent,          get_rex_vote_stake(alice) );
+   BOOST_TEST_REQUIRE ( stake2votes(init_stake + purchase + rent + rent + rent) ==
+                        get_producer_info(producer_names[0])["total_votes"].as_double() );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( deposit_rex_fund, eosio_system_tester ) try {
+
+   const asset init_balance = core_sym::from_string("1000.0000");
+   const asset init_net     = core_sym::from_string("70.0000");
+   const asset init_cpu     = core_sym::from_string("90.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1];
+   setup_rex_accounts( accounts, init_balance, init_net, init_cpu, false );
+
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"),                   get_rex_fund( alice ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must deposit to REX fund first"), withdraw( alice, core_sym::from_string("0.0001") ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("overd
