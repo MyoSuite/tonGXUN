@@ -5466,4 +5466,27 @@ BOOST_FIXTURE_TEST_CASE( deposit_rex_fund, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( get_balance( alice ),                  init_balance - deposit_quant - deposit_quant );
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient funds"), withdraw( alice, get_rex_fund( alice ) + core_sym::from_string("0.0001")) );
    BOOST_REQUIRE_EQUAL( success(),                             withdraw( alice, deposit_quant ) );
-   BOOST_REQUIRE_EQUAL( get
+   BOOST_REQUIRE_EQUAL( get_rex_fund( alice ),                 deposit_quant );
+   BOOST_REQUIRE_EQUAL( get_balance( alice ),                  init_balance - deposit_quant );
+   BOOST_REQUIRE_EQUAL( success(),                             withdraw( alice, get_rex_fund( alice ) ) );
+   BOOST_REQUIRE_EQUAL( get_rex_fund( alice ).get_amount(),    0 );
+   BOOST_REQUIRE_EQUAL( get_balance( alice ),                  init_balance );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( rex_lower_bound, eosio_system_tester ) try {
+
+   const asset init_balance = core_sym::from_string("25000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1];
+   setup_rex_accounts( accounts, init_balance );
+   const symbol rex_sym( SY(4, REX) );
+
+   const asset payment = core_sym::from_string("25000.0000");
+   BOOST_REQUIRE_EQUAL( success(), buyrex( alice, payment ) );
+   const asset fee = core_sym::from_string("25.0000");
+   BOOST_REQUIRE_EQUAL( success(), rentcpu( bob, bob, fee ) );
+
+   const auto rex_pool = get_rex_pool();
+   const int64_t tot_rex      = rex_pool["total_rex"].as<a
