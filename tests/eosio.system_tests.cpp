@@ -5454,4 +5454,16 @@ BOOST_FIXTURE_TEST_CASE( deposit_rex_fund, eosio_system_tester ) try {
 
    BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"),                   get_rex_fund( alice ) );
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("must deposit to REX fund first"), withdraw( alice, core_sym::from_string("0.0001") ) );
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg("overd
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance"),              deposit( alice, init_balance + init_balance ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must deposit core token"),        deposit( alice, asset::from_string("1.0000 RNDM") ) );
+
+   asset deposit_quant( init_balance.get_amount() / 5, init_balance.get_symbol() );
+   BOOST_REQUIRE_EQUAL( success(),                             deposit( alice, deposit_quant ) );
+   BOOST_REQUIRE_EQUAL( get_balance( alice ),                  init_balance - deposit_quant );
+   BOOST_REQUIRE_EQUAL( get_rex_fund( alice ),                 deposit_quant );
+   BOOST_REQUIRE_EQUAL( success(),                             deposit( alice, deposit_quant ) );
+   BOOST_REQUIRE_EQUAL( get_rex_fund( alice ),                 deposit_quant + deposit_quant );
+   BOOST_REQUIRE_EQUAL( get_balance( alice ),                  init_balance - deposit_quant - deposit_quant );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient funds"), withdraw( alice, get_rex_fund( alice ) + core_sym::from_string("0.0001")) );
+   BOOST_REQUIRE_EQUAL( success(),                             withdraw( alice, deposit_quant ) );
+   BOOST_REQUIRE_EQUAL( get
