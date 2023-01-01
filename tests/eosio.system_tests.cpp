@@ -5545,4 +5545,26 @@ BOOST_FIXTURE_TEST_CASE( close_rex, eosio_system_tester ) try {
                         withdraw( carol, init_balance ) );
    BOOST_REQUIRE_EQUAL( success(),         withdraw( carol, init_balance - fee ) );
 
-   produce
+   produce_block( fc::days(20) );
+
+   BOOST_REQUIRE_EQUAL( success(),         closerex( carol ) );
+   BOOST_REQUIRE_EQUAL( true,              !get_rex_fund_obj( carol ).is_null() );
+
+   produce_block( fc::days(10) );
+
+   BOOST_REQUIRE_EQUAL( success(),         closerex( carol ) );
+   BOOST_REQUIRE_EQUAL( true,              get_rex_balance_obj( carol ).is_null() );
+   BOOST_REQUIRE_EQUAL( true,              get_rex_fund_obj( carol ).is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(),         rentnet( emily, emily, fee ) );
+   BOOST_REQUIRE_EQUAL( true,              !get_rex_fund_obj( emily ).is_null() );
+   BOOST_REQUIRE_EQUAL( success(),         closerex( emily ) );
+   BOOST_REQUIRE_EQUAL( true,              !get_rex_fund_obj( emily ).is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(),         sellrex( bob, get_rex_balance( bob ) ) );
+   BOOST_REQUIRE_EQUAL( closerex( bob ),   wasm_assert_msg("account has remaining REX balance, must sell first") );
+
+   produce_block( fc::days(30) );
+
+   BOOST_REQUIRE_EQUAL( closerex( bob ),   success() );
+   BOOST_REQUIRE      ( 0 <                get_rex_fund( bob ).get_am
