@@ -5509,4 +5509,21 @@ BOOST_FIXTURE_TEST_CASE( rex_lower_bound, eosio_system_tester ) try {
 BOOST_FIXTURE_TEST_CASE( close_rex, eosio_system_tester ) try {
 
    const asset init_balance = core_sym::from_string("25000.0000");
-   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1], carol = accounts[2], emily = accounts[3];
+   setup_rex_accounts( accounts, init_balance );
+
+   BOOST_REQUIRE_EQUAL( true,              !get_rex_fund_obj( alice ).is_null() );
+   BOOST_REQUIRE_EQUAL( init_balance,      get_rex_fund( alice ) );
+   BOOST_REQUIRE_EQUAL( success(),         closerex( alice ) );
+   BOOST_REQUIRE_EQUAL( success(),         withdraw( alice, init_balance ) );
+   BOOST_REQUIRE_EQUAL( success(),         closerex( alice ) );
+   BOOST_REQUIRE_EQUAL( true,              get_rex_fund_obj( alice ).is_null() );
+   BOOST_REQUIRE_EQUAL( success(),         deposit( alice, init_balance ) );
+   BOOST_REQUIRE_EQUAL( true,              !get_rex_fund_obj( alice ).is_null() );
+
+   BOOST_REQUIRE_EQUAL( true,              get_rex_balance_obj( bob ).is_null() );
+   BOOST_REQUIRE_EQUAL( success(),         buyrex( bob, init_balance ) );
+   BOOST_REQUIRE_EQUAL( true,              !get_rex_balance_obj( bob ).is_null() );
+   BOOST_REQUIRE_EQUAL( true,              !get_rex_fund_obj( bob ).is_null() );
+   BOOST_REQUIRE_EQUAL( 0,  
