@@ -5489,4 +5489,24 @@ BOOST_FIXTURE_TEST_CASE( rex_lower_bound, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), rentcpu( bob, bob, fee ) );
 
    const auto rex_pool = get_rex_pool();
-   const int64_t tot_rex      = rex_pool["total_rex"].as<a
+   const int64_t tot_rex      = rex_pool["total_rex"].as<asset>().get_amount();
+   const int64_t tot_unlent   = rex_pool["total_unlent"].as<asset>().get_amount();
+   const int64_t tot_lent     = rex_pool["total_lent"].as<asset>().get_amount();
+   const int64_t tot_lendable = rex_pool["total_lendable"].as<asset>().get_amount();
+   double rex_per_eos = double(tot_rex) / double(tot_lendable);
+   int64_t sell_amount = rex_per_eos * ( tot_unlent - 0.09 * tot_lent );
+   produce_block( fc::days(5) );
+   BOOST_REQUIRE_EQUAL( success(), sellrex( alice, asset( sell_amount, rex_sym ) ) );
+   BOOST_REQUIRE_EQUAL( success(), cancelrexorder( alice ) );
+   sell_amount = rex_per_eos * ( tot_unlent - 0.1 * tot_lent );
+   BOOST_REQUIRE_EQUAL( success(), sellrex( alice, asset( sell_amount, rex_sym ) ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("no sellrex order is scheduled"),
+                        cancelrexorder( alice ) );
+
+} FC_LOG_AND_RETHROW()
+
+
+BOOST_FIXTURE_TEST_CASE( close_rex, eosio_system_tester ) try {
+
+   const asset init_balance = core_sym::from_string("25000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"
