@@ -5526,4 +5526,23 @@ BOOST_FIXTURE_TEST_CASE( close_rex, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(),         buyrex( bob, init_balance ) );
    BOOST_REQUIRE_EQUAL( true,              !get_rex_balance_obj( bob ).is_null() );
    BOOST_REQUIRE_EQUAL( true,              !get_rex_fund_obj( bob ).is_null() );
-   BOOST_REQUIRE_EQUAL( 0,  
+   BOOST_REQUIRE_EQUAL( 0,                 get_rex_fund( bob ).get_amount() );
+   BOOST_REQUIRE_EQUAL( closerex( bob ),   wasm_assert_msg("account has remaining REX balance, must sell first") );
+   produce_block( fc::days(5) );
+   BOOST_REQUIRE_EQUAL( success(),         sellrex( bob, get_rex_balance( bob ) ) );
+   BOOST_REQUIRE_EQUAL( success(),         closerex( bob ) );
+   BOOST_REQUIRE_EQUAL( success(),         withdraw( bob, get_rex_fund( bob ) ) );
+   BOOST_REQUIRE_EQUAL( success(),         closerex( bob ) );
+   BOOST_REQUIRE_EQUAL( true,              get_rex_balance_obj( bob ).is_null() );
+   BOOST_REQUIRE_EQUAL( true,              get_rex_fund_obj( bob ).is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(),         deposit( bob, init_balance ) );
+   BOOST_REQUIRE_EQUAL( success(),         buyrex( bob, init_balance ) );
+
+   const asset fee = core_sym::from_string("1.0000");
+   BOOST_REQUIRE_EQUAL( success(),         rentcpu( carol, emily, fee ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient funds"),
+                        withdraw( carol, init_balance ) );
+   BOOST_REQUIRE_EQUAL( success(),         withdraw( carol, init_balance - fee ) );
+
+   produce
