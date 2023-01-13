@@ -5603,4 +5603,18 @@ BOOST_FIXTURE_TEST_CASE( set_rex, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("balance must be set to have a positive amount"),
                         push_action( config::system_account_name, act_name, mvo()("balance", negative_balance) ) );
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("balance symbol must be core symbol"),
-                        push_action( config::system_account_name, act_name, mvo()("balance", differ
+                        push_action( config::system_account_name, act_name, mvo()("balance", different_symbol) ) );
+   const asset fee = core_sym::from_string("100.0000");
+   BOOST_REQUIRE_EQUAL( success(),             rentcpu( bob, bob, fee ) );
+   const auto& init_rex_pool = get_rex_pool();
+   BOOST_REQUIRE_EQUAL( init_total_rent + fee, init_rex_pool["total_rent"].as<asset>() );
+   BOOST_TEST_REQUIRE( set_total_rent != init_rex_pool["total_rent"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( success(),
+                        push_action( config::system_account_name, act_name, mvo()("balance", set_total_rent) ) );
+   const auto& curr_rex_pool = get_rex_pool();
+   BOOST_REQUIRE_EQUAL( init_rex_pool["total_lendable"].as<asset>(),   curr_rex_pool["total_lendable"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( init_rex_pool["total_lent"].as<asset>(),       curr_rex_pool["total_lent"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( init_rex_pool["total_unlent"].as<asset>(),     curr_rex_pool["total_unlent"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( init_rex_pool["namebid_proceeds"].as<asset>(), curr_rex_pool["namebid_proceeds"].as<asset>() );
+   BOOST_REQUIRE_EQUAL( init_rex_pool["loan_num"].as_uint64(),         curr_rex_pool["loan_num"].as_uint64() );
+   BOOST_RE
