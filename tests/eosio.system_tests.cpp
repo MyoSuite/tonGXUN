@@ -5589,4 +5589,18 @@ BOOST_FIXTURE_TEST_CASE( set_rex, eosio_system_tester ) try {
    setup_rex_accounts( accounts, init_balance );
 
    const name act_name{ "setrex"_n };
-   const asset in
+   const asset init_total_rent  = core_sym::from_string("20000.0000");
+   const asset set_total_rent   = core_sym::from_string("10000.0000");
+   const asset negative_balance = core_sym::from_string("-10000.0000");
+   const asset different_symbol = asset::from_string("10000.0000 RND");
+   BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
+                        push_action( alice, act_name, mvo()("balance", set_total_rent) ) );
+   BOOST_REQUIRE_EQUAL( error("missing authority of eosio"),
+                        push_action( bob, act_name, mvo()("balance", set_total_rent) ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("rex system is not initialized"),
+                        push_action( config::system_account_name, act_name, mvo()("balance", set_total_rent) ) );
+   BOOST_REQUIRE_EQUAL( success(), buyrex( alice, init_balance ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("balance must be set to have a positive amount"),
+                        push_action( config::system_account_name, act_name, mvo()("balance", negative_balance) ) );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("balance symbol must be core symbol"),
+                        push_action( config::system_account_name, act_name, mvo()("balance", differ
