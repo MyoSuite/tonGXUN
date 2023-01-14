@@ -5617,4 +5617,32 @@ BOOST_FIXTURE_TEST_CASE( set_rex, eosio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( init_rex_pool["total_unlent"].as<asset>(),     curr_rex_pool["total_unlent"].as<asset>() );
    BOOST_REQUIRE_EQUAL( init_rex_pool["namebid_proceeds"].as<asset>(), curr_rex_pool["namebid_proceeds"].as<asset>() );
    BOOST_REQUIRE_EQUAL( init_rex_pool["loan_num"].as_uint64(),         curr_rex_pool["loan_num"].as_uint64() );
-   BOOST_RE
+   BOOST_REQUIRE_EQUAL( set_total_rent,                                curr_rex_pool["total_rent"].as<asset>() );
+
+} FC_LOG_AND_RETHROW()
+
+// TELOS BEGIN
+/*
+BOOST_FIXTURE_TEST_CASE( b1_vesting, eosio_system_tester ) try {
+
+   cross_15_percent_threshold();
+
+   produce_block( fc::days(14) );
+
+   const asset init_balance = core_sym::from_string("25000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   account_name alice = accounts[0], bob = accounts[1];
+   setup_rex_accounts( accounts, init_balance );
+
+   const name b1{ "b1"_n };
+
+   issue_and_transfer( alice, core_sym::from_string("20000.0000"), config::system_account_name );
+   issue_and_transfer( bob,   core_sym::from_string("20000.0000"), config::system_account_name );
+   BOOST_REQUIRE_EQUAL( success(), bidname( bob,   b1, core_sym::from_string( "0.5000" ) ) );
+   BOOST_REQUIRE_EQUAL( success(), bidname( alice, b1, core_sym::from_string( "1.0000" ) ) );
+
+   produce_block( fc::days(1) );
+
+   create_accounts_with_resources( { b1 }, alice );
+
+   const asset stake_amount = core
