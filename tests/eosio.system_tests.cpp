@@ -5695,4 +5695,25 @@ BOOST_FIXTURE_TEST_CASE( rex_return, eosio_system_tester ) try {
 
    const asset init_balance = core_sym::from_string("100000.0000");
    const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
-   account_name alice = accounts[0], bob = account
+   account_name alice = accounts[0], bob = accounts[1];
+   setup_rex_accounts( accounts, init_balance );
+
+   const asset payment = core_sym::from_string("100000.0000");
+   {
+      BOOST_REQUIRE_EQUAL( success(),        buyrex( alice, payment ) );
+      auto rex_pool = get_rex_pool();
+      BOOST_REQUIRE_EQUAL( payment,          rex_pool["total_lendable"].as<asset>() );
+      BOOST_REQUIRE_EQUAL( payment,          rex_pool["total_unlent"].as<asset>() );
+
+      BOOST_REQUIRE_EQUAL( true,             get_rex_return_pool().is_null() );
+   }
+
+   {
+      const asset    fee                 = core_sym::from_string("30.0000");
+      const uint32_t bucket_interval_sec = fc::hours(12).to_seconds();
+      const uint32_t current_time_sec    = control->pending_block_time().sec_since_epoch();
+      const time_point_sec expected_pending_bucket_time{current_time_sec - current_time_sec % bucket_interval_sec + bucket_interval_sec};
+      BOOST_REQUIRE_EQUAL( success(),        rentcpu( bob, bob, fee ) );
+      auto rex_return_pool = get_rex_return_pool();
+      BOOST_REQUIRE_EQUAL( false,            rex_return_pool.is_null() );
+      BOOST_REQUIRE_EQUAL( 0,                r
