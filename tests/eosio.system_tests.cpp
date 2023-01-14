@@ -5667,4 +5667,32 @@ BOOST_FIXTURE_TEST_CASE( b1_vesting, eosio_system_tester ) try {
                         unstake( b1, b1, final_amount, final_amount ) );
 
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("must vote for at least 21 producers or for a proxy before buying REX"), 
-                        unsta
+                        unstaketorex( b1, b1, final_amount - small_amount, final_amount - small_amount ) );
+
+   BOOST_REQUIRE_EQUAL( error("missing authority of eosio"), vote( b1, { }, "proxyaccount"_n ) );
+
+   BOOST_REQUIRE_EQUAL( success(), unstake( b1, b1, final_amount - small_amount, final_amount - small_amount ) );
+   
+   produce_block( fc::days(4) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_action( b1, "refund"_n, mvo()("owner", b1) ) );
+
+   produce_block( fc::days( 5 * 364 ) );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("b1 can only claim their tokens over 10 years"),
+                        unstake( b1, b1, small_amount, small_amount ) );
+
+} FC_LOG_AND_RETHROW()
+*/
+// TELOS END
+
+
+BOOST_FIXTURE_TEST_CASE( rex_return, eosio_system_tester ) try {
+
+   constexpr uint32_t total_intervals = 30 * 144;
+   constexpr uint32_t dist_interval   = 10 * 60;
+   BOOST_REQUIRE_EQUAL( true,                get_rex_return_pool().is_null() );
+
+   const asset init_balance = core_sym::from_string("100000.0000");
+   const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n };
+   account_name alice = accounts[0], bob = account
