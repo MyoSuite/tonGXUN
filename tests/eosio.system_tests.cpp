@@ -5645,4 +5645,26 @@ BOOST_FIXTURE_TEST_CASE( b1_vesting, eosio_system_tester ) try {
 
    create_accounts_with_resources( { b1 }, alice );
 
-   const asset stake_amount = core
+   const asset stake_amount = core_sym::from_string("50000000.0000");
+   const asset final_amount = core_sym::from_string("17664825.5000");
+   const asset small_amount = core_sym::from_string("1000.0000");
+   issue_and_transfer( b1, stake_amount + stake_amount + stake_amount, config::system_account_name );
+
+   stake( b1, b1, stake_amount, stake_amount );
+
+   BOOST_REQUIRE_EQUAL( 2 * stake_amount.get_amount(), get_voter_info( b1 )["staked"].as<int64_t>() );
+
+   BOOST_REQUIRE_EQUAL( success(), unstake( b1, b1, small_amount, small_amount ) );
+
+   produce_block( fc::days(4) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_action( b1, "refund"_n, mvo()("owner", b1) ) );
+
+   BOOST_REQUIRE_EQUAL( 2 * ( stake_amount.get_amount() - small_amount.get_amount() ),
+                        get_voter_info( b1 )["staked"].as<int64_t>() );
+   
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("b1 can only claim their tokens over 10 years"),
+                        unstake( b1, b1, final_amount, final_amount ) );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("must vote for at least 21 producers or for a proxy before buying REX"), 
+                        unsta
