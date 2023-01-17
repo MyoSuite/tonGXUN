@@ -5733,4 +5733,25 @@ BOOST_FIXTURE_TEST_CASE( rex_return, eosio_system_tester ) try {
       int64_t  expected = payment.get_amount() + change;
 
       auto rex_pool = get_rex_pool();
-      BOOST_REQUIRE_EQUAL( expected,         rex_pool["total_lenda
+      BOOST_REQUIRE_EQUAL( expected,         rex_pool["total_lendable"].as<asset>().get_amount() );
+
+      produce_blocks( 1 );
+      produce_block( fc::days(25) );
+      BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
+      rex_return_pool = get_rex_return_pool();
+      BOOST_REQUIRE_EQUAL( rate,             rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( 1,                get_rex_return_buckets()["return_buckets"].get_array().size() );
+      int64_t t2 = rex_return_pool["last_dist_time"].as<time_point_sec>().sec_since_epoch();
+      change      = rate * ((t2-t0) / dist_interval) + fee.get_amount() % total_intervals;
+      expected    = payment.get_amount() + change;
+
+      rex_pool = get_rex_pool();
+      BOOST_REQUIRE_EQUAL( expected,         rex_pool["total_lendable"].as<asset>().get_amount() );
+
+      produce_blocks( 1 );
+      produce_block( fc::days(5) );
+      BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
+
+      rex_return_pool = get_rex_return_pool();
+      BOOST_REQUIRE_EQUAL( 0,                rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( 0,                get_rex_return_buckets()["return_buckets"].get_array().size(
