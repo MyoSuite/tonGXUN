@@ -5716,4 +5716,21 @@ BOOST_FIXTURE_TEST_CASE( rex_return, eosio_system_tester ) try {
       BOOST_REQUIRE_EQUAL( success(),        rentcpu( bob, bob, fee ) );
       auto rex_return_pool = get_rex_return_pool();
       BOOST_REQUIRE_EQUAL( false,            rex_return_pool.is_null() );
-      BOOST_REQUIRE_EQUAL( 0,                r
+      BOOST_REQUIRE_EQUAL( 0,                rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( 0,                get_rex_return_buckets()["return_buckets"].get_array().size() );
+      BOOST_REQUIRE_EQUAL( expected_pending_bucket_time.sec_since_epoch(),
+                           rex_return_pool["pending_bucket_time"].as<time_point_sec>().sec_since_epoch() );
+      int32_t t0 = rex_return_pool["pending_bucket_time"].as<time_point_sec>().sec_since_epoch();
+
+      produce_block( fc::hours(13) );
+      BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
+      rex_return_pool = get_rex_return_pool();
+      int64_t rate    = fee.get_amount() / total_intervals;
+      BOOST_REQUIRE_EQUAL( rate,             rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+
+      int32_t t1 = rex_return_pool["last_dist_time"].as<time_point_sec>().sec_since_epoch();
+      int64_t  change   = rate * ((t1-t0) / dist_interval) + fee.get_amount() % total_intervals;
+      int64_t  expected = payment.get_amount() + change;
+
+      auto rex_pool = get_rex_pool();
+      BOOST_REQUIRE_EQUAL( expected,         rex_pool["total_lenda
