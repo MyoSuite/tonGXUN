@@ -5793,4 +5793,24 @@ BOOST_FIXTURE_TEST_CASE( rex_return, eosio_system_tester ) try {
       produce_block( fc::days(30) );
       BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
       rex_return_pool = get_rex_return_pool();
-      BOOST_REQUIRE_EQUAL( fee.get_amount() / total_intervals, rex_return_pool["current_rate_of_in
+      BOOST_REQUIRE_EQUAL( fee.get_amount() / total_intervals, rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+      BOOST_TEST_REQUIRE( (init_lendable + fee + fee).get_amount() < get_rex_pool()["total_lendable"].as<asset>().get_amount() );
+
+      produce_block( fc::days(1) );
+      BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
+      rex_return_pool = get_rex_return_pool();
+      BOOST_REQUIRE_EQUAL( 0,                rex_return_pool["current_rate_of_increase"].as<int64_t>() );
+      BOOST_REQUIRE_EQUAL( 0,                get_rex_return_buckets()["return_buckets"].get_array().size() );
+      BOOST_REQUIRE_EQUAL( init_lendable.get_amount() + 3 * fee.get_amount(),
+                           get_rex_pool()["total_lendable"].as<asset>().get_amount() );
+   }
+
+   {
+      const asset fee = core_sym::from_string("25.0000");
+      BOOST_REQUIRE_EQUAL( success(),        rentcpu( bob, bob, fee ) );
+      produce_block( fc::hours(13) );
+      BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
+      auto rex_pool_0        = get_rex_pool();
+      auto rex_return_pool_0 = get_rex_return_pool();
+      produce_block( fc::minutes(2) );
+      BOOST_REQUIRE_EQUAL( success(),
