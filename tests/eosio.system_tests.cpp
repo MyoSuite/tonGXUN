@@ -5853,4 +5853,18 @@ BOOST_FIXTURE_TEST_CASE( rex_return, eosio_system_tester ) try {
 
 BOOST_AUTO_TEST_CASE( setabi_bios ) try {
    fc::temp_directory tempdir;
-   validating_tester t( tempdir,
+   validating_tester t( tempdir, true );
+   t.execute_setup_policy( setup_policy::full );
+
+   abi_serializer abi_ser(fc::json::from_string( (const char*)contracts::bios_abi().data()).template as<abi_def>(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+   t.set_code( config::system_account_name, contracts::bios_wasm() );
+   t.set_abi( config::system_account_name, contracts::bios_abi().data() );
+   t.create_account("eosio.token"_n);
+   t.set_abi( "eosio.token"_n, contracts::token_abi().data() );
+   {
+      auto res = t.get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "eosio.token"_n );
+      _abi_hash abi_hash;
+      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(base_tester::abi_serializer_max_time) );
+      abi_serializer::from_variant( abi_hash_var, abi_hash, t.get_resolver(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+      auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::token_abi().data()).template as<abi_def>());
+      auto r
