@@ -5813,4 +5813,18 @@ BOOST_FIXTURE_TEST_CASE( rex_return, eosio_system_tester ) try {
       auto rex_pool_0        = get_rex_pool();
       auto rex_return_pool_0 = get_rex_return_pool();
       produce_block( fc::minutes(2) );
-      BOOST_REQUIRE_EQUAL( success(),
+      BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
+      auto rex_pool_1        = get_rex_pool();
+      auto rex_return_pool_1 = get_rex_return_pool();
+      BOOST_REQUIRE_EQUAL( rex_return_pool_0["last_dist_time"].as<time_point_sec>().sec_since_epoch(),
+                           rex_return_pool_1["last_dist_time"].as<time_point_sec>().sec_since_epoch() );
+      BOOST_REQUIRE_EQUAL( rex_pool_0["total_lendable"].as<asset>(),
+                           rex_pool_1["total_lendable"].as<asset>() );
+      produce_block( fc::minutes(9) );
+      BOOST_REQUIRE_EQUAL( success(),        rexexec( bob, 1 ) );
+      auto rex_pool_2        = get_rex_pool();
+      auto rex_return_pool_2 = get_rex_return_pool();
+      BOOST_TEST_REQUIRE( rex_return_pool_1["last_dist_time"].as<time_point_sec>().sec_since_epoch() <
+                          rex_return_pool_2["last_dist_time"].as<time_point_sec>().sec_since_epoch() );
+      BOOST_TEST_REQUIRE( rex_pool_1["total_lendable"].as<asset>().get_amount() <
+                          rex_pool_2["total_lendable"].as<asset>().get_amount()
