@@ -5905,4 +5905,33 @@ BOOST_FIXTURE_TEST_CASE( setabi, eosio_system_tester ) try {
       auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(abi_serializer_max_time) );
       abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
       auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::system_abi().data()).template as<abi_def>());
-      auto result = fc::sha256::hash( (const char*
+      auto result = fc::sha256::hash( (const char*)abi.data(), abi.size() );
+
+      BOOST_REQUIRE( abi_hash.hash == result );
+   }
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( change_limited_account_back_to_unlimited, eosio_system_tester ) try {
+   BOOST_REQUIRE( get_total_stake( "eosio" ).is_null() );
+
+   transfer( "eosio"_n, "alice1111111"_n, core_sym::from_string("1.0000") );
+
+   auto error_msg = stake( "alice1111111"_n, "eosio"_n, core_sym::from_string("0.0000"), core_sym::from_string("1.0000") );
+   auto semicolon_pos = error_msg.find(';');
+
+   BOOST_REQUIRE_EQUAL( error("account eosio has insufficient ram"),
+                        error_msg.substr(0, semicolon_pos) );
+
+   int64_t ram_bytes_needed = 0;
+   {
+      std::istringstream s( error_msg );
+      s.seekg( semicolon_pos + 7, std::ios_base::beg );
+      s >> ram_bytes_needed;
+      ram_bytes_needed += 256; // enough room to cover total_resources_table
+   }
+
+   push_action( "eosio"_n, "setalimits"_n, mvo()
+                                          ("account", "eosio")
+                                          ("ram_bytes", ram_bytes_needed)
+                                      
