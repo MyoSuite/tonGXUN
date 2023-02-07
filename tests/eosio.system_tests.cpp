@@ -5889,4 +5889,20 @@ BOOST_FIXTURE_TEST_CASE( setabi, eosio_system_tester ) try {
    set_abi( "eosio.token"_n, contracts::token_abi().data() );
    {
       auto res = get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "eosio.token"_n );
-      _abi_hash abi_h
+      _abi_hash abi_hash;
+      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::token_abi().data()).template as<abi_def>());
+      auto result = fc::sha256::hash( (const char*)abi.data(), abi.size() );
+
+      BOOST_REQUIRE( abi_hash.hash == result );
+   }
+
+   set_abi( "eosio.token"_n, contracts::system_abi().data() );
+   {
+      auto res = get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "eosio.token"_n );
+      _abi_hash abi_hash;
+      auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto abi = fc::raw::pack(fc::json::from_string( (const char*)contracts::system_abi().data()).template as<abi_def>());
+      auto result = fc::sha256::hash( (const char*
