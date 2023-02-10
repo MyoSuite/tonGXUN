@@ -5959,4 +5959,36 @@ BOOST_FIXTURE_TEST_CASE( change_limited_account_back_to_unlimited, eosio_system_
    BOOST_REQUIRE_EQUAL( error( "transaction net usage is too high: 128 > 0" ),
                         push_action( "eosio"_n, "setalimits"_n, mvo()
                            ("account", "eosio.saving")
-            
+                           ("ram_bytes", -1)
+                           ("net_weight", -1)
+                           ("cpu_weight", -1)
+                        )
+   );
+
+   BOOST_REQUIRE_EQUAL( success(),
+                        push_action( "eosio"_n, "setacctnet"_n, mvo()
+                           ("account", "eosio")
+                           ("net_weight", -1)
+                        )
+   );
+
+   BOOST_REQUIRE_EQUAL( success(),
+                        push_action( "eosio"_n, "setacctcpu"_n, mvo()
+                           ("account", "eosio")
+                           ("cpu_weight", -1)
+
+                        )
+   );
+
+   BOOST_REQUIRE_EQUAL( success(),
+                        push_action( "eosio"_n, "setalimits"_n, mvo()
+                                          ("account", "eosio.saving")
+                                          ("ram_bytes", ram_bytes_needed)
+                                          ("net_weight", -1)
+                                          ("cpu_weight", -1)
+                        )
+   );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( buy_pin_sell
