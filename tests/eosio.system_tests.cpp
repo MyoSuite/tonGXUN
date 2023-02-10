@@ -5991,4 +5991,31 @@ BOOST_FIXTURE_TEST_CASE( change_limited_account_back_to_unlimited, eosio_system_
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( buy_pin_sell
+BOOST_FIXTURE_TEST_CASE( buy_pin_sell_ram, eosio_system_tester ) try {
+   BOOST_REQUIRE( get_total_stake( "eosio" ).is_null() );
+
+   transfer( "eosio"_n, "alice1111111"_n, core_sym::from_string("1020.0000") );
+
+   auto error_msg = stake( "alice1111111"_n, "eosio"_n, core_sym::from_string("10.0000"), core_sym::from_string("10.0000") );
+   auto semicolon_pos = error_msg.find(';');
+
+   BOOST_REQUIRE_EQUAL( error("account eosio has insufficient ram"),
+                        error_msg.substr(0, semicolon_pos) );
+
+   int64_t ram_bytes_needed = 0;
+   {
+      std::istringstream s( error_msg );
+      s.seekg( semicolon_pos + 7, std::ios_base::beg );
+      s >> ram_bytes_needed;
+      ram_bytes_needed += ram_bytes_needed/10; // enough buffer to make up for buyrambytes estimation errors
+   }
+
+   auto alice_original_balance = get_balance( "alice1111111"_n );
+
+   BOOST_REQUIRE_EQUAL( success(), buyrambytes( "alice1111111"_n, "eosio"_n, static_cast<uint32_t>(ram_bytes_needed) ) );
+
+   auto tokens_paid_for_ram = alice_original_balance - get_balance( "alice1111111"_n );
+
+   auto total_res = get_total_stake( "eosio" );
+
+   REQUIRE_MATCHING_OBJECT( total_
