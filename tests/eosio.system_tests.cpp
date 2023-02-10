@@ -5934,4 +5934,29 @@ BOOST_FIXTURE_TEST_CASE( change_limited_account_back_to_unlimited, eosio_system_
    push_action( "eosio"_n, "setalimits"_n, mvo()
                                           ("account", "eosio")
                                           ("ram_bytes", ram_bytes_needed)
-                                      
+                                          ("net_weight", -1)
+                                          ("cpu_weight", -1)
+              );
+
+   stake( "alice1111111"_n, "eosio"_n, core_sym::from_string("0.0000"), core_sym::from_string("1.0000") );
+
+   REQUIRE_MATCHING_OBJECT( get_total_stake( "eosio" ), mvo()
+      ("owner", "eosio")
+      ("net_weight", core_sym::from_string("0.0000"))
+      ("cpu_weight", core_sym::from_string("1.0000"))
+      ("ram_bytes",  0)
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "only supports unlimited accounts" ),
+                        push_action( "eosio"_n, "setalimits"_n, mvo()
+                                          ("account", "eosio")
+                                          ("ram_bytes", ram_bytes_needed)
+                                          ("net_weight", -1)
+                                          ("cpu_weight", -1)
+                        )
+   );
+
+   BOOST_REQUIRE_EQUAL( error( "transaction net usage is too high: 128 > 0" ),
+                        push_action( "eosio"_n, "setalimits"_n, mvo()
+                           ("account", "eosio.saving")
+            
