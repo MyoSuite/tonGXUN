@@ -6018,4 +6018,31 @@ BOOST_FIXTURE_TEST_CASE( buy_pin_sell_ram, eosio_system_tester ) try {
 
    auto total_res = get_total_stake( "eosio" );
 
-   REQUIRE_MATCHING_OBJECT( total_
+   REQUIRE_MATCHING_OBJECT( total_res, mvo()
+      ("owner", "eosio")
+      ("net_weight", core_sym::from_string("0.0000"))
+      ("cpu_weight", core_sym::from_string("0.0000"))
+      ("ram_bytes",  total_res["ram_bytes"].as_int64() )
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "only supports unlimited accounts" ),
+                        push_action( "eosio"_n, "setalimits"_n, mvo()
+                                          ("account", "eosio")
+                                          ("ram_bytes", ram_bytes_needed)
+                                          ("net_weight", -1)
+                                          ("cpu_weight", -1)
+                        )
+   );
+
+   BOOST_REQUIRE_EQUAL( success(),
+                        push_action( "eosio"_n, "setacctram"_n, mvo()
+                           ("account", "eosio")
+                           ("ram_bytes", total_res["ram_bytes"].as_int64() )
+                        )
+   );
+
+   auto eosio_original_balance = get_balance( "eosio"_n );
+
+   BOOST_REQUIRE_EQUAL( success(), sellram( "eosio"_n, total_res["ram_bytes"].as_int64() ) );
+
+   auto tokens_received_by_selling_ram = get_balance( "eosio"_n ) - 
