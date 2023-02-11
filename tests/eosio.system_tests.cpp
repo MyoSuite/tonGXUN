@@ -6045,4 +6045,10 @@ BOOST_FIXTURE_TEST_CASE( buy_pin_sell_ram, eosio_system_tester ) try {
 
    BOOST_REQUIRE_EQUAL( success(), sellram( "eosio"_n, total_res["ram_bytes"].as_int64() ) );
 
-   auto tokens_received_by_selling_ram = get_balance( "eosio"_n ) - 
+   auto tokens_received_by_selling_ram = get_balance( "eosio"_n ) - eosio_original_balance;
+
+   BOOST_REQUIRE( double(tokens_paid_for_ram.get_amount() - tokens_received_by_selling_ram.get_amount()) / tokens_paid_for_ram.get_amount() < 0.01 );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
