@@ -55,4 +55,31 @@ public:
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "currency_stats", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
-   
+   fc::variant get_account( account_name acc, const string& symbolname)
+   {
+      auto symb = eosio::chain::symbol::from_string(symbolname);
+      auto symbol_code = symb.to_symbol_code().value;
+      vector<char> data = get_row_by_account( "eosio.token"_n, acc, "accounts"_n, account_name(symbol_code) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "account", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+   }
+
+   action_result create( account_name issuer,
+                         asset        maximum_supply ) {
+
+      return push_action( "eosio.token"_n, "create"_n, mvo()
+           ( "issuer", issuer)
+           ( "maximum_supply", maximum_supply)
+      );
+   }
+
+   action_result issue( account_name issuer, asset quantity, string memo ) {
+      return push_action( issuer, "issue"_n, mvo()
+           ( "to", issuer)
+           ( "quantity", quantity)
+           ( "memo", memo)
+      );
+   }
+
+   action_result retire( account_name issuer, asset quantity, string memo ) {
+      return push_action( issuer, "retire"_n, mvo()
+           ( "quantity",
