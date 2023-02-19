@@ -82,4 +82,48 @@ public:
 
    action_result retire( account_name issuer, asset quantity, string memo ) {
       return push_action( issuer, "retire"_n, mvo()
-           ( "quantity",
+           ( "quantity", quantity)
+           ( "memo", memo)
+      );
+
+   }
+
+   action_result transfer( account_name from,
+                  account_name to,
+                  asset        quantity,
+                  string       memo ) {
+      return push_action( from, "transfer"_n, mvo()
+           ( "from", from)
+           ( "to", to)
+           ( "quantity", quantity)
+           ( "memo", memo)
+      );
+   }
+
+   action_result open( account_name owner,
+                       const string& symbolname,
+                       account_name ram_payer    ) {
+      return push_action( ram_payer, "open"_n, mvo()
+           ( "owner", owner )
+           ( "symbol", symbolname )
+           ( "ram_payer", ram_payer )
+      );
+   }
+
+   action_result close( account_name owner,
+                        const string& symbolname ) {
+      return push_action( owner, "close"_n, mvo()
+           ( "owner", owner )
+           ( "symbol", "0,CERO" )
+      );
+   }
+
+   abi_serializer abi_ser;
+};
+
+BOOST_AUTO_TEST_SUITE(eosio_token_tests)
+
+BOOST_FIXTURE_TEST_CASE( create_tests, eosio_token_tester ) try {
+
+   auto token = create( "alice"_n, asset::from_string("1000.000 TKN"));
+  
