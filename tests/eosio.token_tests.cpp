@@ -196,4 +196,33 @@ BOOST_FIXTURE_TEST_CASE( create_max_decimals, eosio_token_tester ) try {
    );
    produce_blocks(1);
 
-   asset max(10, symbol
+   asset max(10, symbol(SY(0, NKT)));
+   //1.0000000000000000000 => 0x8ac7230489e80000L
+   share_type amount = 0x8ac7230489e80000L;
+   static_assert(sizeof(share_type) <= sizeof(asset), "asset changed so test is no longer valid");
+   static_assert(std::is_trivially_copyable<asset>::value, "asset is not trivially copyable");
+   memcpy(&max, &amount, sizeof(share_type)); // hack in an invalid amount
+
+   BOOST_CHECK_EXCEPTION( create( "alice"_n, max) , asset_type_exception, [](const asset_type_exception& e) {
+      return expect_assert_message(e, "magnitude of asset amount must be less than 2^62");
+   });
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( issue_tests, eosio_token_tester ) try {
+
+   auto token = create( "alice"_n, asset::from_string("1000.000 TKN"));
+   produce_blocks(1);
+
+   issue( "alice"_n, asset::from_string("500.000 TKN"), "hola" );
+
+   auto stats = get_stats("3,TKN");
+   REQUIRE_MATCHING_OBJECT( stats, mvo()
+      ("supply", "500.000 TKN")
+      ("max_supply", "1000.000 TKN")
+      ("issuer", "alice")
+   );
+
+   auto alice_balance = get_account("alice"_n, "3,TKN");
+   REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
+  
