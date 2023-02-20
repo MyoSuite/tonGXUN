@@ -126,4 +126,43 @@ BOOST_AUTO_TEST_SUITE(eosio_token_tests)
 BOOST_FIXTURE_TEST_CASE( create_tests, eosio_token_tester ) try {
 
    auto token = create( "alice"_n, asset::from_string("1000.000 TKN"));
-  
+   auto stats = get_stats("3,TKN");
+   REQUIRE_MATCHING_OBJECT( stats, mvo()
+      ("supply", "0.000 TKN")
+      ("max_supply", "1000.000 TKN")
+      ("issuer", "alice")
+   );
+   produce_blocks(1);
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( create_negative_max_supply, eosio_token_tester ) try {
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "max-supply must be positive" ),
+      create( "alice"_n, asset::from_string("-1000.000 TKN"))
+   );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( symbol_already_exists, eosio_token_tester ) try {
+
+   auto token = create( "alice"_n, asset::from_string("100 TKN"));
+   auto stats = get_stats("0,TKN");
+   REQUIRE_MATCHING_OBJECT( stats, mvo()
+      ("supply", "0 TKN")
+      ("max_supply", "100 TKN")
+      ("issuer", "alice")
+   );
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "token with symbol already exists" ),
+                        create( "alice"_n, asset::from_string("100 TKN"))
+   );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( create_max_supply, eosio_token_tester ) try {
+
+   auto token = create( "alice"_n, asset::from_string("4611686018427387903 TKN"));
+   auto stats = get_stats("0,TKN");
+   REQUIRE
