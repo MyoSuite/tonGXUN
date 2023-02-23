@@ -225,4 +225,37 @@ BOOST_FIXTURE_TEST_CASE( issue_tests, eosio_token_tester ) try {
 
    auto alice_balance = get_account("alice"_n, "3,TKN");
    REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
-  
+      ("balance", "500.000 TKN")
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "quantity exceeds available supply" ),
+                        issue( "alice"_n, asset::from_string("500.001 TKN"), "hola" )
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "must issue positive quantity" ),
+                        issue( "alice"_n, asset::from_string("-1.000 TKN"), "hola" )
+   );
+
+   BOOST_REQUIRE_EQUAL( success(),
+                        issue( "alice"_n, asset::from_string("1.000 TKN"), "hola" )
+   );
+
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( retire_tests, eosio_token_tester ) try {
+
+   auto token = create( "alice"_n, asset::from_string("1000.000 TKN"));
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EQUAL( success(), issue( "alice"_n, asset::from_string("500.000 TKN"), "hola" ) );
+
+   auto stats = get_stats("3,TKN");
+   REQUIRE_MATCHING_OBJECT( stats, mvo()
+      ("supply", "500.000 TKN")
+      ("max_supply", "1000.000 TKN")
+      ("issuer", "alice")
+   );
+
+   auto alice_balance = get_account("alice"_n, "3,TKN");
+   REQUIRE_MATCHING_OBJECT( ali
