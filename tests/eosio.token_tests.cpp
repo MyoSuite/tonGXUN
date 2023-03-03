@@ -315,4 +315,41 @@ BOOST_FIXTURE_TEST_CASE( transfer_tests, eosio_token_tester ) try {
    );
 
    auto alice_balance = get_account("alice"_n, "0,CERO");
-   REQUIRE_MATCHING_OBJECT
+   REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
+      ("balance", "1000 CERO")
+   );
+
+   transfer( "alice"_n, "bob"_n, asset::from_string("300 CERO"), "hola" );
+
+   alice_balance = get_account("alice"_n, "0,CERO");
+   REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
+      ("balance", "700 CERO")
+      ("frozen", 0)
+      ("whitelist", 1)
+   );
+
+   auto bob_balance = get_account("bob"_n, "0,CERO");
+   REQUIRE_MATCHING_OBJECT( bob_balance, mvo()
+      ("balance", "300 CERO")
+      ("frozen", 0)
+      ("whitelist", 1)
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "overdrawn balance" ),
+      transfer( "alice"_n, "bob"_n, asset::from_string("701 CERO"), "hola" )
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "must transfer positive quantity" ),
+      transfer( "alice"_n, "bob"_n, asset::from_string("-1000 CERO"), "hola" )
+   );
+
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( open_tests, eosio_token_tester ) try {
+
+   auto token = create( "alice"_n, asset::from_string("1000 CERO"));
+
+   auto alice_balance = get_account("alice"_n, "0,CERO");
+   BOOST_REQUIRE_EQUAL(true, alice_balance.is_null() );
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("tokens can only be issued to issuer
