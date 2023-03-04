@@ -379,4 +379,35 @@ BOOST_FIXTURE_TEST_CASE( open_tests, eosio_token_tester ) try {
 
    BOOST_REQUIRE_EQUAL( success(), transfer( "alice"_n, "bob"_n, asset::from_string("200 CERO"), "hola" ) );
 
-   b
+   bob_balance = get_account("bob"_n, "0,CERO");
+   REQUIRE_MATCHING_OBJECT( bob_balance, mvo()
+      ("balance", "200 CERO")
+   );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "symbol does not exist" ),
+                        open( "carol"_n, "0,INVALID", "alice"_n ) );
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "symbol precision mismatch" ),
+                        open( "carol"_n, "1,CERO", "alice"_n ) );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( close_tests, eosio_token_tester ) try {
+
+   auto token = create( "alice"_n, asset::from_string("1000 CERO"));
+
+   auto alice_balance = get_account("alice"_n, "0,CERO");
+   BOOST_REQUIRE_EQUAL(true, alice_balance.is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(), issue( "alice"_n, asset::from_string("1000 CERO"), "hola" ) );
+
+   alice_balance = get_account("alice"_n, "0,CERO");
+   REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
+      ("balance", "1000 CERO")
+   );
+
+   BOOST_REQUIRE_EQUAL( success(), transfer( "alice"_n, "bob"_n, asset::from_string("1000 CERO"), "hola" ) );
+
+   alice_balance = get_account("alice"_n, "0,CERO");
+   REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
+      ("balance", 
