@@ -410,4 +410,13 @@ BOOST_FIXTURE_TEST_CASE( close_tests, eosio_token_tester ) try {
 
    alice_balance = get_account("alice"_n, "0,CERO");
    REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
-      ("balance", 
+      ("balance", "0 CERO")
+   );
+
+   BOOST_REQUIRE_EQUAL( success(), close( "alice"_n, "0,CERO" ) );
+   alice_balance = get_account("alice"_n, "0,CERO");
+   BOOST_REQUIRE_EQUAL(true, alice_balance.is_null() );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
