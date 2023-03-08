@@ -26,4 +26,46 @@
             ]
         },
         {
-            "name
+            "name": "approval",
+            "base": "",
+            "fields": [
+                {
+                    "name": "level",
+                    "type": "permission_level"
+                },
+                {
+                    "name": "time",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "approvals_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "requested_approvals",
+                    "type": "approval[]"
+                },
+                {
+                    "name": "provided_approvals",
+                    "type": "approval[]"
+                }
+            ]
+        },
+        {
+            "name": "approve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "name"
+     
