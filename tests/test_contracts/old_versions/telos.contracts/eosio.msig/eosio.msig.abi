@@ -68,4 +68,46 @@
                 {
                     "name": "proposer",
                     "type": "name"
-     
+                },
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "level",
+                    "type": "permission_level"
+                },
+                {
+                    "name": "proposal_hash",
+                    "type": "checksum256$"
+                }
+            ]
+        },
+        {
+            "name": "cancel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "canceler",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "exec",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+  
