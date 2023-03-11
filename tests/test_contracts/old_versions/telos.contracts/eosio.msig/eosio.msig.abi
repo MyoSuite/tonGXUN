@@ -110,4 +110,51 @@
                     "type": "name"
                 },
                 {
-  
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "executer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "extension",
+            "base": "",
+            "fields": [
+                {
+                    "name": "type",
+                    "type": "uint16"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "invalidate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "invalidation",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "last_invalidation_time",
+                    "type": "time_point"
+                }
+            ]
+        },
+     
