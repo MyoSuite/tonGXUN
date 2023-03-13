@@ -157,4 +157,45 @@
                 }
             ]
         },
-     
+        {
+            "name": "old_approvals_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "requested_approvals",
+                    "type": "permission_level[]"
+                },
+                {
+                    "name": "provided_approvals",
+                    "type": "permission_level[]"
+                }
+            ]
+        },
+        {
+            "name": "permission_level",
+            "base": "",
+            "fields": [
+                {
+                    "name": "actor",
+                    "type": "name"
+                },
+                {
+                    "name": "permission",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "proposal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "packed_t
