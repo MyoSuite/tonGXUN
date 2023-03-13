@@ -198,4 +198,45 @@
                     "type": "name"
                 },
                 {
-                    "name": "packed_t
+                    "name": "packed_transaction",
+                    "type": "bytes"
+                },
+                {
+                    "name": "earliest_exec_time",
+                    "type": "time_point?$"
+                }
+            ]
+        },
+        {
+            "name": "propose",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "requested",
+                    "type": "permission_level[]"
+                },
+                {
+                    "name": "trx",
+                    "type": "transaction"
+                }
+            ]
+        },
+        {
+            "name": "transaction",
+            "base": "transaction_header",
+            "fields": [
+                {
+                    "name": "context_free_actions",
+                    "type": "action[]"
+                },
+                {
+                    "name": "actions",
+ 
