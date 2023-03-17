@@ -280,4 +280,29 @@
         {
             "name": "unapprove",
             "base": "",
-            "fi
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "level",
+                    "type": "permission_level"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "approve",
+            "type": "approve",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Approve Proposed Transaction\nsummary: '{{nowrap level.actor}} approves the {{nowrap proposal_name}} proposal'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/multisig.png#4fb41d3cf02d0dd2d35a29308e93c2d826ec770d6bb520db668f530764be7153\n---\n\n{{level.actor}} approves the {{proposal_name}} proposal proposed by {{proposer}} with the {{level.permission}} permission of {{level.actor}}."
+        },
+        {
+            "name": "cancel",
+            "type": "cancel",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Cancel Proposed Transaction\nsummary: '{{nowra
