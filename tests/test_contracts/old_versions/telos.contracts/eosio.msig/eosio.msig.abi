@@ -305,4 +305,14 @@
         {
             "name": "cancel",
             "type": "cancel",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Cancel Proposed Transaction\nsummary: '{{nowra
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Cancel Proposed Transaction\nsummary: '{{nowrap canceler}} cancels the {{nowrap proposal_name}} proposal'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/multisig.png#4fb41d3cf02d0dd2d35a29308e93c2d826ec770d6bb520db668f530764be7153\n---\n\n{{canceler}} cancels the {{proposal_name}} proposal submitted by {{proposer}}."
+        },
+        {
+            "name": "exec",
+            "type": "exec",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Execute Proposed Transaction\nsummary: '{{nowrap executer}} executes the {{nowrap proposal_name}} proposal'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/multisig.png#4fb41d3cf02d0dd2d35a29308e93c2d826ec770d6bb520db668f530764be7153\n---\n\n{{executer}} executes the {{proposal_name}} proposal submitted by {{proposer}} if the minimum required approvals for the proposal have been secured."
+        },
+        {
+            "name": "invalidate",
+            "type": "invalidate",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Invalidate All Approvals\nsummary: '{{nowrap account}} invalidates approvals on outstanding proposals'\nicon: ht
