@@ -315,4 +315,14 @@
         {
             "name": "invalidate",
             "type": "invalidate",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Invalidate All Approvals\nsummary: '{{nowrap account}} invalidates approvals on outstanding proposals'\nicon: ht
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Invalidate All Approvals\nsummary: '{{nowrap account}} invalidates approvals on outstanding proposals'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/multisig.png#4fb41d3cf02d0dd2d35a29308e93c2d826ec770d6bb520db668f530764be7153\n---\n\n{{account}} invalidates all approvals on proposals which have not yet executed."
+        },
+        {
+            "name": "propose",
+            "type": "propose",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Propose Transaction\nsummary: '{{nowrap proposer}} creates the {{nowrap proposal_name}}'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/multisig.png#4fb41d3cf02d0dd2d35a29308e93c2d826ec770d6bb520db668f530764be7153\n---\n\n{{proposer}} creates the {{proposal_name}} proposal for the following transaction:\n{{to_json trx}}\n\nThe proposal requests approvals from the following accounts at the specified permission levels:\n{{#each requested}}\n   + {{this.permission}} permission of {{this.actor}}\n{{/each}}\n\nIf the proposed transaction is not executed prior to {{trx.expiration}}, the proposal will automatically expire."
+        },
+        {
+            "name": "unapprove",
+            "type": "unapprove",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Unapprove Proposed Transaction\nsummary: '{{
