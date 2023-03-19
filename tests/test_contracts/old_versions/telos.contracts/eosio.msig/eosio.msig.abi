@@ -325,4 +325,34 @@
         {
             "name": "unapprove",
             "type": "unapprove",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Unapprove Proposed Transaction\nsummary: '{{
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Unapprove Proposed Transaction\nsummary: '{{nowrap level.actor}} revokes the approval previously provided to {{nowrap proposal_name}} proposal'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/multisig.png#4fb41d3cf02d0dd2d35a29308e93c2d826ec770d6bb520db668f530764be7153\n---\n\n{{level.actor}} revokes the approval previously provided at their {{level.permission}} permission level from the {{proposal_name}} proposal proposed by {{proposer}}."
+        }
+    ],
+    "tables": [
+        {
+            "name": "approvals",
+            "type": "old_approvals_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "approvals2",
+            "type": "approvals_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "invals",
+            "type": "invalidation",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "proposal",
+            "type": "proposal",
+            "index_type": "i64",
+            "key_names": [],
+   
