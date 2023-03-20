@@ -355,4 +355,9 @@
             "type": "proposal",
             "index_type": "i64",
             "key_names": [],
-   
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": []
+}
