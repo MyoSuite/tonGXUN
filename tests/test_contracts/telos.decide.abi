@@ -1,0 +1,1003 @@
+
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.1",
+    "types": [],
+    "structs": [
+        {
+            "name": "account",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "addfunds",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "addoption",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "new_option_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "addseat",
+            "base": "",
+            "fields": [
+                {
+                    "name": "committee_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "new_seat_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "archival",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "archived_until",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "archive",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "archived_until",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "assignseat",
+            "base": "",
+            "fields": [
+                {
+                    "name": "committee_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "seat_name",
+                    "type": "name"
+                },
+                {
+                    "name": "seat_holder",
+                    "type": "name"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "ballot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "category",
+                    "type": "name"
+                },
+                {
+                    "name": "publisher",
+                    "type": "name"
+                },
+                {
+                    "name": "status",
+                    "type": "name"
+                },
+                {
+                    "name": "title",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "content",
+                    "type": "string"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "voting_method",
+                    "type": "name"
+                },
+                {
+                    "name": "min_options",
+                    "type": "uint8"
+                },
+                {
+                    "name": "max_options",
+                    "type": "uint8"
+                },
+                {
+                    "name": "options",
+                    "type": "pair_name_asset[]"
+                },
+                {
+                    "name": "total_voters",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total_delegates",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total_raw_weight",
+                    "type": "asset"
+                },
+                {
+                    "name": "cleaned_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "settings",
+                    "type": "pair_name_bool[]"
+                },
+                {
+                    "name": "begin_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "end_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "broadcast",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "final_results",
+                    "type": "pair_name_asset[]"
+                },
+                {
+                    "name": "total_voters",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "burn",
+            "base": "",
+            "fields": [
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "cancelballot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "castvote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "options",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "claimpayment",
+            "base": "",
+            "fields": [
+                {
+                    "name": "worker_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "cleanupvote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "worker",
+                    "type": "name?"
+                }
+            ]
+        },
+        {
+            "name": "closevoting",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "broadcast",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "committee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "committee_title",
+                    "type": "string"
+                },
+                {
+                    "name": "committee_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "seats",
+                    "type": "pair_name_name[]"
+                },
+                {
+                    "name": "updater_acct",
+                    "type": "name"
+                },
+                {
+                    "name": "updater_auth",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "app_name",
+                    "type": "string"
+                },
+                {
+                    "name": "app_version",
+                    "type": "string"
+                },
+                {
+                    "name": "total_deposits",
+                    "type": "asset"
+                },
+                {
+                    "name": "fees",
+                    "type": "pair_name_asset[]"
+                },
+                {
+                    "name": "times",
+                    "type": "pair_name_uint32[]"
+                }
+            ]
+        },
+        {
+            "name": "delcommittee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "committee_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "delegate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "delegate_name",
+                    "type": "name"
+                },
+                {
+                    "name": "total_delegated",
+                    "type": "asset"
+                },
+                {
+                    "name": "constituents",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "deleteballot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "editdetails",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "title",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "content",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "editminmax",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "new_min_options",
+                    "type": "uint8"
+                },
+                {
+                    "name": "new_max_options",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "editpayrate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "period_length",
+                    "type": "uint32"
+                },
+                {
+                    "name": "per_period",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "edittrsinfo",
+            "base": "",
+            "fields": [
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "title",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "icon",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "featured_ballot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "featured_until",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "forfeitwork",
+            "base": "",
+            "fields": [
+                {
+                    "name": "worker_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "init",
+            "base": "",
+            "fields": [
+                {
+                    "name": "app_version",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "labor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "worker_name",
+                    "type": "name"
+                },
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "unclaimed_volume",
+                    "type": "pair_name_asset[]"
+                },
+                {
+                    "name": "unclaimed_events",
+                    "type": "pair_name_uint32[]"
+                }
+            ]
+        },
+        {
+            "name": "labor_bucket",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payroll_name",
+                    "type": "name"
+                },
+                {
+                    "name": "claimable_volume",
+                    "type": "pair_name_asset[]"
+                },
+                {
+                    "name": "claimable_events",
+                    "type": "pair_name_uint32[]"
+                }
+            ]
+        },
+        {
+            "name": "lock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "mint",
+            "base": "",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "mutatemax",
+            "base": "",
+            "fields": [
+                {
+                    "name": "new_max_supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "newballot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "category",
+                    "type": "name"
+                },
+                {
+                    "name": "publisher",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "voting_method",
+                    "type": "name"
+                },
+                {
+                    "name": "initial_options",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "newtreasury",
+            "base": "",
+            "fields": [
+                {
+                    "name": "manager",
+                    "type": "name"
+                },
+                {
+                    "name": "max_supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "access",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "openvoting",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "end_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "pair_name_asset",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "name"
+                },
+                {
+                    "name": "value",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "pair_name_bool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "name"
+                },
+                {
+                    "name": "value",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "pair_name_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "name"
+                },
+                {
+                    "name": "value",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "pair_name_uint32",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "name"
+                },
+                {
+                    "name": "value",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "payroll",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payroll_name",
+                    "type": "name"
+                },
+                {
+                    "name": "payroll_funds",
+                    "type": "asset"
+                },
+                {
+                    "name": "period_length",
+                    "type": "uint32"
+                },
+                {
+                    "name": "per_period",
+                    "type": "asset"
+                },
+                {
+                    "name": "last_claim_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "claimable_pay",
+                    "type": "asset"
+                },
+                {
+                    "name": "payee",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "postresults",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "light_results",
+                    "type": "pair_name_asset[]"
+                },
+                {
+                    "name": "total_voters",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "rebalance",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "worker",
+                    "type": "name?"
+                }
+            ]
+        },
+        {
+            "name": "reclaim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "refresh",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "regcommittee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "committee_name",
+                    "type": "name"
+                },
+                {
+                    "name": "committee_title",
+                    "type": "string"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "initial_seats",
+                    "type": "name[]"
+                },
+                {
+                    "name": "registree",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "regvoter",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "referrer",
+                    "type": "name?"
+                }
+            ]
+        },
+        {
+            "name": "removeseat",
+            "base": "",
+            "fields": [
+                {
+                    "name": "committee_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "seat_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "rmvoption",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "option_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "setunlocker",
+            "base": "",
+            "fields": [
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "new_unlock_acct",
+                    "type": "name"
+                },
+                {
+                    "name": "new_unlock_auth",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "setupdater",
+            "base": "",
+            "fields": [
+                {
+                    "name": "committee_name",
+                    "type": "name"
+                },
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "updater_account",
+                    "type": "name"
+                },
+                {
+                    "name": "updater_auth",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "setversion",
+            "base": "",
+            "fields": [
+                {
+                    "name": "new_app_version",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "stake",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "toggle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "treasury_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "setting_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "togglebal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ballot_name",
+                    "type": "name"
+                },
+                {
+                    "name": "setting_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
